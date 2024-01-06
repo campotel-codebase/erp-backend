@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model PasswordReset {
+  id        Int      @id @default(autoincrement())
+  email     String   @db.VarChar(100)
+  uuid      String   @unique @db.VarChar(255)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Company {
+  id                Int                 @id @default(autoincrement())
+  uuid              String              @unique
+  isActive          Int                 @default(1) @db.TinyInt
+  name              String              @db.VarChar(255)
+  jobTitles         String?             @db.VarChar(255)
+  departments       String?             @db.VarChar(255)
+  talentSegments    String?             @db.VarChar(255)
+  employmentTypes   String?             @db.VarChar(255)
+  benefits          String?             @db.VarChar(255)
+  User              User[]
+  Employee          Employee[]
+  BankAccount       BankAccount[]
+  EmploymentHistory EmploymentHistory[]
+  createdAt         DateTime            @default(now())
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  companyId Int
+  uuid      String   @unique
+  isActive  Int      @default(1) @db.TinyInt
+  role      String?
+  avatar    String?
+  lastName  String   @db.VarChar(30)
+  firstName String   @db.VarChar(30)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  Company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Employee {
+  id                   Int                 @id @default(autoincrement())
+  companyId            Int
+  reportingToId        Int?
+  uuid                 String              @unique
+  lastName             String              @db.VarChar(30)
+  firstName            String              @db.VarChar(30)
+  nickname             String?             @db.VarChar(30)
+  suffix               String              @db.VarChar(10)
+  phoneNumber          String              @unique @db.VarChar(30)
+  email                String              @unique @db.VarChar(100)
+  birthday             DateTime
+  fullName             String?             @db.VarChar(100)
+  middleName           String?             @db.VarChar(30)
+  isPortalOpen         Int                 @default(0) @db.TinyInt
+  password             String?             @db.VarChar(255)
+  avatar               String?
+  bloodType            String?             @db.VarChar(20)
+  driverLicense        String?             @db.VarChar(100)
+  taxId                String?             @db.VarChar(100)
+  hiredDate            DateTime?
+  lastHiredDate        DateTime?
+  isRehired            Int                 @default(0) @db.TinyInt
+  isActive             Int                 @default(0) @db.TinyInt
+  payType              String?             @db.VarChar(10)
+  employmentStatus     String?             @db.VarChar(255)
+  employeecompanyId    String?
+  tenure               String?
+  salary               Decimal             @default(0) @db.Decimal(10, 2)
+  BankAccount          BankAccount[]
+  EmploymentHistory    EmploymentHistory[]
+  LeaveRequest         LeaveRequest[]
+  ReportingTo          Employee?           @relation("reportingTo", fields: [reportingToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  EmployeesReportingTo Employee[]          @relation("reportingTo")
+  Company              Company             @relation(fields: [companyId], references: [id])
+  createdAt            DateTime            @default(now())
+
+  @@index([fullName])
+}
+
+model BankAccount {
+  id            Int       @id @default(autoincrement())
+  companyId     Int
+  employeeId    Int?
+  bankName      String    @db.VarChar(255)
+  accountNumber String    @db.VarChar(255)
+  cardNumber    String    @db.VarChar(255)
+  accountType   String    @db.VarChar(255)
+  isActive      Int       @default(0) @db.TinyInt
+  Company       Company   @relation(fields: [companyId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  Employee      Employee? @relation(fields: [employeeId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model EmploymentHistory {
+  id          Int      @id @default(autoincrement())
+  companyId   Int
+  employeeId  Int
+  onBoarding  DateTime
+  offBoarding DateTime
+  reason      String   @db.VarChar(255)
+  remarks     String?  @db.VarChar(255)
+  Company     Company  @relation(fields: [companyId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  Employee    Employee @relation(fields: [employeeId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model LeaveRequest {
+  id                  Int      @id @default(autoincrement())
+  employeeId          Int
+  uuid                String   @unique
+  from                DateTime
+  to                  DateTime
+  numberOfWorkingDays Int
+  resume              DateTime
+  reasons             String?
+  absenceType         String   @db.VarChar(20)
+  isPaid              Int
+  isHrNoted           Int      @default(0) @db.TinyInt
+  Employee            Employee @relation(fields: [employeeId], references: [id])
+  createdAt           DateTime @default(now())
+}
