@@ -3,7 +3,16 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node src/index.ts"
+    "start": "nodemon --exec ts-node src/index.ts",
+    "studio": "npx prisma studio",
+    "ft:prettier ": "npx prettier --write src/ prisma/seed.ts",
+    "ft:prisma": "npx prisma format",
+    "g:client": "npx prisma generate",
+    "mg:dev": "npx prisma migrate dev",
+    "mg:reset": "npx prisma migrate reset",
+    "mg:create": "npx prisma migrate dev --create-only",
+    "db:seed": "npx prisma db seed",
+    "build": "tsc --sourceMap false"
   },
   "dependencies": {
     "@prisma/client": "5.7.1",
@@ -12,6 +21,8 @@
   "devDependencies": {
     "@types/express": "4.17.21",
     "@types/node": "20.10.6",
+    "nodemon": "^3.0.2",
+    "prettier": "3.1.1",
     "prisma": "5.7.1",
     "ts-node": "10.9.2",
     "typescript": "5.3.3"
