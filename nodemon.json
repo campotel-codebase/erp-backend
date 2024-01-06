@@ -1,0 +1,17 @@
+{
+  "verbose": true,
+  "ext": "ts,json",
+  "ignore": [
+    "*.log",
+    "*.txt",
+    "*.yml",
+    ".git",
+    ".gitignore",
+    "Dockerfile"
+  ],
+  "legacyWatch": false,
+  "delay": "1",
+  "execMap": {
+    "ts": "node --loader ts-node/esm --extensions .ts"
+  }
+}

@@ -3,7 +3,15 @@
     "sourceMap": true,
     "outDir": "dist",
     "strict": true,
-    "lib": ["esnext"],
+    "removeComments": true,
+    "lib": [
+      "esnext"
+    ],
     "esModuleInterop": true
-  }
+  },
+  "include": [
+    "libs/prisma.ts",
+    "src/**/*",
+    "types/**/*" 
+  ],
 }
