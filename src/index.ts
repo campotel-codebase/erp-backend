@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import prisma from "../libs/prisma";
-import publicRoutes from "./routes/public-routes";
+import publicRoute from "./routes/public.route";
 
 const port = process.env.EXPRESS_PORT;
 const app = express();
@@ -11,7 +11,7 @@ app.use(cors());
 app.get("/", (req, res) => {
 	res.json({data: "welcome"});
 });
-app.use("/public/api", publicRoutes);
+app.use("/public/api", publicRoute);
 
 const listeningTo = () => {
 	console.log("🚀 Server ready at: http://localhost:" + port);
