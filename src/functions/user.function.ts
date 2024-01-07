@@ -1,7 +1,7 @@
 import prisma from "../../libs/prisma";
 import {signInType, signUpType} from "../../types/user";
 import {generateJwt} from "../utils/jwt.util";
-import {hashPassword, verifyHashedPassword} from "../utils/password.util";
+import {hashPassword, sendResetLinkForPwd, verifyHashedPassword} from "../utils/password.util";
 import {generateUuid} from "../utils/uuid.util";
 
 export const signUp = async (body: signUpType) => {
@@ -66,6 +66,19 @@ export const signIn = async (body: signInType) => {
 		}
 	} else {
 		return {status: 404, data: "account not found"};
+	}
+};
+
+export const userPwdResetLink = async (email: string) => {
+	const isExists = await prisma.user.findUnique({
+		where: {email},
+		select: {uuid: true},
+	});
+	if (isExists) {
+		await sendResetLinkForPwd(email, "user");
+		return {status: 200, data: "password reset link was sent to your email address"};
+	} else {
+		return {status: 404, data: "email not found"};
 	}
 };
 

@@ -18,7 +18,7 @@ const productionConfig = {
 
 const developmentConfig = {
 	host: env.host,
-	port: parseInt(env.port),
+	port: env.port ? parseInt(env.port) : 1025,
 };
 
 export const transporter = nodemailer.createTransport(developmentConfig);
