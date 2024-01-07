@@ -1,7 +1,7 @@
 import prisma from "../../libs/prisma";
-import {signUpType} from "../../types/user";
+import {signInType, signUpType} from "../../types/user";
 import {generateJwt} from "../utils/jwt";
-import {hashPassword} from "../utils/password";
+import {hashPassword, verifyHashedPassword} from "../utils/password";
 import {generateUuid} from "../utils/uuid";
 
 export const signUp = async (body: signUpType) => {
@@ -34,5 +34,37 @@ export const signUp = async (body: signUpType) => {
 		} else {
 			return {status: 400, data: "fail to generate token"};
 		}
+	}
+};
+
+export const signIn = async (body: signInType) => {
+	const userAccount = await prisma.user.findUnique({
+		where: {email: body.email},
+		select: {uuid: true, password: true},
+	});
+	if (userAccount) {
+		const isPasswordMatch = await verifyHashedPassword(userAccount.password, body.password);
+		if (isPasswordMatch) {
+			const user = await prisma.user.findUnique({
+				where: {
+					uuid: userAccount.uuid,
+				},
+				include: {Company: {select: {uuid: true}}},
+			});
+			if (user) {
+				const jwt = generateJwt({companyUuid: user.Company.uuid, userUuid: user.uuid});
+				if (jwt) {
+					return {status: 200, data: jwt};
+				} else {
+					return {status: 400, data: "fail to generate token"};
+				}
+			} else {
+				return {status: 400, data: "fail to query user"};
+			}
+		} else {
+			return {status: 401, data: "incorrect password"};
+		}
+	} else {
+		return {status: 404, data: "account not found"};
 	}
 };
