@@ -12,4 +12,12 @@ user.get("/profile", async (req, res) => {
 	}
 });
 
+user.put("/update-avatar", async (req, res) => {
+	try {
+		res.json("avatar");
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
 export default user;
