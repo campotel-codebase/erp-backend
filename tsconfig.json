@@ -11,6 +11,7 @@
   },
   "include": [
     "libs/prisma.ts",
+    "configs/**/*" ,
     "src/**/*",
     "types/**/*" 
   ],
