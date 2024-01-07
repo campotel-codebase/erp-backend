@@ -8,7 +8,7 @@ user.get("/profile", async (req, res) => {
 		const result = await profile(currentUser.userUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
-		res.status(500).json(error);
+		res.status(500).json({error: error.message});
 	}
 });
 

@@ -17,7 +17,7 @@ config.patch("/departments", async (req, res) => {
 		const result = await setDepartments(prepData, currentUser.companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
-		res.status(500).json(error.message);
+		res.status(500).json({error: error.message});
 	}
 });
 config.patch("/job-titles", async (req, res) => {
@@ -30,7 +30,7 @@ config.patch("/job-titles", async (req, res) => {
 		const result = await setJobTitles(prepData, currentUser.companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
-		res.status(500).json(error.message);
+		res.status(500).json({error: error.message});
 	}
 });
 config.patch("/talent-segments", async (req, res) => {
@@ -43,7 +43,7 @@ config.patch("/talent-segments", async (req, res) => {
 		const result = await setTalentSegments(prepData, currentUser.companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
-		res.status(500).json(error.message);
+		res.status(500).json({error: error.message});
 	}
 });
 config.patch("/benefits", async (req, res) => {
@@ -56,7 +56,7 @@ config.patch("/benefits", async (req, res) => {
 		const result = await setBenefits(prepData, currentUser.companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
-		res.status(500).json(error.message);
+		res.status(500).json({error: error.message});
 	}
 });
 

@@ -7,7 +7,7 @@ publicRoute.post("/user/sign-up", async (req, res) => {
 		const result = await signUp(req.body);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
-		res.status(500).json(error);
+		res.status(500).json({error: error.message});
 	}
 });
 publicRoute.post("/user/sign-in", async (req, res) => {
@@ -15,7 +15,19 @@ publicRoute.post("/user/sign-in", async (req, res) => {
 		const result = await signIn(req.body);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
-		res.status(500).json(error);
+		res.status(500).json({error: error.message});
+	}
+});
+publicRoute.post("/user/forgot-password", async (req, res) => {
+	try {
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+publicRoute.post("/user/reset-password", async (req, res) => {
+	try {
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
 	}
 });
 
