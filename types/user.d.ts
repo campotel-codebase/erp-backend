@@ -6,3 +6,7 @@ export type signUpType = {
 	email: string;
 	password: string;
 };
+export type signInType = {
+	email: string;
+	password: string;
+};

@@ -15,7 +15,6 @@ export const verifyResetUuidForPwd = async (uuid: string) => {
 			uuid,
 		},
 	});
-
 	if (reset) {
 		const currentTimestamp = new Date();
 
