@@ -68,3 +68,15 @@ export const signIn = async (body: signInType) => {
 		return {status: 404, data: "account not found"};
 	}
 };
+
+export const profile = async (uuid: string) => {
+	const profile = await prisma.user.findUnique({
+		where: {uuid},
+	});
+	if (profile) {
+		const {id, password, ...rest} = profile;
+		return {status: 200, data: rest};
+	} else {
+		return {status: 404, data: "user not found"};
+	}
+};
