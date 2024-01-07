@@ -4,6 +4,7 @@ declare global {
 			DATABASE_URL: string;
 			EXPRESS_PORT: string;
 			AUTH_KEY: string;
+			AUTH_EXPIRATION: string;
 		}
 	}
 }

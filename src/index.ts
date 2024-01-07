@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import prisma from "../libs/prisma";
+import user from "./routes/user";
 
 const port = process.env.EXPRESS_PORT;
 const app = express();
@@ -10,6 +11,7 @@ app.use(cors());
 app.get("/", (req, res) => {
 	res.json({data: "welcome"});
 });
+app.use("/api/user", user);
 
 const listeningTo = () => {
 	console.log("🚀 Server ready at: http://localhost:" + port);
