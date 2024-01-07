@@ -1,5 +1,5 @@
 import express from "express";
-import {signIn, signUp} from "../functions/user";
+import {signIn, signUp} from "../functions/user.function";
 const publicRoute = express.Router();
 
 publicRoute.post("/user/sign-up", async (req, res) => {

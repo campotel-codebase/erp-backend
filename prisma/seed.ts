@@ -1,6 +1,6 @@
 import prisma from "../libs/prisma";
 import {faker} from "@faker-js/faker";
-import {hashPassword} from "../src/utils/password";
+import {hashPassword} from "../src/utils/password.util";
 
 const seed = async () => {
 	const hashedPassword = await hashPassword("secret");

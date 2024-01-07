@@ -1,8 +1,8 @@
 import prisma from "../../libs/prisma";
 import {signInType, signUpType} from "../../types/user";
-import {generateJwt} from "../utils/jwt";
-import {hashPassword, verifyHashedPassword} from "../utils/password";
-import {generateUuid} from "../utils/uuid";
+import {generateJwt} from "../utils/jwt.util";
+import {hashPassword, verifyHashedPassword} from "../utils/password.util";
+import {generateUuid} from "../utils/uuid.util";
 
 export const signUp = async (body: signUpType) => {
 	const isEmailExists = await prisma.user.findUnique({

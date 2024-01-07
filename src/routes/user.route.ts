@@ -1,5 +1,5 @@
 import express from "express";
-import {profile} from "../functions/user";
+import {profile} from "../functions/user.function";
 const user = express.Router();
 
 user.get("/profile", async (req, res) => {
