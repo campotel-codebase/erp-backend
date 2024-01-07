@@ -28,7 +28,7 @@ export const signUp = async (body: signUpType) => {
 			},
 			include: {User: true},
 		});
-		const jwt = await generateJwt({companyUuid: newUser.uuid, userUuid: newUser.User[0].uuid});
+		const jwt = generateJwt({companyUuid: newUser.uuid, userUuid: newUser.User[0].uuid});
 		if (jwt) {
 			return {status: 200, data: jwt};
 		} else {
