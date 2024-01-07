@@ -1,7 +1,12 @@
 import prisma from "../../libs/prisma";
 import {signInType, signUpType} from "../../types/user";
 import {generateJwt} from "../utils/jwt.util";
-import {hashPassword, sendResetLinkForPwd, verifyHashedPassword} from "../utils/password.util";
+import {
+	hashPassword,
+	sendResetLinkForPwd,
+	verifyHashedPassword,
+	verifyResetUuidForPwd,
+} from "../utils/password.util";
 import {generateUuid} from "../utils/uuid.util";
 
 export const signUp = async (body: signUpType) => {
@@ -79,6 +84,26 @@ export const userPwdResetLink = async (email: string) => {
 		return {status: 200, data: "password reset link was sent to your email address"};
 	} else {
 		return {status: 404, data: "email not found"};
+	}
+};
+
+export const userResetPwd = async (body: {uuid: string; newPassword: string}) => {
+	const {uuid, newPassword} = body;
+	const isVerify = await verifyResetUuidForPwd(uuid);
+	if (isVerify.result === true) {
+		const hashedPassword = await hashPassword(newPassword);
+		await prisma.user.update({
+			where: {email: isVerify.email},
+			data: {password: hashedPassword},
+			select: {uuid: true},
+		});
+		await prisma.passwordReset.delete({
+			where: {uuid},
+			select: {uuid: true},
+		});
+		return {status: 200, data: "password reset successfully"};
+	} else {
+		return {status: 400, data: "fail to reset password"};
 	}
 };
 
