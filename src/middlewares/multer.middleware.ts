@@ -6,7 +6,7 @@ const MIME_TYPE_MAP: {[key: string]: string} = {
 	"image/jpeg": "jpg",
 	"image/jpg": "jpg",
 };
-
+const csvStorage = multer.memoryStorage();
 const imageStorage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		cb(null, "public/avatar/");
@@ -19,6 +19,7 @@ const imageStorage = multer.diskStorage({
 	},
 });
 
+export const uploadCsv = multer({storage: csvStorage});
 export const uploadImage = multer({
 	storage: imageStorage,
 	fileFilter: (req, file, cb) => {
