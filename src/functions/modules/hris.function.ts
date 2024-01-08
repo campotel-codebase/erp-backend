@@ -85,8 +85,8 @@ export const createEmployee = async (body: any, companyUuid: string) => {
 	}
 };
 
-export const onboardEmployee = async (body: onBoardType) => {
-	const {employeeUuid, reportingToId, hiredDate, ...rest} = body;
+export const onboardEmployee = async (body: onBoardType, employeeUuid: string) => {
+	const {reportingToId, hiredDate, ...rest} = body;
 	const newBoardedEmployee = await prisma.employee.update({
 		where: {uuid: employeeUuid, isActive: 0},
 		data: {
