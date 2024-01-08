@@ -1,10 +1,28 @@
 import {parse} from "csv-parse";
+import prisma from "../../../libs/prisma";
 
-export const employeesCsvToJsonArray = async (params: {
-	expectedHeader: string[];
-	csvBuffer: string;
-}) => {
-	const {expectedHeader, csvBuffer} = params;
+export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
+	const company = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {benefits: true},
+	});
+	
+	const benefitsToArray: string[] = JSON.parse(company?.benefits ? company.benefits : "[]");
+	const expectedHeader = [
+		"lastName",
+		"firstName",
+		"middleName",
+		"suffix",
+		"phoneNumber",
+		"nickname",
+		"email",
+		"birthday",
+		"bloodType",
+		"driverLicense",
+		"taxId",
+		...benefitsToArray,
+	];
+	
 	const parseCsv = await new Promise((resolve, reject) => {
 		parse(
 			csvBuffer,
