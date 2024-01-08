@@ -91,6 +91,7 @@ model BankAccount {
   id            Int       @id @default(autoincrement())
   companyId     Int
   employeeId    Int?
+  uuid          String    @unique
   bankName      String    @db.VarChar(255)
   accountNumber String    @db.VarChar(255)
   cardNumber    String    @db.VarChar(255)

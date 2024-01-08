@@ -3,6 +3,7 @@ import prisma from "../../../libs/prisma";
 import {generateUuid} from "../../utils/uuid.util";
 import {formatISO} from "date-fns";
 import {onBoardType} from "../../../types/modules/hris/employess";
+import {bankAccountType} from "../../../types/modules/hris/payrol";
 
 export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
 	const company = await prisma.company.findUnique({
@@ -99,4 +100,25 @@ export const onboardEmployee = async (body: onBoardType) => {
 		},
 	});
 	return {status: 200, data: newBoardedEmployee};
+};
+
+export const createBankAccount = async (body: bankAccountType, companyUuid: string) => {
+	const company = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {id: true},
+	});
+	if (company) {
+		const newBankAccount = await prisma.bankAccount.create({
+			data: {
+				...body,
+				uuid: await generateUuid(),
+				Company: {
+					connect: {id: company.id},
+				},
+			},
+		});
+		return {status: 200, data: newBankAccount};
+	} else {
+		return {status: 404, data: "company not found"};
+	}
 };

@@ -55,6 +55,7 @@ const seed = async () => {
 	const newBankAccount = await prisma.bankAccount.create({
 		data: {
 			bankName: "metro bank",
+			uuid: faker.string.uuid(),
 			accountNumber: faker.finance.accountNumber(),
 			cardNumber: faker.finance.creditCardNumber(),
 			accountType: "debit",
