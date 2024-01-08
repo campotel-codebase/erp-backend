@@ -2,7 +2,7 @@ import {parse} from "csv-parse";
 import prisma from "../../../libs/prisma";
 import {generateUuid} from "../../utils/uuid.util";
 import {formatISO} from "date-fns";
-import {onBoardType} from "../../../types/modules/hris/employess";
+import {offBoardType, onBoardType} from "../../../types/modules/hris/employess";
 import {bankAccountType} from "../../../types/modules/hris/payroll";
 
 export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
@@ -104,7 +104,7 @@ export const onboardEmployee = async (body: onBoardType, employeeUuid: string) =
 };
 
 export const offboardEmployee = async (
-	body: {offBoarding: string; reason: string; remarks: string},
+	body: offBoardType,
 	employeeUuid: string,
 	companyUuid: string,
 ) => {
