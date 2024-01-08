@@ -118,3 +118,12 @@ export const profile = async (uuid: string) => {
 		return {status: 404, data: "user not found"};
 	}
 };
+
+export const updateAvatar = async (imgSrc: string, currentUserUuid: string) => {
+	const newAvatar = await prisma.user.update({
+		where: {uuid: currentUserUuid},
+		data: {avatar: imgSrc},
+		select: {avatar: true},
+	});
+	return {status: 200, data: "avatar updated successfully"};
+};

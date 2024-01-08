@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import cors from "cors";
 import prisma from "../libs/prisma";
 import {authorization} from "./middlewares/auth.middleware";
@@ -14,6 +15,7 @@ app.use(cors());
 app.get("/", (req, res) => {
 	res.json({data: "welcome"});
 });
+app.use("/public/avatar", express.static(path.join("public/avatar/")));
 app.use("/public/api", publicRoute);
 app.use("/api/user", authorization, user);
 app.use("/api/config", authorization, config);
