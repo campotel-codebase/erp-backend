@@ -6,6 +6,7 @@ import {authorization} from "./middlewares/auth.middleware";
 import publicRoute from "./routes/public.route";
 import user from "./routes/user.route";
 import config from "./routes/config.route";
+import hris from "./routes/modules/hris.route";
 
 const port = process.env.EXPRESS_PORT;
 const app = express();
@@ -19,6 +20,7 @@ app.use("/public/avatar", express.static(path.join("public/avatar/")));
 app.use("/public/api", publicRoute);
 app.use("/api/user", authorization, user);
 app.use("/api/config", authorization, config);
+app.use("/api/module/hris", authorization, hris);
 
 const listeningTo = () => {
 	console.log("🚀 Server ready at: http://localhost:" + port);
