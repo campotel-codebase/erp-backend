@@ -3,7 +3,7 @@ import prisma from "../../../libs/prisma";
 import {generateUuid} from "../../utils/uuid.util";
 import {formatISO} from "date-fns";
 import {onBoardType} from "../../../types/modules/hris/employess";
-import {bankAccountType} from "../../../types/modules/hris/payrol";
+import {bankAccountType} from "../../../types/modules/hris/payroll";
 
 export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
 	const company = await prisma.company.findUnique({
