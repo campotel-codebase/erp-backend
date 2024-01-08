@@ -1,12 +1,13 @@
 import {parse} from "csv-parse";
 import prisma from "../../../libs/prisma";
+import {generateUuid} from "../../utils/uuid.util";
 
 export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
 		select: {benefits: true},
 	});
-	
+
 	const benefitsToArray: string[] = JSON.parse(company?.benefits ? company.benefits : "[]");
 	const expectedHeader = [
 		"lastName",
@@ -22,7 +23,7 @@ export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: st
 		"taxId",
 		...benefitsToArray,
 	];
-	
+
 	const parseCsv = await new Promise((resolve, reject) => {
 		parse(
 			csvBuffer,
@@ -63,4 +64,19 @@ export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: st
 		);
 	});
 	return {status: 200, data: parseCsv};
+};
+
+export const createEmployee = async (body: any, companyUuid: string) => {
+	const company = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {id: true},
+	});
+	if (company) {
+		const newEmployee = await prisma.employee.create({
+			data: {...body, uuid: await generateUuid(), Company: {connect: {id: company.id}}},
+		});
+		return {status: 200, data: newEmployee};
+	} else {
+		return {status: 404, data: "company not found"};
+	}
 };
