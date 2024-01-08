@@ -1,6 +1,8 @@
 import {parse} from "csv-parse";
 import prisma from "../../../libs/prisma";
 import {generateUuid} from "../../utils/uuid.util";
+import {formatISO} from "date-fns";
+import {onBoardType} from "../../../types/modules/hris/employess";
 
 export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
 	const company = await prisma.company.findUnique({
@@ -66,6 +68,7 @@ export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: st
 	return {status: 200, data: parseCsv};
 };
 
+// todo set body to correct type
 export const createEmployee = async (body: any, companyUuid: string) => {
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
@@ -79,4 +82,21 @@ export const createEmployee = async (body: any, companyUuid: string) => {
 	} else {
 		return {status: 404, data: "company not found"};
 	}
+};
+
+export const onboardEmployee = async (body: onBoardType) => {
+	const {employeeUuid, reportingToId, hiredDate, ...rest} = body;
+	const newBoardedEmployee = await prisma.employee.update({
+		where: {uuid: employeeUuid, isActive: 0},
+		data: {
+			...rest,
+			hiredDate: formatISO(hiredDate),
+			lastHiredDate: formatISO(hiredDate),
+			isActive: 1,
+			ReportingTo: {
+				connect: {id: reportingToId},
+			},
+		},
+	});
+	return {status: 200, data: newBoardedEmployee};
 };

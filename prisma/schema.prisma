@@ -72,8 +72,8 @@ model Employee {
   isRehired            Int                 @default(0) @db.TinyInt
   isActive             Int                 @default(0) @db.TinyInt
   payType              String?             @db.VarChar(10)
-  employmentStatus     String?             @db.VarChar(255)
-  employeecompanyId    String?
+  employmentType       String?             @db.VarChar(255)
+  employeeCompanyId    String?
   tenure               String?
   salary               Decimal             @default(0) @db.Decimal(10, 2)
   BankAccount          BankAccount[]

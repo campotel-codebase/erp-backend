@@ -1,6 +1,10 @@
 import express from "express";
 import {uploadCsv} from "../../middlewares/multer.middleware";
-import {createEmployee, employeesCsvToJsonArray} from "../../functions/modules/hris.function";
+import {
+	createEmployee,
+	employeesCsvToJsonArray,
+	onboardEmployee,
+} from "../../functions/modules/hris.function";
 const hris = express.Router();
 
 hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
@@ -23,6 +27,15 @@ hris.post("/create-employee", async (req, res) => {
 	const currentUser = req.authorization;
 	try {
 		const result = await createEmployee(req.body, currentUser.companyUuid);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
+hris.patch("/onboard-employee", async (req, res) => {
+	try {
+		const result = await onboardEmployee(req.body);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
