@@ -5,6 +5,7 @@ import {
 	createBankAccount,
 	createEmployee,
 	employeesCsvToJsonArray,
+	offboardEmployee,
 	onboardEmployee,
 } from "../../functions/modules/hris.function";
 const hris = express.Router();
@@ -39,6 +40,17 @@ hris.patch("/onboard-employee/:employeeUuid", async (req, res) => {
 	const {employeeUuid} = req.params;
 	try {
 		const result = await onboardEmployee(req.body, employeeUuid);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
+hris.patch("/offboard-employee/:employeeUuid", async (req, res) => {
+	const currentUser = req.authorization;
+	const {employeeUuid} = req.params;
+	try {
+		const result = await offboardEmployee(req.body, employeeUuid, currentUser.companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

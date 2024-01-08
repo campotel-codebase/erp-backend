@@ -5,3 +5,5 @@ export type onBoardType = {
 	salary: number;
 	reportingToId: number;
 };
+
+export type offBoardType = {offBoarding: string; reason: string; remarks: string};

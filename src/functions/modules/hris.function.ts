@@ -2,7 +2,7 @@ import {parse} from "csv-parse";
 import prisma from "../../../libs/prisma";
 import {generateUuid} from "../../utils/uuid.util";
 import {formatISO} from "date-fns";
-import {onBoardType} from "../../../types/modules/hris/employess";
+import {offBoardType, onBoardType} from "../../../types/modules/hris/employess";
 import {bankAccountType} from "../../../types/modules/hris/payroll";
 
 export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
@@ -101,6 +101,62 @@ export const onboardEmployee = async (body: onBoardType, employeeUuid: string) =
 		},
 	});
 	return {status: 200, data: newBoardedEmployee};
+};
+
+export const offboardEmployee = async (
+	body: offBoardType,
+	employeeUuid: string,
+	companyUuid: string,
+) => {
+	const company = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {
+			id: true,
+			Employee: {
+				where: {uuid: employeeUuid, isActive: 1},
+			},
+		},
+	});
+	if (company?.Employee[0]) {
+		const updateEmployee = await prisma.employee.update({
+			where: {uuid: company.Employee[0].uuid},
+			data: {
+				isPortalOpen: 0,
+				password: null,
+				isActive: 0,
+			},
+			select: {id: true, hiredDate: true},
+		});
+		await prisma.bankAccount.updateMany({
+			where: {
+				employeeId: updateEmployee.id,
+			},
+			data: {
+				isActive: 0,
+			},
+		});
+		if (updateEmployee.hiredDate) {
+			await prisma.employmentHistory.create({
+				data: {
+					offBoarding: formatISO(body.offBoarding),
+					onBoarding: updateEmployee.hiredDate,
+					reason: body.reason,
+					remarks: body.remarks,
+					Employee: {
+						connect: {id: updateEmployee.id},
+					},
+					Company: {
+						connect: {id: company.id},
+					},
+				},
+			});
+			return {status: 200, data: "employee offboarded successfully"};
+		} else {
+			return {status: 400, data: "employee hired date is not define"};
+		}
+	} else {
+		return {status: 404, data: "employee not found"};
+	}
 };
 
 export const createBankAccount = async (body: bankAccountType, companyUuid: string) => {
