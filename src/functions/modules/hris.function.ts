@@ -86,6 +86,7 @@ export const createEmployee = async (body: any, companyUuid: string) => {
 };
 
 export const onboardEmployee = async (body: onBoardType, employeeUuid: string) => {
+	// ! bug this needs to be access within the company
 	const {reportingToId, hiredDate, ...rest} = body;
 	const newBoardedEmployee = await prisma.employee.update({
 		where: {uuid: employeeUuid, isActive: 0},
@@ -120,5 +121,50 @@ export const createBankAccount = async (body: bankAccountType, companyUuid: stri
 		return {status: 200, data: newBankAccount};
 	} else {
 		return {status: 404, data: "company not found"};
+	}
+};
+
+export const assignBankAccount = async (
+	employeeUuid: string,
+	bankAccountUuid: string,
+	companyUuid: string,
+) => {
+	const company = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {
+			Employee: {
+				where: {uuid: employeeUuid, isActive: 1},
+			},
+			BankAccount: {
+				where: {
+					uuid: bankAccountUuid,
+					isActive: 0,
+					employeeId: null,
+				},
+			},
+		},
+	});
+	if (company?.Employee[0] && company?.BankAccount[0]) {
+		const updateEmployee = await prisma.employee.update({
+			where: {uuid: employeeUuid},
+			data: {
+				payType: "atm",
+			},
+			select: {id: true, payType: true},
+		});
+		const assignBank = await prisma.bankAccount.update({
+			where: {uuid: bankAccountUuid},
+			data: {
+				isActive: 1,
+				Employee: {
+					connect: {
+						id: updateEmployee.id,
+					},
+				},
+			},
+		});
+		return {status: 200, data: {updateEmployee, assignBank}};
+	} else {
+		return {status: 400, data: "invalid request"};
 	}
 };

@@ -1,6 +1,7 @@
 import express from "express";
 import {uploadCsv} from "../../middlewares/multer.middleware";
 import {
+	assignBankAccount,
 	createBankAccount,
 	createEmployee,
 	employeesCsvToJsonArray,
@@ -37,7 +38,7 @@ hris.post("/create-employee", async (req, res) => {
 hris.patch("/onboard-employee/:employeeUuid", async (req, res) => {
 	const {employeeUuid} = req.params;
 	try {
-		const result = await onboardEmployee(req.body,employeeUuid);
+		const result = await onboardEmployee(req.body, employeeUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -48,6 +49,17 @@ hris.post("/create-bank-account", async (req, res) => {
 	const currentUser = req.authorization;
 	try {
 		const result = await createBankAccount(req.body, currentUser.companyUuid);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
+hris.patch("/assign-bank-account/:employeeUuid/:bankAccountUuid", async (req, res) => {
+	const currentUser = req.authorization;
+	const {employeeUuid, bankAccountUuid} = req.params;
+	try {
+		const result = await assignBankAccount(employeeUuid, bankAccountUuid, currentUser.companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
