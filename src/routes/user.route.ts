@@ -1,5 +1,6 @@
 import express from "express";
-import {profile} from "../functions/user.function";
+import {profile, updateAvatar} from "../functions/user.function";
+import {uploadImage} from "../middlewares/multer.middleware";
 const user = express.Router();
 
 user.get("/profile", async (req, res) => {
@@ -12,9 +13,16 @@ user.get("/profile", async (req, res) => {
 	}
 });
 
-user.put("/update-avatar", async (req, res) => {
+user.put("/update-avatar", uploadImage.single("avatar"), async (req, res) => {
+	const currentUser = req.authorization;
+	const url = req.protocol + "://" + req.get("host");
+	const fileName = req.file?.filename;
+	const filePath = "/public/avatar/";
+	const imgSrc = url + filePath + fileName;
+
 	try {
-		res.json("avatar");
+		const result = await updateAvatar(imgSrc, currentUser.userUuid);
+		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
 	}
