@@ -240,3 +240,15 @@ export const assignBankAccount = async (
 		return {status: 400, data: "invalid request"};
 	}
 };
+
+export const employees = async (companyUuid: string) => {
+	const employees = await prisma.company.findMany({
+		where: {
+			uuid: companyUuid,
+		},
+		select: {
+			Employee: true,
+		},
+	});
+	return {status: 200, data: employees};
+};

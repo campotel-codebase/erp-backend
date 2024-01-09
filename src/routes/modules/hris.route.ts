@@ -4,6 +4,7 @@ import {
 	assignBankAccount,
 	createBankAccount,
 	createEmployee,
+	employees,
 	employeesCsvToJsonArray,
 	offboardEmployee,
 	onboardEmployee,
@@ -73,6 +74,16 @@ hris.patch("/assign-bank-account/:employeeUuid/:bankAccountUuid", async (req, re
 	const {employeeUuid, bankAccountUuid} = req.params;
 	try {
 		const result = await assignBankAccount(employeeUuid, bankAccountUuid, currentUser.companyUuid);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
+hris.get("/employees", async (req, res) => {
+	const companyUuid = req.authorization.companyUuid;
+	try {
+		const result = await employees(companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
