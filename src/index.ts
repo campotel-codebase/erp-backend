@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import prisma from "../libs/prisma";
-import {authorization} from "./middlewares/auth.middleware";
+import {authorization} from "./middlewares/authorization.middleware";
 import publicRoute from "./routes/public.route";
 import user from "./routes/user.route";
 import config from "./routes/config.route";
