@@ -8,6 +8,7 @@ import {
 	employeesCsvToJsonArray,
 	offboardEmployee,
 	onboardEmployee,
+	searchEmployee,
 } from "../../functions/modules/hris.function";
 const hris = express.Router();
 
@@ -84,6 +85,17 @@ hris.get("/employees", async (req, res) => {
 	const companyUuid = req.authorization.companyUuid;
 	try {
 		const result = await employees(companyUuid);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
+hris.get("/search-employee", async (req, res) => {
+	const companyUuid = req.authorization.companyUuid;
+	const keyword = req.query.keyword;
+	try {
+		const result = await searchEmployee(companyUuid, keyword);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
