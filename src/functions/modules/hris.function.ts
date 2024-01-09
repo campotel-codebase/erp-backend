@@ -252,3 +252,25 @@ export const employees = async (companyUuid: string) => {
 	});
 	return {status: 200, data: employees};
 };
+
+export const searchEmployee = async (companyUuid: string, keyword: any) => {
+	const employees = await prisma.company.findMany({
+		where: {
+			uuid: companyUuid,
+		},
+		select: {
+			Employee: {
+				where: {
+					fullName: {
+						contains: keyword,
+					},
+				},
+				take: 5,
+				orderBy: {
+					createdAt: "desc",
+				},
+			},
+		},
+	});
+	return {status: 200, data: employees};
+};
