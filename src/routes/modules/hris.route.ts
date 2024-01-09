@@ -37,9 +37,10 @@ hris.post("/create-employee", async (req, res) => {
 });
 
 hris.patch("/onboard-employee/:employeeUuid", async (req, res) => {
+	const currentUser = req.authorization;
 	const {employeeUuid} = req.params;
 	try {
-		const result = await onboardEmployee(req.body, employeeUuid);
+		const result = await onboardEmployee(req.body, employeeUuid, currentUser.companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

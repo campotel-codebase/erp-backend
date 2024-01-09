@@ -85,22 +85,38 @@ export const createEmployee = async (body: any, companyUuid: string) => {
 	}
 };
 
-export const onboardEmployee = async (body: onBoardType, employeeUuid: string) => {
-	// ! bug this needs to be access within the company
+export const onboardEmployee = async (
+	body: onBoardType,
+	employeeUuid: string,
+	companyUuid: string,
+) => {
 	const {reportingToId, hiredDate, ...rest} = body;
-	const newBoardedEmployee = await prisma.employee.update({
-		where: {uuid: employeeUuid, isActive: 0},
-		data: {
-			...rest,
-			hiredDate: formatISO(hiredDate),
-			lastHiredDate: formatISO(hiredDate),
-			isActive: 1,
-			ReportingTo: {
-				connect: {id: reportingToId},
+	const company = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {
+			id: true,
+			Employee: {
+				where: {uuid: employeeUuid, isActive: 0},
 			},
 		},
 	});
-	return {status: 200, data: newBoardedEmployee};
+	if (company?.Employee[0]) {
+		const newBoardedEmployee = await prisma.employee.update({
+			where: {uuid: employeeUuid},
+			data: {
+				...rest,
+				hiredDate: formatISO(hiredDate),
+				lastHiredDate: formatISO(hiredDate),
+				isActive: 1,
+				ReportingTo: {
+					connect: {id: reportingToId},
+				},
+			},
+		});
+		return {status: 200, data: newBoardedEmployee};
+	} else {
+		return {status: 404, data: "employee not found"};
+	}
 };
 
 export const offboardEmployee = async (
