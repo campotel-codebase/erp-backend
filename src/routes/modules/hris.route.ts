@@ -13,14 +13,14 @@ import {
 const hris = express.Router();
 
 hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
-	const currentUser = req.authorization;
+	const companyUuid = req.authorization.companyUuid;
 	const csvBuffer = req.file?.buffer.toString("utf8");
 
 	if (!csvBuffer) {
 		res.status(400).json({error: "please provide a csv"});
 	} else {
 		try {
-			const result = await employeesCsvToJsonArray(csvBuffer, currentUser.companyUuid);
+			const result = await employeesCsvToJsonArray(csvBuffer, companyUuid);
 			res.status(result.status).json(result.data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
@@ -29,9 +29,9 @@ hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
 });
 
 hris.post("/create-employee", async (req, res) => {
-	const currentUser = req.authorization;
+	const companyUuid = req.authorization.companyUuid;
 	try {
-		const result = await createEmployee(req.body, currentUser.companyUuid);
+		const result = await createEmployee(req.body, companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -39,10 +39,10 @@ hris.post("/create-employee", async (req, res) => {
 });
 
 hris.patch("/onboard-employee/:employeeUuid", async (req, res) => {
-	const currentUser = req.authorization;
+	const companyUuid = req.authorization.companyUuid;
 	const {employeeUuid} = req.params;
 	try {
-		const result = await onboardEmployee(req.body, employeeUuid, currentUser.companyUuid);
+		const result = await onboardEmployee(req.body, employeeUuid, companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -50,10 +50,10 @@ hris.patch("/onboard-employee/:employeeUuid", async (req, res) => {
 });
 
 hris.patch("/offboard-employee/:employeeUuid", async (req, res) => {
-	const currentUser = req.authorization;
+	const companyUuid = req.authorization.companyUuid;
 	const {employeeUuid} = req.params;
 	try {
-		const result = await offboardEmployee(req.body, employeeUuid, currentUser.companyUuid);
+		const result = await offboardEmployee(req.body, employeeUuid, companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -61,9 +61,9 @@ hris.patch("/offboard-employee/:employeeUuid", async (req, res) => {
 });
 
 hris.post("/create-bank-account", async (req, res) => {
-	const currentUser = req.authorization;
+	const companyUuid = req.authorization.companyUuid;
 	try {
-		const result = await createBankAccount(req.body, currentUser.companyUuid);
+		const result = await createBankAccount(req.body, companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -71,10 +71,10 @@ hris.post("/create-bank-account", async (req, res) => {
 });
 
 hris.patch("/assign-bank-account/:employeeUuid/:bankAccountUuid", async (req, res) => {
-	const currentUser = req.authorization;
+	const companyUuid = req.authorization.companyUuid;
 	const {employeeUuid, bankAccountUuid} = req.params;
 	try {
-		const result = await assignBankAccount(employeeUuid, bankAccountUuid, currentUser.companyUuid);
+		const result = await assignBankAccount(employeeUuid, bankAccountUuid, companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

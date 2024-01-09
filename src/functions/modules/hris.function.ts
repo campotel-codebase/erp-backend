@@ -4,6 +4,7 @@ import {generateUuid} from "../../utils/uuid.util";
 import {formatISO} from "date-fns";
 import {offBoardType, onBoardType} from "../../../types/modules/hris/employess";
 import {bankAccountType} from "../../../types/modules/hris/payroll";
+import {Prisma} from "@prisma/client";
 
 export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
 	const company = await prisma.company.findUnique({
@@ -69,8 +70,7 @@ export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: st
 	return {status: 200, data: parseCsv};
 };
 
-// todo set body to correct type
-export const createEmployee = async (body: any, companyUuid: string) => {
+export const createEmployee = async (body: Prisma.EmployeeCreateInput, companyUuid: string) => {
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
 		select: {id: true},
@@ -134,7 +134,7 @@ export const offboardEmployee = async (
 		},
 	});
 	if (company?.Employee[0]) {
-		const updateEmployee = await prisma.employee.update({
+		const newOffBoardedEmployee = await prisma.employee.update({
 			where: {uuid: company.Employee[0].uuid},
 			data: {
 				isPortalOpen: 0,
@@ -145,21 +145,21 @@ export const offboardEmployee = async (
 		});
 		await prisma.bankAccount.updateMany({
 			where: {
-				employeeId: updateEmployee.id,
+				employeeId: newOffBoardedEmployee.id,
 			},
 			data: {
 				isActive: 0,
 			},
 		});
-		if (updateEmployee.hiredDate) {
+		if (newOffBoardedEmployee.hiredDate) {
 			await prisma.employmentHistory.create({
 				data: {
 					offBoarding: formatISO(body.offBoarding),
-					onBoarding: updateEmployee.hiredDate,
+					onBoarding: newOffBoardedEmployee.hiredDate,
 					reason: body.reason,
 					remarks: body.remarks,
 					Employee: {
-						connect: {id: updateEmployee.id},
+						connect: {id: newOffBoardedEmployee.id},
 					},
 					Company: {
 						connect: {id: company.id},
@@ -217,7 +217,7 @@ export const assignBankAccount = async (
 		},
 	});
 	if (company?.Employee[0] && company?.BankAccount[0]) {
-		const updateEmployee = await prisma.employee.update({
+		const newPayrollForEmployee = await prisma.employee.update({
 			where: {uuid: employeeUuid},
 			data: {
 				payType: "atm",
@@ -230,12 +230,12 @@ export const assignBankAccount = async (
 				isActive: 1,
 				Employee: {
 					connect: {
-						id: updateEmployee.id,
+						id: newPayrollForEmployee.id,
 					},
 				},
 			},
 		});
-		return {status: 200, data: {updateEmployee, assignBank}};
+		return {status: 200, data: {newPayrollForEmployee, assignBank}};
 	} else {
 		return {status: 400, data: "invalid request"};
 	}
