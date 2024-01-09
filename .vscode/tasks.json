@@ -42,6 +42,13 @@
 			"problemMatcher": [],
 			"label": "npm: g:client",
 			"detail": "npx prisma generate"
+		},
+		{
+			"type": "npm",
+			"script": "studio",
+			"problemMatcher": [],
+			"label": "npm: studio",
+			"detail": "npx prisma studio"
 		}
 	]
 }
