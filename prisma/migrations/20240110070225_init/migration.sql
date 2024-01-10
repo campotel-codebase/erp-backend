@@ -35,6 +35,7 @@ CREATE TABLE [dbo].[User] (
     [companyId] INT NOT NULL,
     [uuid] NVARCHAR(1000) NOT NULL,
     [isActive] TINYINT NOT NULL CONSTRAINT [User_isActive_df] DEFAULT 1,
+    [isDarkMode] TINYINT NOT NULL CONSTRAINT [User_isDarkMode_df] DEFAULT 0,
     [role] NVARCHAR(1000),
     [avatar] NVARCHAR(1000),
     [lastName] VARCHAR(30) NOT NULL,
@@ -73,8 +74,8 @@ CREATE TABLE [dbo].[Employee] (
     [isRehired] TINYINT NOT NULL CONSTRAINT [Employee_isRehired_df] DEFAULT 0,
     [isActive] TINYINT NOT NULL CONSTRAINT [Employee_isActive_df] DEFAULT 0,
     [payType] VARCHAR(10),
-    [employmentStatus] VARCHAR(255),
-    [employeecompanyId] NVARCHAR(1000),
+    [employmentType] VARCHAR(255),
+    [employeeCompanyId] NVARCHAR(1000),
     [tenure] NVARCHAR(1000),
     [salary] DECIMAL(10,2) NOT NULL CONSTRAINT [Employee_salary_df] DEFAULT 0,
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [Employee_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
@@ -89,13 +90,15 @@ CREATE TABLE [dbo].[BankAccount] (
     [id] INT NOT NULL IDENTITY(1,1),
     [companyId] INT NOT NULL,
     [employeeId] INT,
+    [uuid] NVARCHAR(1000) NOT NULL,
     [bankName] VARCHAR(255) NOT NULL,
     [accountNumber] VARCHAR(255) NOT NULL,
     [cardNumber] VARCHAR(255) NOT NULL,
     [accountType] VARCHAR(255) NOT NULL,
     [isActive] TINYINT NOT NULL CONSTRAINT [BankAccount_isActive_df] DEFAULT 0,
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [BankAccount_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT [BankAccount_pkey] PRIMARY KEY CLUSTERED ([id])
+    CONSTRAINT [BankAccount_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [BankAccount_uuid_key] UNIQUE NONCLUSTERED ([uuid])
 );
 
 -- CreateTable
