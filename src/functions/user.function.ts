@@ -9,7 +9,7 @@ import {
 } from "../utils/password.util";
 import {generateUuid} from "../utils/uuid.util";
 
-export const signUp = async (body: signUpType) => {
+export const userSignUp = async (body: signUpType) => {
 	const isEmailExists = await prisma.user.findUnique({
 		where: {email: body.email},
 		select: {id: true},
@@ -42,7 +42,7 @@ export const signUp = async (body: signUpType) => {
 	}
 };
 
-export const signIn = async (body: signInType) => {
+export const userSignIn = async (body: signInType) => {
 	const userAccount = await prisma.user.findUnique({
 		where: {email: body.email},
 		select: {uuid: true, password: true},

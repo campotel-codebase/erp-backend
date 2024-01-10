@@ -1,10 +1,10 @@
 import express from "express";
-import {signIn, signUp, userPwdResetLink, userResetPwd} from "../functions/user.function";
+import {userSignIn, userSignUp, userPwdResetLink, userResetPwd} from "../functions/user.function";
 const publicRoute = express.Router();
 
 publicRoute.post("/user/sign-up", async (req, res) => {
 	try {
-		const result = await signUp(req.body);
+		const result = await userSignUp(req.body);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -12,7 +12,7 @@ publicRoute.post("/user/sign-up", async (req, res) => {
 });
 publicRoute.post("/user/sign-in", async (req, res) => {
 	try {
-		const result = await signIn(req.body);
+		const result = await userSignIn(req.body);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
