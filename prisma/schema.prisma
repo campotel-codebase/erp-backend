@@ -33,18 +33,19 @@ model Company {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  companyId Int
-  uuid      String   @unique
-  isActive  Int      @default(1) @db.TinyInt
-  role      String?
-  avatar    String?
-  lastName  String   @db.VarChar(30)
-  firstName String   @db.VarChar(30)
-  email     String   @unique @db.VarChar(255)
-  password  String   @db.VarChar(255)
-  Company   Company  @relation(fields: [companyId], references: [id])
-  createdAt DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  companyId  Int
+  uuid       String   @unique
+  isActive   Int      @default(1) @db.TinyInt
+  isDarkMode Int      @default(0) @db.TinyInt
+  role       String?
+  avatar     String?
+  lastName   String   @db.VarChar(30)
+  firstName  String   @db.VarChar(30)
+  email      String   @unique @db.VarChar(255)
+  password   String   @db.VarChar(255)
+  Company    Company  @relation(fields: [companyId], references: [id])
+  createdAt  DateTime @default(now())
 }
 
 model Employee {
