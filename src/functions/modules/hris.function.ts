@@ -2,7 +2,7 @@ import {parse} from "csv-parse";
 import prisma from "../../../libs/prisma";
 import {generateUuid} from "../../utils/uuid.util";
 import {formatISO} from "date-fns";
-import {offBoardType, onBoardType} from "../../../types/modules/hris/employess";
+import {offBoardType, onBoardType} from "../../../types/modules/hris/employees";
 import {bankAccountType} from "../../../types/modules/hris/payroll";
 import {Prisma} from "@prisma/client";
 import pwdGenerator from "generate-password";
