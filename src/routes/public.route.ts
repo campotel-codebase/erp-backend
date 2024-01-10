@@ -34,8 +34,23 @@ publicRoute.post("/user/reset-password", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
-publicRoute.post("/employee/sign-in", async (req, res) => {});
-publicRoute.post("/employee/forgot-password", async (req, res) => {});
-publicRoute.post("/employee/reset-password", async (req, res) => {});
+publicRoute.post("/employee/sign-in", async (req, res) => {
+	try {
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+publicRoute.post("/employee/forgot-password", async (req, res) => {
+	try {
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+publicRoute.post("/employee/reset-password", async (req, res) => {
+	try {
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
 
 export default publicRoute;
