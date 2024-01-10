@@ -37,7 +37,7 @@ model User {
   companyId  Int
   uuid       String   @unique
   isActive   Int      @default(1) @db.TinyInt
-  isDarkMode Int      @default(1) @db.TinyInt
+  isDarkMode Int      @default(0) @db.TinyInt
   role       String?
   avatar     String?
   lastName   String   @db.VarChar(30)
