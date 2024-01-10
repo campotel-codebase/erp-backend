@@ -4,6 +4,7 @@ import {
 	assignBankAccount,
 	createBankAccount,
 	createEmployee,
+	employee,
 	employees,
 	employeesCsvToJsonArray,
 	offboardEmployee,
@@ -96,6 +97,17 @@ hris.get("/search-employee", async (req, res) => {
 	const keyword = req.query.keyword;
 	try {
 		const result = await searchEmployee(companyUuid, keyword);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
+hris.get("/employee/:employeeUuid", async (req, res) => {
+	const companyUuid = req.authorization.companyUuid;
+	const {employeeUuid} = req.params;
+	try {
+		const result = await employee(companyUuid, employeeUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

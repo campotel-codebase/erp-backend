@@ -76,8 +76,9 @@ export const createEmployee = async (body: Prisma.EmployeeCreateInput, companyUu
 		select: {id: true},
 	});
 	if (company) {
+		const fullName = `${body.lastName} ${body.firstName} ${body.middleName}`;
 		const newEmployee = await prisma.employee.create({
-			data: {...body, uuid: await generateUuid(), Company: {connect: {id: company.id}}},
+			data: {...body, fullName, uuid: await generateUuid(), Company: {connect: {id: company.id}}},
 		});
 		return {status: 200, data: newEmployee};
 	} else {
@@ -273,4 +274,22 @@ export const searchEmployee = async (companyUuid: string, keyword: any) => {
 		},
 	});
 	return {status: 200, data: employees};
+};
+
+export const employee = async (companyUuid: string, employeeUuid: string) => {
+	const employee = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {
+			Employee: {
+				where: {
+					uuid: employeeUuid,
+				},
+				include: {
+					ReportingTo: {select: {fullName: true}},
+					EmployeesReportingTo: {select: {fullName: true}},
+				},
+			},
+		},
+	});
+	return {status: 200, data: employee};
 };
