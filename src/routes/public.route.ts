@@ -39,6 +39,8 @@ publicRoute.post("/user/reset-password", async (req, res) => {
 // Portal
 publicRoute.post("/employee/sign-in", async (req, res) => {
 	try {
+		const result = await employeeSignIn(req.body);
+		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
 	}
