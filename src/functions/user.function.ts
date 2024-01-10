@@ -1,5 +1,5 @@
 import prisma from "../../libs/prisma";
-import {signInType, signUpType} from "../../types/user";
+import {userSignInType, userSignUpType} from "../../types/user";
 import {generateJwt} from "../utils/jwt.util";
 import {
 	hashPassword,
@@ -9,7 +9,7 @@ import {
 } from "../utils/password.util";
 import {generateUuid} from "../utils/uuid.util";
 
-export const signUp = async (body: signUpType) => {
+export const userSignUp = async (body: userSignUpType) => {
 	const isEmailExists = await prisma.user.findUnique({
 		where: {email: body.email},
 		select: {id: true},
@@ -42,7 +42,7 @@ export const signUp = async (body: signUpType) => {
 	}
 };
 
-export const signIn = async (body: signInType) => {
+export const userSignIn = async (body: userSignInType) => {
 	const userAccount = await prisma.user.findUnique({
 		where: {email: body.email},
 		select: {uuid: true, password: true},

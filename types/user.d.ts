@@ -1,4 +1,4 @@
-export type signUpType = {
+export type userSignUpType = {
 	companyName: string;
 	uuid: string;
 	lastName: string;
@@ -6,7 +6,7 @@ export type signUpType = {
 	email: string;
 	password: string;
 };
-export type signInType = {
+export type userSignInType = {
 	email: string;
 	password: string;
 };

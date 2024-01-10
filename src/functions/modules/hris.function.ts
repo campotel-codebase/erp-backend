@@ -2,9 +2,11 @@ import {parse} from "csv-parse";
 import prisma from "../../../libs/prisma";
 import {generateUuid} from "../../utils/uuid.util";
 import {formatISO} from "date-fns";
-import {offBoardType, onBoardType} from "../../../types/modules/hris/employess";
+import {offBoardType, onBoardType} from "../../../types/modules/hris/employees";
 import {bankAccountType} from "../../../types/modules/hris/payroll";
 import {Prisma} from "@prisma/client";
+import pwdGenerator from "generate-password";
+import {hashPassword} from "../../utils/password.util";
 
 export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
 	const company = await prisma.company.findUnique({
@@ -77,10 +79,23 @@ export const createEmployee = async (body: Prisma.EmployeeCreateInput, companyUu
 	});
 	if (company) {
 		const fullName = `${body.lastName} ${body.firstName} ${body.middleName}`;
-		const newEmployee = await prisma.employee.create({
-			data: {...body, fullName, uuid: await generateUuid(), Company: {connect: {id: company.id}}},
+		const generatedPassword = pwdGenerator.generate({
+			length: 10,
+			numbers: true,
+			symbols: true,
+			strict: true,
 		});
-		return {status: 200, data: newEmployee};
+
+		const newEmployee = await prisma.employee.create({
+			data: {
+				...body,
+				fullName,
+				password: await hashPassword(generatedPassword),
+				uuid: await generateUuid(),
+				Company: {connect: {id: company.id}},
+			},
+		});
+		return {status: 200, data: {newEmployee, generatedPassword}};
 	} else {
 		return {status: 404, data: "company not found"};
 	}
@@ -95,7 +110,6 @@ export const onboardEmployee = async (
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
 		select: {
-			id: true,
 			Employee: {
 				where: {uuid: employeeUuid, isActive: 0},
 			},
@@ -139,7 +153,6 @@ export const offboardEmployee = async (
 			where: {uuid: company.Employee[0].uuid},
 			data: {
 				isPortalOpen: 0,
-				password: null,
 				isActive: 0,
 			},
 			select: {id: true, hiredDate: true},
