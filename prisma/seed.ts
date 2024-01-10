@@ -41,6 +41,7 @@ const seed = async () => {
 			suffix: faker.person.suffix(),
 			phoneNumber: faker.phone.number(),
 			email: faker.internet.email(),
+			password: faker.internet.password(),
 			birthday: faker.date.birthdate({min: 18, max: 60, mode: "age"}),
 			bloodType: "a+",
 			salary: faker.finance.amount(),

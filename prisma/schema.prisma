@@ -63,7 +63,7 @@ model Employee {
   fullName             String?             @db.VarChar(100)
   middleName           String?             @db.VarChar(30)
   isPortalOpen         Int                 @default(0) @db.TinyInt
-  password             String?             @db.VarChar(255)
+  password             String              @db.VarChar(255)
   avatar               String?
   bloodType            String?             @db.VarChar(20)
   driverLicense        String?             @db.VarChar(100)
