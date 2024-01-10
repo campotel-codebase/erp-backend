@@ -5,6 +5,7 @@ import {
 	verifyHashedPassword,
 	verifyResetUuidForPwd,
 	sendResetLinkForPwd,
+	hashPassword,
 } from "../../utils/password.util";
 
 export const employeeSignIn = async (body: employeeSignInType) => {
@@ -51,5 +52,21 @@ export const employeePwdResetLink = async (email: string) => {
 	}
 };
 export const employeeResetPwd = async (body: {uuid: string; newPassword: string}) => {
-	return {status: 404, data: ""};
+	const {uuid, newPassword} = body;
+	const isVerify = await verifyResetUuidForPwd(uuid);
+	if (isVerify.result === true) {
+		const hashedPassword = await hashPassword(newPassword);
+		await prisma.employee.update({
+			where: {email: isVerify.email},
+			data: {password: hashedPassword},
+			select: {uuid: true},
+		});
+		await prisma.passwordReset.delete({
+			where: {uuid},
+			select: {uuid: true},
+		});
+		return {status: 200, data: "password reset successfully"};
+	} else {
+		return {status: 400, data: "fail to reset password"};
+	}
 };
