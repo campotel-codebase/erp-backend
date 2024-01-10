@@ -110,7 +110,6 @@ export const onboardEmployee = async (
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
 		select: {
-			id: true,
 			Employee: {
 				where: {uuid: employeeUuid, isActive: 0},
 			},
@@ -154,7 +153,6 @@ export const offboardEmployee = async (
 			where: {uuid: company.Employee[0].uuid},
 			data: {
 				isPortalOpen: 0,
-				password: null,
 				isActive: 0,
 			},
 			select: {id: true, hiredDate: true},
