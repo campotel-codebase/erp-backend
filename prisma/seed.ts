@@ -48,20 +48,15 @@ const seed = async () => {
 		},
 	});
 
-	const newBankAccount = await prisma.bankAccount.create({
-		data: {
-			bankName: "metro bank",
+	const newBankAccount = await prisma.bankAccount.createMany({
+		data: Array.from({length: 4}).map(() => ({
 			uuid: faker.string.uuid(),
+			companyId: newCompany.id,
+			bankName: "metro bank",
 			accountNumber: faker.finance.accountNumber(),
 			cardNumber: faker.finance.creditCardNumber(),
 			accountType: "debit",
-			Company: {
-				connect: {id: newCompany.id},
-			},
-			Employee: {
-				connect: {id: newEmployee.id},
-			},
-		},
+		})),
 	});
 
 	const newEmploymentHistory = await prisma.employmentHistory.create({
