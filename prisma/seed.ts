@@ -28,7 +28,7 @@ const seed = async () => {
 	});
 
 	const newEmployees = await prisma.employee.createMany({
-		data: Array.from({length: 4}).map(() => ({
+		data: Array.from({length: 50}).map(() => ({
 			companyId: newCompany.id,
 			uuid: faker.string.uuid(),
 			...employeeName,
