@@ -27,8 +27,9 @@ const seed = async () => {
 		},
 	});
 
-	const newEmployee = await prisma.employee.create({
-		data: {
+	const newEmployees = await prisma.employee.createMany({
+		data: Array.from({length: 4}).map(() => ({
+			companyId: newCompany.id,
 			uuid: faker.string.uuid(),
 			...employeeName,
 			fullName: `${employeeName.lastName} ${employeeName.firstName} ${employeeName.middleName}`,
@@ -42,47 +43,24 @@ const seed = async () => {
 			salary: faker.finance.amount(),
 			driverLicense: faker.number.int({min: 100000, max: 999999}).toString(),
 			taxId: faker.number.int({min: 100000, max: 999999}).toString(),
-			Company: {
-				connect: {id: newCompany.id},
-			},
-		},
+		})),
 	});
 
-	const newBankAccount = await prisma.bankAccount.create({
-		data: {
-			bankName: "metro bank",
+	const newBankAccounts = await prisma.bankAccount.createMany({
+		data: Array.from({length: 4}).map(() => ({
 			uuid: faker.string.uuid(),
+			companyId: newCompany.id,
+			bankName: "metro bank",
 			accountNumber: faker.finance.accountNumber(),
 			cardNumber: faker.finance.creditCardNumber(),
 			accountType: "debit",
-			Company: {
-				connect: {id: newCompany.id},
-			},
-			Employee: {
-				connect: {id: newEmployee.id},
-			},
-		},
-	});
-
-	const newEmploymentHistory = await prisma.employmentHistory.create({
-		data: {
-			onBoarding: faker.date.recent({days: 10}),
-			offBoarding: faker.date.future({years: 10}),
-			reason: "termination",
-			Company: {
-				connect: {id: newCompany.id},
-			},
-			Employee: {
-				connect: {id: newEmployee.id},
-			},
-		},
+		})),
 	});
 
 	console.log({
 		newCompany,
-		newEmployee,
-		newBankAccount,
-		newEmploymentHistory,
+		newEmployees,
+		newBankAccounts,
 	});
 };
 
