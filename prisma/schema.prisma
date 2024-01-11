@@ -77,6 +77,10 @@ model Employee {
   employeeCompanyId    String?
   tenure               String?
   salary               Decimal             @default(0) @db.Decimal(10, 2)
+  jobTitle            String?             @db.VarChar(255)
+  department          String?             @db.VarChar(255)
+  talentSegment       String?             @db.VarChar(255)
+  benefits             String?             @db.VarChar(255)
   BankAccount          BankAccount[]
   EmploymentHistory    EmploymentHistory[]
   LeaveRequest         LeaveRequest[]

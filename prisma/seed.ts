@@ -15,11 +15,6 @@ const seed = async () => {
 		data: {
 			uuid: faker.string.uuid(),
 			name: faker.company.name(),
-			jobTitles: faker.person.jobTitle(),
-			departments: faker.commerce.department(),
-			talentSegments: "none",
-			employmentTypes: "regular",
-			benefits: "none",
 			User: {
 				create: {
 					lastName: faker.person.lastName(),
