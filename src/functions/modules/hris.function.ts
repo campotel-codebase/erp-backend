@@ -80,6 +80,7 @@ export const createEmployee = async (body: Prisma.EmployeeCreateInput, companyUu
 	if (company) {
 		const fullName = `${body.lastName} ${body.firstName} ${body.middleName}`;
 		const {department, jobTitle, talentSegment, benefits, ...rest} = body;
+		const benefitsToString = JSON.stringify(benefits);
 		const generatedPassword = pwdGenerator.generate({
 			length: 10,
 			numbers: true,
@@ -89,12 +90,12 @@ export const createEmployee = async (body: Prisma.EmployeeCreateInput, companyUu
 
 		const newEmployee = await prisma.employee.create({
 			data: {
-				...body,
+				...rest,
 				fullName,
 				department,
 				jobTitle,
 				talentSegment,
-				benefits,
+				benefits: benefitsToString,
 				password: await hashPassword(generatedPassword),
 				uuid: await generateUuid(),
 				Company: {connect: {id: company.id}},
