@@ -114,4 +114,13 @@ hris.get("/employee/:employeeUuid", async (req, res) => {
 	}
 });
 
+hris.get("/company/org-chart-tree", async (req, res) => {
+	const companyUuid = req.authorization.companyUuid;
+	try {
+		res.json("org");
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
 export default hris;
