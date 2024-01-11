@@ -9,6 +9,7 @@ import {
 	employeesCsvToJsonArray,
 	offboardEmployee,
 	onboardEmployee,
+	orgChartTree,
 	searchEmployee,
 } from "../../functions/modules/hris.function";
 const hris = express.Router();
@@ -114,10 +115,12 @@ hris.get("/employee/:employeeUuid", async (req, res) => {
 	}
 });
 
-hris.get("/company/org-chart-tree", async (req, res) => {
+hris.get("/org-chart-tree/:employeeUuid", async (req, res) => {
 	const companyUuid = req.authorization.companyUuid;
+	const {employeeUuid} = req.params;
 	try {
-		res.json("org");
+		const result = await orgChartTree(companyUuid, employeeUuid);
+		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
 	}

@@ -312,3 +312,33 @@ export const employee = async (companyUuid: string, employeeUuid: string) => {
 	});
 	return {status: 200, data: employee};
 };
+
+export const orgChartTree = async (companyUuid: string, employeeUuid: string) => {
+	const company = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {id: true},
+	});
+	if (company) {
+		const selectedChart = await prisma.employee.findUnique({
+			where: {
+				companyId: company.id,
+				uuid: employeeUuid,
+			},
+			select: {
+				uuid: true,
+				jobTitle: true,
+				fullName: true,
+				EmployeesReportingTo: {
+					select: {
+						uuid: true,
+						jobTitle: true,
+						fullName: true,
+					},
+				},
+			},
+		});
+		return {status: 200, data: selectedChart};
+	} else {
+		return {status: 404, data: "company not found"};
+	}
+};
