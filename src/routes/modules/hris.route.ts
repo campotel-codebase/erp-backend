@@ -40,6 +40,15 @@ hris.post("/create-employee", async (req, res) => {
 	}
 });
 
+hris.post("/create-employees", async (req, res) => {
+	const companyUuid = req.authorization.companyUuid;
+	try {
+		res.json("employees creation  batch " + companyUuid);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
 hris.patch("/onboard-employee/:employeeUuid", async (req, res) => {
 	const companyUuid = req.authorization.companyUuid;
 	const {employeeUuid} = req.params;

@@ -107,6 +107,8 @@ export const createEmployee = async (body: Prisma.EmployeeCreateInput, companyUu
 	}
 };
 
+export const createEmployees = async (body: [], companyUuid: string) => {};
+
 export const onboardEmployee = async (
 	body: onBoardType,
 	employeeUuid: string,
