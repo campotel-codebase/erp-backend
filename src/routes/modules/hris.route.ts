@@ -4,6 +4,7 @@ import {
 	assignBankAccount,
 	createBankAccount,
 	createEmployee,
+	createEmployees,
 	employee,
 	employees,
 	employeesCsvToJsonArray,
@@ -34,6 +35,16 @@ hris.post("/create-employee", async (req, res) => {
 	const companyUuid = req.authorization.companyUuid;
 	try {
 		const result = await createEmployee(req.body, companyUuid);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
+hris.post("/create-employees", async (req, res) => {
+	const companyUuid = req.authorization.companyUuid;
+	try {
+		const result = await createEmployees(req.body, companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

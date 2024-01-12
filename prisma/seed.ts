@@ -14,13 +14,14 @@ const seed = async () => {
 	const newCompany = await prisma.company.create({
 		data: {
 			uuid: faker.string.uuid(),
-			name: faker.company.name(),
+			name: "campotel",
+			benefits: JSON.stringify(["sss", "pagIbig"]),
 			User: {
 				create: {
 					lastName: faker.person.lastName(),
 					firstName: faker.person.firstName(),
 					uuid: faker.string.uuid(),
-					email: faker.internet.email(),
+					email: "campo@example.com",
 					password: hashedPassword,
 				},
 			},
