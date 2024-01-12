@@ -314,31 +314,51 @@ export const employee = async (companyUuid: string, employeeUuid: string) => {
 };
 
 export const orgChartTree = async (companyUuid: string, employeeUuid: string) => {
+	const depth = 1;
+
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
 		select: {id: true},
 	});
+
 	if (company) {
-		const selectedChart = await prisma.employee.findUnique({
-			where: {
-				companyId: company.id,
-				uuid: employeeUuid,
-			},
-			select: {
-				uuid: true,
-				jobTitle: true,
-				fullName: true,
-				EmployeesReportingTo: {
-					select: {
-						uuid: true,
-						jobTitle: true,
-						fullName: true,
+		const buildOrgChart = async (currentDepth: number): Promise<any> => {
+			if (currentDepth > depth) {
+				return null;
+			}
+
+			// Needs to fetch if  the reporting to is not null
+			const selectedChart = await prisma.employee.findUnique({
+				where: {
+					companyId: company.id,
+					uuid: employeeUuid,
+				},
+				select: {
+					id: true,
+					uuid: true,
+					jobTitle: true,
+					fullName: true,
+					EmployeesReportingTo: {
+						select: {
+							id: true,
+							uuid: true,
+							jobTitle: true,
+							fullName: true,
+							EmployeesReportingTo: {
+								select: await buildOrgChart(currentDepth + 2),
+							},
+						},
 					},
 				},
-			},
-		});
-		return {status: 200, data: selectedChart};
+			});
+			console.log("running");
+
+			return selectedChart;
+		};
+
+		const chartTree = await buildOrgChart(1);
+		return {status: 200, data: chartTree};
 	} else {
-		return {status: 404, data: "company not found"};
+		return {status: 404, data: "Company not found"};
 	}
 };
