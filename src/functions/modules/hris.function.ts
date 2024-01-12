@@ -312,3 +312,58 @@ export const employee = async (companyUuid: string, employeeUuid: string) => {
 	});
 	return {status: 200, data: employee};
 };
+
+export const orgChartTree = async (companyUuid: string, employeeUuid: string) => {
+	const company = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {id: true},
+	});
+
+	if (company) {
+		// TODO Needs to fetch if  the reporting to is not null
+		const selectedChart = await prisma.employee.findUnique({
+			where: {
+				companyId: company.id,
+				uuid: employeeUuid,
+			},
+			// CEO
+			select: {
+				id: true,
+				uuid: true,
+				jobTitle: true,
+				fullName: true,
+				// Managers
+				EmployeesReportingTo: {
+					select: {
+						id: true,
+						uuid: true,
+						jobTitle: true,
+						fullName: true,
+						// Group Leaders
+						EmployeesReportingTo: {
+							select: {
+								id: true,
+								uuid: true,
+								jobTitle: true,
+								fullName: true,
+								// Team Leaders
+								EmployeesReportingTo: {
+									select: {
+										id: true,
+										uuid: true,
+										jobTitle: true,
+										fullName: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		});
+
+		return {status: 200, data: selectedChart};
+	} else {
+		return {status: 404, data: "Company not found"};
+	}
+};
