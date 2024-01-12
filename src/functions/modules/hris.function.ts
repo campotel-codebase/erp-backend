@@ -8,6 +8,13 @@ import {Prisma} from "@prisma/client";
 import pwdGenerator from "generate-password";
 import {hashPassword} from "../../utils/password.util";
 
+const generatedPassword = pwdGenerator.generate({
+	length: 10,
+	numbers: true,
+	symbols: true,
+	strict: true,
+});
+
 export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
@@ -81,12 +88,6 @@ export const createEmployee = async (body: Prisma.EmployeeCreateInput, companyUu
 		const fullName = `${body.lastName} ${body.firstName} ${body.middleName}`;
 		const {department, jobTitle, talentSegment, benefits, ...rest} = body;
 		const benefitsToString = JSON.stringify(benefits);
-		const generatedPassword = pwdGenerator.generate({
-			length: 10,
-			numbers: true,
-			symbols: true,
-			strict: true,
-		});
 
 		const newEmployee = await prisma.employee.create({
 			data: {
@@ -107,7 +108,41 @@ export const createEmployee = async (body: Prisma.EmployeeCreateInput, companyUu
 	}
 };
 
-export const createEmployees = async (body: [], companyUuid: string) => {};
+export const createEmployees = async (
+	body: Prisma.EmployeeCreateManyInput[],
+	companyUuid: string,
+) => {
+	const company = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {id: true},
+	});
+	if (company) {
+		const employees = await Promise.all(
+			body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
+				const {department, jobTitle, talentSegment, benefits, ...rest} = employee;
+				const fullName = `${employee.lastName} ${employee.firstName} ${employee.middleName}`;
+				const benefitsToString = JSON.stringify(benefits);
+				return {
+					...rest,
+					companyId: company.id,
+					fullName,
+					department,
+					jobTitle,
+					talentSegment,
+					benefits: benefitsToString,
+					uuid: await generateUuid(),
+					password: await hashPassword(generatedPassword),
+				};
+			}),
+		);
+		const newEmployees = await prisma.employee.createMany({
+			data: employees,
+		});
+		return {status: 200, data: newEmployees};
+	} else {
+		return {status: 404, data: "company not found"};
+	}
+};
 
 export const onboardEmployee = async (
 	body: onBoardType,

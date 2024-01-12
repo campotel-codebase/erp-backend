@@ -4,6 +4,7 @@ import {
 	assignBankAccount,
 	createBankAccount,
 	createEmployee,
+	createEmployees,
 	employee,
 	employees,
 	employeesCsvToJsonArray,
@@ -43,7 +44,8 @@ hris.post("/create-employee", async (req, res) => {
 hris.post("/create-employees", async (req, res) => {
 	const companyUuid = req.authorization.companyUuid;
 	try {
-		res.json("employees creation  batch " + companyUuid);
+		const result = await createEmployees(req.body, companyUuid);
+		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
 	}
