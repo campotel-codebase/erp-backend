@@ -31,9 +31,9 @@ hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
 });
 
 hris.post("/onboard-employee", async (req, res) => {
-	const companyUuid = req.authCreds.company.uuid;
+	const company = req.authCreds.company.id;
 	try {
-		const result = await onboardEmployee(req.body, companyUuid);
+		const result = await onboardEmployee(req.body, company);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

@@ -8,6 +8,7 @@ import {Prisma} from "@prisma/client";
 import pwdGenerator from "generate-password";
 import {hashPassword} from "../../utils/password.util";
 
+// make this is as a utils
 const generatedPassword = pwdGenerator.generate({
 	length: 10,
 	numbers: true,
@@ -79,36 +80,28 @@ export const employeesCsvToJsonArray = async (
 
 export const onboardEmployee = async (
 	body: {employee: Prisma.EmployeeCreateInput; reportingToId: number},
-	companyUuid: string,
+	companyId: number,
 ) => {
-	const company = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {id: true},
-	});
-	if (company) {
-		const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
-		const {benefits, hiredDate, ...rest} = body.employee;
-		const benefitsToString = JSON.stringify(benefits);
+	const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
+	const {benefits, hiredDate, ...rest} = body.employee;
+	const benefitsToString = JSON.stringify(benefits);
 
-		const newEmployee = await prisma.employee.create({
-			data: {
-				...rest,
-				fullName,
-				hiredDate,
-				lastHiredDate: formatISO(hiredDate),
-				benefits: benefitsToString,
-				password: await hashPassword(generatedPassword),
-				uuid: await generateUuid(),
-				Company: {connect: {id: company.id}},
-				ReportingTo: {
-					connect: {id: body.reportingToId},
-				},
+	const newEmployee = await prisma.employee.create({
+		data: {
+			...rest,
+			fullName,
+			hiredDate,
+			lastHiredDate: formatISO(hiredDate),
+			benefits: benefitsToString,
+			password: await hashPassword(generatedPassword),
+			uuid: await generateUuid(),
+			Company: {connect: {id: companyId}},
+			ReportingTo: {
+				connect: {id: body.reportingToId},
 			},
-		});
-		return {status: 200, data: {newEmployee, generatedPassword}};
-	} else {
-		return {status: 404, data: "company not found"};
-	}
+		},
+	});
+	return {status: 200, data: {newEmployee, generatedPassword}};
 };
 
 export const onBoardEmployees = async (
