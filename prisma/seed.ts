@@ -4,11 +4,6 @@ import {hashPassword} from "../src/utils/password.util";
 
 const seed = async () => {
 	const hashedPassword = await hashPassword("secret");
-	const employeeName = {
-		lastName: faker.person.lastName(),
-		firstName: faker.person.firstName(),
-		middleName: faker.person.middleName(),
-	};
 
 	// seeds
 	const newCompany = await prisma.company.create({
@@ -55,20 +50,9 @@ const seed = async () => {
 		}),
 	});
 
-	const newBankAccounts = await prisma.bankAccount.createMany({
-		data: Array.from({length: 4}).map(() => ({
-			uuid: faker.string.uuid(),
-			bankName: "metro bank",
-			accountNumber: faker.finance.accountNumber(),
-			cardNumber: faker.finance.creditCardNumber(),
-			accountType: "debit",
-		})),
-	});
-
 	console.log({
 		newCompany,
 		newEmployees,
-		newBankAccounts,
 	});
 };
 
