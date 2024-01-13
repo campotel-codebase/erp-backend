@@ -27,8 +27,6 @@ model Company {
   benefits          String?             @db.VarChar(255)
   User              User[]
   Employee          Employee[]
-  BankAccount       BankAccount[]
-  EmploymentHistory EmploymentHistory[]
   createdAt         DateTime            @default(now())
 }
 
@@ -44,7 +42,7 @@ model User {
   firstName  String   @db.VarChar(30)
   email      String   @unique @db.VarChar(255)
   password   String   @db.VarChar(255)
-  Company    Company  @relation(fields: [companyId], references: [id])
+  Company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
 }
 
@@ -86,7 +84,7 @@ model Employee {
   LeaveRequest         LeaveRequest[]
   ReportingTo          Employee?           @relation("reportingTo", fields: [reportingToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   EmployeesReportingTo Employee[]          @relation("reportingTo")
-  Company              Company             @relation(fields: [companyId], references: [id])
+  Company              Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
   createdAt            DateTime            @default(now())
 
   @@index([fullName])
@@ -94,7 +92,6 @@ model Employee {
 
 model BankAccount {
   id            Int       @id @default(autoincrement())
-  companyId     Int
   employeeId    Int?
   uuid          String    @unique
   bankName      String    @db.VarChar(255)
@@ -102,21 +99,18 @@ model BankAccount {
   cardNumber    String    @db.VarChar(255)
   accountType   String    @db.VarChar(255)
   isActive      Int       @default(0) @db.TinyInt
-  Company       Company   @relation(fields: [companyId], references: [id], onUpdate: NoAction, onDelete: NoAction)
-  Employee      Employee? @relation(fields: [employeeId], references: [id])
+  Employee      Employee? @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   createdAt     DateTime  @default(now())
 }
 
 model EmploymentHistory {
   id          Int      @id @default(autoincrement())
-  companyId   Int
   employeeId  Int
   onBoarding  DateTime
   offBoarding DateTime
   reason      String   @db.VarChar(255)
   remarks     String?  @db.VarChar(255)
-  Company     Company  @relation(fields: [companyId], references: [id], onUpdate: NoAction, onDelete: NoAction)
-  Employee    Employee @relation(fields: [employeeId], references: [id])
+  Employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
 }
 
@@ -132,6 +126,6 @@ model LeaveRequest {
   absenceType         String   @db.VarChar(20)
   isPaid              Int
   isHrNoted           Int      @default(0) @db.TinyInt
-  Employee            Employee @relation(fields: [employeeId], references: [id])
+  Employee            Employee @relation(fields: [employeeId], references: [id] , onDelete: Cascade)
   createdAt           DateTime @default(now())
 }

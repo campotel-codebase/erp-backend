@@ -29,28 +29,34 @@ const seed = async () => {
 	});
 
 	const newEmployees = await prisma.employee.createMany({
-		data: Array.from({length: 50}).map(() => ({
-			companyId: newCompany.id,
-			uuid: faker.string.uuid(),
-			...employeeName,
-			fullName: `${employeeName.lastName} ${employeeName.firstName} ${employeeName.middleName}`,
-			nickname: faker.internet.userName(),
-			suffix: faker.person.suffix(),
-			phoneNumber: faker.phone.number(),
-			email: faker.internet.email(),
-			password: faker.internet.password(),
-			birthday: faker.date.birthdate({min: 18, max: 60, mode: "age"}),
-			bloodType: "a+",
-			salary: faker.finance.amount(),
-			driverLicense: faker.number.int({min: 100000, max: 999999}).toString(),
-			taxId: faker.number.int({min: 100000, max: 999999}).toString(),
-		})),
+		data: Array.from({length: 40}).map(() => {
+			const employeeName = {
+				lastName: faker.person.lastName(),
+				firstName: faker.person.firstName(),
+				middleName: faker.person.middleName(),
+			};
+			return {
+				companyId: newCompany.id,
+				uuid: faker.string.uuid(),
+				...employeeName,
+				fullName: `${employeeName.lastName} ${employeeName.firstName} ${employeeName.middleName}`,
+				nickname: faker.internet.userName(),
+				suffix: faker.person.suffix(),
+				phoneNumber: faker.phone.number(),
+				email: faker.internet.email(),
+				password: faker.internet.password(),
+				birthday: faker.date.birthdate({min: 18, max: 60, mode: "age"}),
+				bloodType: "a+",
+				salary: faker.finance.amount(),
+				driverLicense: faker.number.int({min: 100000, max: 999999}).toString(),
+				taxId: faker.number.int({min: 100000, max: 999999}).toString(),
+			};
+		}),
 	});
 
 	const newBankAccounts = await prisma.bankAccount.createMany({
 		data: Array.from({length: 4}).map(() => ({
 			uuid: faker.string.uuid(),
-			companyId: newCompany.id,
 			bankName: "metro bank",
 			accountNumber: faker.finance.accountNumber(),
 			cardNumber: faker.finance.creditCardNumber(),
