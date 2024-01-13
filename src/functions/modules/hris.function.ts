@@ -8,7 +8,7 @@ import {Prisma} from "@prisma/client";
 import pwdGenerator from "generate-password";
 import {hashPassword} from "../../utils/password.util";
 
-// make this is as a utils
+//TODO make this is as a utils
 const generatedPassword = pwdGenerator.generate({
 	length: 10,
 	numbers: true,
@@ -136,6 +136,7 @@ export const offboardEmployee = async (
 	employeeUuid: string,
 	companyUuid: string,
 ) => {
+	// TODO make a middlware for this kind of query
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
 		select: {
@@ -183,27 +184,9 @@ export const offboardEmployee = async (
 	}
 };
 
-export const createBankAccount = async (body: bankAccountType, companyUuid: string) => {
-	const company = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {id: true},
-	});
-	if (company) {
-		const newBankAccount = await prisma.bankAccount.create({
-			data: {
-				...body,
-				uuid: await generateUuid(),
-			},
-		});
-		return {status: 200, data: newBankAccount};
-	} else {
-		return {status: 404, data: "company not found"};
-	}
-};
-
 export const assignBankAccount = async (
+	body: bankAccountType,
 	employeeUuid: string,
-	bankAccountUuid: string,
 	companyUuid: string,
 ) => {
 	const company = await prisma.company.findUnique({
@@ -222,10 +205,10 @@ export const assignBankAccount = async (
 			},
 			select: {id: true, payType: true},
 		});
-		const assignBank = await prisma.bankAccount.update({
-			where: {uuid: bankAccountUuid},
+		const assignBank = await prisma.bankAccount.create({
 			data: {
-				isActive: 1,
+				uuid: await generateUuid(),
+				...body,
 				Employee: {
 					connect: {
 						id: newPayrollForEmployee.id,

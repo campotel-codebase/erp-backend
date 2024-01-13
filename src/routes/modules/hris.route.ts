@@ -2,7 +2,6 @@ import express from "express";
 import {uploadCsv} from "../../middlewares/multer.middleware";
 import {
 	assignBankAccount,
-	createBankAccount,
 	onBoardEmployees,
 	employee,
 	employees,
@@ -51,31 +50,21 @@ hris.post("/create-employees", async (req, res) => {
 });
 
 hris.patch("/offboard-employee/:employeeUuid", async (req, res) => {
-	const companyUuid = req.authCreds.company.uuid;
+	const company = req.authCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
-		const result = await offboardEmployee(req.body, employeeUuid, companyUuid);
+		const result = await offboardEmployee(req.body, employeeUuid, company);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
 	}
 });
 
-hris.post("/create-bank-account", async (req, res) => {
-	const companyUuid = req.authCreds.company.uuid;
+hris.patch("/assign-bank-account/:employeeUuid", async (req, res) => {
+	const company = req.authCreds.company.uuid;
+	const {employeeUuid} = req.params;
 	try {
-		const result = await createBankAccount(req.body, companyUuid);
-		res.status(result.status).json(result.data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
-
-hris.patch("/assign-bank-account/:employeeUuid/:bankAccountUuid", async (req, res) => {
-	const companyUuid = req.authCreds.company.uuid;
-	const {employeeUuid, bankAccountUuid} = req.params;
-	try {
-		const result = await assignBankAccount(employeeUuid, bankAccountUuid, companyUuid);
+		const result = await assignBankAccount(req.body, employeeUuid, company);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
