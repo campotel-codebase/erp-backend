@@ -87,7 +87,7 @@ export const onboardEmployee = async (
 			hiredDate,
 			lastHiredDate: formatISO(hiredDate),
 			benefits: benefitsToString,
-			password: tempPassword,
+			password: await hashPassword(tempPassword),
 			uuid: await generateUuid(),
 			Company: {connect: {id: company.id}},
 			ReportingTo: {
