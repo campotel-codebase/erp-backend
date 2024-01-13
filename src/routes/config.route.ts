@@ -8,7 +8,7 @@ import {
 const config = express.Router();
 
 config.patch("/departments", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	const toString = JSON.stringify(req.body.departments);
 	const prepData = {
 		departments: toString,
@@ -21,7 +21,7 @@ config.patch("/departments", async (req, res) => {
 	}
 });
 config.patch("/job-titles", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	const toString = JSON.stringify(req.body.jobTitles);
 	const prepData = {
 		jobTitles: toString,
@@ -34,7 +34,7 @@ config.patch("/job-titles", async (req, res) => {
 	}
 });
 config.patch("/talent-segments", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	const toString = JSON.stringify(req.body.talentSegments);
 	const prepData = {
 		talentSegments: toString,
@@ -47,7 +47,7 @@ config.patch("/talent-segments", async (req, res) => {
 	}
 });
 config.patch("/benefits", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	const toString = JSON.stringify(req.body.benefits);
 	const prepData = {
 		benefits: toString,

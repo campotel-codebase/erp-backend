@@ -4,7 +4,7 @@ import {uploadImage} from "../middlewares/multer.middleware";
 const user = express.Router();
 
 user.get("/profile", async (req, res) => {
-	const userUuid = req.authorization.userUuid;
+	const userUuid = req.authCreds.user.uuid;
 	try {
 		const result = await profile(userUuid);
 		res.status(result.status).json(result.data);
@@ -14,7 +14,7 @@ user.get("/profile", async (req, res) => {
 });
 
 user.put("/update-avatar", uploadImage.single("avatar"), async (req, res) => {
-	const userUuid = req.authorization.userUuid;
+	const userUuid = req.authCreds.user.uuid;
 	const url = req.protocol + "://" + req.get("host");
 	const fileName = req.file?.filename;
 	const filePath = "/public/avatar/";

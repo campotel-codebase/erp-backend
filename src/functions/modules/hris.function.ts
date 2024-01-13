@@ -5,23 +5,13 @@ import {formatISO} from "date-fns";
 import {offBoardType} from "../../../types/modules/hris/employees";
 import {bankAccountType} from "../../../types/modules/hris/payroll";
 import {Prisma} from "@prisma/client";
-import pwdGenerator from "generate-password";
-import {hashPassword} from "../../utils/password.util";
+import {generatePassword, hashPassword} from "../../utils/password.util";
 
-const generatedPassword = pwdGenerator.generate({
-	length: 10,
-	numbers: true,
-	symbols: true,
-	strict: true,
-});
-
-export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
-	const company = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {benefits: true},
-	});
-
-	const benefitsToArray: string[] = JSON.parse(company?.benefits ? company.benefits : "[]");
+export const employeesCsvToJsonArray = async (
+	csvBuffer: string,
+	companyBenefits: string | null,
+) => {
+	const benefitsToArray: string[] = JSON.parse(companyBenefits ? companyBenefits : "[]");
 	const expectedHeader = [
 		"lastName",
 		"firstName",
@@ -81,72 +71,56 @@ export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: st
 
 export const onboardEmployee = async (
 	body: {employee: Prisma.EmployeeCreateInput; reportingToId: number},
-	companyUuid: string,
+	companyId: number,
 ) => {
-	const company = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {id: true},
-	});
-	if (company) {
-		const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
-		const {benefits, hiredDate, ...rest} = body.employee;
-		const benefitsToString = JSON.stringify(benefits);
+	const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
+	const {benefits, hiredDate, ...rest} = body.employee;
+	const benefitsToString = JSON.stringify(benefits);
+	const tempPassword = generatePassword;
 
-		const newEmployee = await prisma.employee.create({
-			data: {
+	const newEmployee = await prisma.employee.create({
+		data: {
+			...rest,
+			fullName,
+			hiredDate,
+			lastHiredDate: formatISO(hiredDate),
+			benefits: benefitsToString,
+			password: tempPassword,
+			uuid: await generateUuid(),
+			Company: {connect: {id: companyId}},
+			ReportingTo: {
+				connect: {id: body.reportingToId},
+			},
+		},
+	});
+	return {status: 200, data: {newEmployee, tempPassword}};
+};
+
+export const onBoardEmployees = async (
+	body: Prisma.EmployeeCreateManyInput[],
+	companyId: number,
+) => {
+	const employees = await Promise.all(
+		body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
+			const {department, jobTitle, talentSegment, benefits, hiredDate, ...rest} = employee;
+			const fullName = `${employee.lastName} ${employee.firstName} ${employee.middleName}`;
+			const benefitsToString = JSON.stringify(benefits);
+			return {
 				...rest,
+				companyId: companyId,
 				fullName,
 				hiredDate,
 				lastHiredDate: formatISO(hiredDate),
 				benefits: benefitsToString,
-				password: await hashPassword(generatedPassword),
 				uuid: await generateUuid(),
-				Company: {connect: {id: company.id}},
-				ReportingTo: {
-					connect: {id: body.reportingToId},
-				},
-			},
-		});
-		return {status: 200, data: {newEmployee, generatedPassword}};
-	} else {
-		return {status: 404, data: "company not found"};
-	}
-};
-
-export const createEmployees = async (
-	body: Prisma.EmployeeCreateManyInput[],
-	companyUuid: string,
-) => {
-	const company = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {id: true},
+				password: await hashPassword(generatePassword),
+			};
+		}),
+	);
+	const newEmployees = await prisma.employee.createMany({
+		data: employees,
 	});
-	if (company) {
-		const employees = await Promise.all(
-			body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
-				const {department, jobTitle, talentSegment, benefits, ...rest} = employee;
-				const fullName = `${employee.lastName} ${employee.firstName} ${employee.middleName}`;
-				const benefitsToString = JSON.stringify(benefits);
-				return {
-					...rest,
-					companyId: company.id,
-					fullName,
-					department,
-					jobTitle,
-					talentSegment,
-					benefits: benefitsToString,
-					uuid: await generateUuid(),
-					password: await hashPassword(generatedPassword),
-				};
-			}),
-		);
-		const newEmployees = await prisma.employee.createMany({
-			data: employees,
-		});
-		return {status: 200, data: newEmployees};
-	} else {
-		return {status: 404, data: "company not found"};
-	}
+	return {status: 200, data: newEmployees};
 };
 
 export const offboardEmployee = async (
@@ -201,27 +175,9 @@ export const offboardEmployee = async (
 	}
 };
 
-export const createBankAccount = async (body: bankAccountType, companyUuid: string) => {
-	const company = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {id: true},
-	});
-	if (company) {
-		const newBankAccount = await prisma.bankAccount.create({
-			data: {
-				...body,
-				uuid: await generateUuid(),
-			},
-		});
-		return {status: 200, data: newBankAccount};
-	} else {
-		return {status: 404, data: "company not found"};
-	}
-};
-
 export const assignBankAccount = async (
+	body: bankAccountType,
 	employeeUuid: string,
-	bankAccountUuid: string,
 	companyUuid: string,
 ) => {
 	const company = await prisma.company.findUnique({
@@ -240,10 +196,10 @@ export const assignBankAccount = async (
 			},
 			select: {id: true, payType: true},
 		});
-		const assignBank = await prisma.bankAccount.update({
-			where: {uuid: bankAccountUuid},
+		const assignBank = await prisma.bankAccount.create({
 			data: {
-				isActive: 1,
+				uuid: await generateUuid(),
+				...body,
 				Employee: {
 					connect: {
 						id: newPayrollForEmployee.id,
@@ -309,57 +265,47 @@ export const employee = async (companyUuid: string, employeeUuid: string) => {
 	return {status: 200, data: employee};
 };
 
-export const orgChartTree = async (companyUuid: string, employeeUuid: string) => {
-	const company = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {id: true},
-	});
-
-	if (company) {
-		// TODO Needs to fetch if  the reporting to is not null
-		const selectedChart = await prisma.employee.findUnique({
-			where: {
-				companyId: company.id,
-				uuid: employeeUuid,
-			},
-			// CEO
-			select: {
-				id: true,
-				uuid: true,
-				jobTitle: true,
-				fullName: true,
-				// Managers
-				EmployeesReportingTo: {
-					select: {
-						id: true,
-						uuid: true,
-						jobTitle: true,
-						fullName: true,
-						// Group Leaders
-						EmployeesReportingTo: {
-							select: {
-								id: true,
-								uuid: true,
-								jobTitle: true,
-								fullName: true,
-								// Team Leaders
-								EmployeesReportingTo: {
-									select: {
-										id: true,
-										uuid: true,
-										jobTitle: true,
-										fullName: true,
-									},
+export const orgChartTree = async (employeeUuid: string) => {
+	// TODO Needs to fetch if  the reporting to is not null
+	const selectedChart = await prisma.employee.findUnique({
+		where: {
+			uuid: employeeUuid,
+		},
+		// CEO
+		select: {
+			id: true,
+			uuid: true,
+			jobTitle: true,
+			fullName: true,
+			// Managers
+			EmployeesReportingTo: {
+				select: {
+					id: true,
+					uuid: true,
+					jobTitle: true,
+					fullName: true,
+					// Group Leaders
+					EmployeesReportingTo: {
+						select: {
+							id: true,
+							uuid: true,
+							jobTitle: true,
+							fullName: true,
+							// Team Leaders
+							EmployeesReportingTo: {
+								select: {
+									id: true,
+									uuid: true,
+									jobTitle: true,
+									fullName: true,
 								},
 							},
 						},
 					},
 				},
 			},
-		});
+		},
+	});
 
-		return {status: 200, data: selectedChart};
-	} else {
-		return {status: 404, data: "Company not found"};
-	}
+	return {status: 200, data: selectedChart};
 };

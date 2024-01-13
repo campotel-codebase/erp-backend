@@ -1,11 +1,11 @@
 import prisma from "../../libs/prisma";
 import {Request, Response, NextFunction} from "express";
 import jwt from "jsonwebtoken";
-import {jwtPayloadType} from "../../types/jwt-payload";
+import {authCredentialsType, jwtPayloadType} from "../../types/jwt-payload";
 
 declare module "express-serve-static-core" {
 	interface Request {
-		authorization: jwtPayloadType;
+		authCreds: authCredentialsType;
 	}
 }
 
@@ -21,22 +21,32 @@ export const authorization = async (req: Request, res: Response, next: NextFunct
 				const validatePayload = await prisma.company.findUniqueOrThrow({
 					where: {uuid: tokenPayload.companyUuid},
 					select: {
+						id: true,
 						uuid: true,
+						benefits: true,
 						User: {
 							where: {
 								uuid: tokenPayload.userUuid,
 							},
 							select: {
+								id: true,
 								uuid: true,
 							},
 						},
 					},
 				});
-				const prepData: jwtPayloadType = {
-					companyUuid: validatePayload.uuid,
-					userUuid: validatePayload.User[0].uuid,
+				const prepData: authCredentialsType = {
+					company: {
+						id: validatePayload.id,
+						uuid: validatePayload.uuid,
+						benefits: validatePayload.benefits,
+					},
+					user: {
+						id: validatePayload.User[0].id,
+						uuid: validatePayload.User[0].uuid,
+					},
 				};
-				req.authorization = prepData;
+				req.authCreds = prepData;
 				next();
 			} catch (error: any) {
 				res.status(401).json({error: error.message});
