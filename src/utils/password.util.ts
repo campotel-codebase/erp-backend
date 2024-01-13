@@ -1,32 +1,9 @@
 import prisma from "../../libs/prisma";
 import argon2 from "argon2";
-import handlebars from "handlebars";
-import mjml2html from "mjml";
-import fs from "fs";
-import path from "path";
-import {transporter} from "../../configs/email.config";
 import {addHours, formatISO} from "date-fns";
 import {generateUuid} from "./uuid.util";
 import pwdGenerator from "generate-password";
-const templatePath = path.join(__dirname, "../../mjml/password-reset.mjml");
-
-const emailContent = async (sendTo: any) => {
-	const {to, subject, text} = sendTo;
-	const mjmlTemplate = fs.readFileSync(templatePath, "utf8");
-
-	const template = handlebars.compile(mjmlTemplate);
-	const mjmlWithDynamicData = template({title: text.title, msg: text.msg});
-
-	const {html} = mjml2html(mjmlWithDynamicData);
-
-	const mailOptions = {
-		from: process.env.EMAIL_ACCOUNT,
-		to,
-		subject,
-		html,
-	};
-	return await transporter.sendMail(mailOptions);
-};
+import {emailContent} from "./email.util";
 
 export const sendResetLinkForPwd = async (email: string, usedFor: string) => {
 	const twoHoursFromNow = formatISO(addHours(new Date(), 2));
@@ -48,6 +25,7 @@ export const sendResetLinkForPwd = async (email: string, usedFor: string) => {
 				title: "dear user click this link to reset password",
 				msg: resetLink,
 			},
+			usedFor: "reset-password",
 		};
 		const {envelope} = await emailContent(sendTo);
 		return envelope;
