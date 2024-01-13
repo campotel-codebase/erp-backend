@@ -113,7 +113,7 @@ export const onboardEmployee = async (
 	}
 };
 
-export const createEmployees = async (
+export const onBoardEmployees = async (
 	body: Prisma.EmployeeCreateManyInput[],
 	companyUuid: string,
 ) => {
@@ -124,16 +124,15 @@ export const createEmployees = async (
 	if (company) {
 		const employees = await Promise.all(
 			body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
-				const {department, jobTitle, talentSegment, benefits, ...rest} = employee;
+				const {department, jobTitle, talentSegment, benefits, hiredDate, ...rest} = employee;
 				const fullName = `${employee.lastName} ${employee.firstName} ${employee.middleName}`;
 				const benefitsToString = JSON.stringify(benefits);
 				return {
 					...rest,
 					companyId: company.id,
 					fullName,
-					department,
-					jobTitle,
-					talentSegment,
+					hiredDate,
+					lastHiredDate: formatISO(hiredDate),
 					benefits: benefitsToString,
 					uuid: await generateUuid(),
 					password: await hashPassword(generatedPassword),
