@@ -5,4 +5,5 @@ export type sendToType = {
 		title: string;
 		msg: string;
 	};
+	usedFor: string;
 };

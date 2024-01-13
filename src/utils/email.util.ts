@@ -5,12 +5,19 @@ import {transporter} from "../../configs/email.config";
 import Handlebars from "handlebars";
 import {sendToType} from "../../types/email";
 
-const resetPasswordTemplate = path.join(__dirname, "../../mjml/password-reset.mjml");
+const resetPasswordTemplate = path.join(__dirname, "../../mjml/reset-password.mjml");
 const notificationTemplate = path.join(__dirname, "../../mjml/notification.mjml");
 
 export const emailContent = async (sendTo: sendToType) => {
-	const {to, subject, text} = sendTo;
-	const mjmlTemplate = fs.readFileSync(resetPasswordTemplate, "utf8");
+	const {to, subject, text, usedFor} = sendTo;
+	const isFor = () => {
+		if (usedFor === "notification") {
+			return notificationTemplate;
+		} else {
+			return resetPasswordTemplate;
+		}
+	};
+	const mjmlTemplate = fs.readFileSync(isFor(), "utf8");
 
 	const template = Handlebars.compile(mjmlTemplate);
 	const mjmlWithDynamicData = template({title: text.title, msg: text.msg});

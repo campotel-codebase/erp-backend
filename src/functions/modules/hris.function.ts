@@ -102,6 +102,7 @@ export const onboardEmployee = async (
 			title: `Welcome ${newEmployee.fullName} to ${company.name}`,
 			msg: `temporary erp portal password: ${tempPassword}`,
 		},
+		usedFor: "notification",
 	};
 	await emailContent(sendTo);
 	return {status: 200, data: {newEmployee, tempPassword}};

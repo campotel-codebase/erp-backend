@@ -3,7 +3,7 @@ import argon2 from "argon2";
 import {addHours, formatISO} from "date-fns";
 import {generateUuid} from "./uuid.util";
 import pwdGenerator from "generate-password";
-import { emailContent } from "./email.util";
+import {emailContent} from "./email.util";
 
 export const sendResetLinkForPwd = async (email: string, usedFor: string) => {
 	const twoHoursFromNow = formatISO(addHours(new Date(), 2));
@@ -25,6 +25,7 @@ export const sendResetLinkForPwd = async (email: string, usedFor: string) => {
 				title: "dear user click this link to reset password",
 				msg: resetLink,
 			},
+			usedFor: "reset-password",
 		};
 		const {envelope} = await emailContent(sendTo);
 		return envelope;
