@@ -11,29 +11,33 @@ import {
 export const employeeSignIn = async (body: employeeSignInType) => {
 	const userAccount = await prisma.employee.findUnique({
 		where: {email: body.email},
-		select: {uuid: true, password: true},
+		select: {uuid: true, password: true, isPortalOpen: true},
 	});
 	if (userAccount) {
-		const isPasswordMatch = await verifyHashedPassword(userAccount.password, body.password);
-		if (isPasswordMatch) {
-			const user = await prisma.employee.findUnique({
-				where: {
-					uuid: userAccount.uuid,
-				},
-				include: {Company: {select: {uuid: true}}},
-			});
-			if (user) {
-				const jwt = generateJwt({companyUuid: user.Company.uuid, userUuid: user.uuid});
-				if (jwt) {
-					return {status: 200, data: jwt};
+		if (userAccount.isPortalOpen) {
+			const isPasswordMatch = await verifyHashedPassword(userAccount.password, body.password);
+			if (isPasswordMatch) {
+				const user = await prisma.employee.findUnique({
+					where: {
+						uuid: userAccount.uuid,
+					},
+					include: {Company: {select: {uuid: true}}},
+				});
+				if (user) {
+					const jwt = generateJwt({companyUuid: user.Company.uuid, userUuid: user.uuid});
+					if (jwt) {
+						return {status: 200, data: jwt};
+					} else {
+						return {status: 400, data: "fail to generate token"};
+					}
 				} else {
-					return {status: 400, data: "fail to generate token"};
+					return {status: 400, data: "fail to query user"};
 				}
 			} else {
-				return {status: 400, data: "fail to query user"};
+				return {status: 401, data: "incorrect password"};
 			}
 		} else {
-			return {status: 401, data: "incorrect password"};
+			return {status: 403, data: "no access"};
 		}
 	} else {
 		return {status: 404, data: "account not found"};
@@ -42,11 +46,15 @@ export const employeeSignIn = async (body: employeeSignInType) => {
 export const employeePwdResetLink = async (email: string) => {
 	const isExists = await prisma.employee.findUnique({
 		where: {email},
-		select: {uuid: true},
+		select: {uuid: true, isPortalOpen: true},
 	});
 	if (isExists) {
-		await sendResetLinkForPwd(email, "employee");
-		return {status: 200, data: "password reset link was sent to your email address"};
+		if (isExists.isPortalOpen) {
+			await sendResetLinkForPwd(email, "employee");
+			return {status: 200, data: "password reset link was sent to your email address"};
+		} else {
+			return {status: 403, data: "no access"};
+		}
 	} else {
 		return {status: 404, data: "email not found"};
 	}
