@@ -23,6 +23,7 @@ export const authorization = async (req: Request, res: Response, next: NextFunct
 					select: {
 						id: true,
 						uuid: true,
+						benefits: true,
 						User: {
 							where: {
 								uuid: tokenPayload.userUuid,
@@ -38,6 +39,7 @@ export const authorization = async (req: Request, res: Response, next: NextFunct
 					company: {
 						id: validatePayload.id,
 						uuid: validatePayload.uuid,
+						benefits: validatePayload.benefits,
 					},
 					user: {
 						id: validatePayload.User[0].id,
