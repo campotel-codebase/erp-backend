@@ -218,9 +218,6 @@ export const offboardEmployee = async (
 					Employee: {
 						connect: {id: newOffBoardedEmployee.id},
 					},
-					Company: {
-						connect: {id: company.id},
-					},
 				},
 			});
 			return {status: 200, data: "employee offboarded successfully"};
@@ -242,9 +239,6 @@ export const createBankAccount = async (body: bankAccountType, companyUuid: stri
 			data: {
 				...body,
 				uuid: await generateUuid(),
-				Company: {
-					connect: {id: company.id},
-				},
 			},
 		});
 		return {status: 200, data: newBankAccount};
@@ -264,16 +258,9 @@ export const assignBankAccount = async (
 			Employee: {
 				where: {uuid: employeeUuid, isActive: 1},
 			},
-			BankAccount: {
-				where: {
-					uuid: bankAccountUuid,
-					isActive: 0,
-					employeeId: null,
-				},
-			},
 		},
 	});
-	if (company?.Employee[0] && company?.BankAccount[0]) {
+	if (company?.Employee[0]) {
 		const newPayrollForEmployee = await prisma.employee.update({
 			where: {uuid: employeeUuid},
 			data: {
