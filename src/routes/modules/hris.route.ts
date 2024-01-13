@@ -39,7 +39,7 @@ hris.post("/onboard-employee", async (req, res) => {
 	}
 });
 
-hris.post("/create-employees", async (req, res) => {
+hris.post("/onboard-employees", async (req, res) => {
 	const company = req.authCreds.company.id;
 	try {
 		const result = await onBoardEmployees(req.body, company);
@@ -104,10 +104,9 @@ hris.get("/employee/:employeeUuid", async (req, res) => {
 });
 
 hris.get("/org-chart-tree/:employeeUuid", async (req, res) => {
-	const company = req.authCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
-		const result = await orgChartTree(company, employeeUuid);
+		const result = await orgChartTree(employeeUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
