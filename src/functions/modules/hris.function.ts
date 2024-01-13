@@ -106,37 +106,29 @@ export const onboardEmployee = async (
 
 export const onBoardEmployees = async (
 	body: Prisma.EmployeeCreateManyInput[],
-	companyUuid: string,
+	companyId: number,
 ) => {
-	const company = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {id: true},
+	const employees = await Promise.all(
+		body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
+			const {department, jobTitle, talentSegment, benefits, hiredDate, ...rest} = employee;
+			const fullName = `${employee.lastName} ${employee.firstName} ${employee.middleName}`;
+			const benefitsToString = JSON.stringify(benefits);
+			return {
+				...rest,
+				companyId: companyId,
+				fullName,
+				hiredDate,
+				lastHiredDate: formatISO(hiredDate),
+				benefits: benefitsToString,
+				uuid: await generateUuid(),
+				password: await hashPassword(generatedPassword),
+			};
+		}),
+	);
+	const newEmployees = await prisma.employee.createMany({
+		data: employees,
 	});
-	if (company) {
-		const employees = await Promise.all(
-			body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
-				const {department, jobTitle, talentSegment, benefits, hiredDate, ...rest} = employee;
-				const fullName = `${employee.lastName} ${employee.firstName} ${employee.middleName}`;
-				const benefitsToString = JSON.stringify(benefits);
-				return {
-					...rest,
-					companyId: company.id,
-					fullName,
-					hiredDate,
-					lastHiredDate: formatISO(hiredDate),
-					benefits: benefitsToString,
-					uuid: await generateUuid(),
-					password: await hashPassword(generatedPassword),
-				};
-			}),
-		);
-		const newEmployees = await prisma.employee.createMany({
-			data: employees,
-		});
-		return {status: 200, data: newEmployees};
-	} else {
-		return {status: 404, data: "company not found"};
-	}
+	return {status: 200, data: newEmployees};
 };
 
 export const offboardEmployee = async (

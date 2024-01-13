@@ -41,9 +41,9 @@ hris.post("/onboard-employee", async (req, res) => {
 });
 
 hris.post("/create-employees", async (req, res) => {
-	const companyUuid = req.authCreds.company.uuid;
+	const company = req.authCreds.company.id;
 	try {
-		const result = await onBoardEmployees(req.body, companyUuid);
+		const result = await onBoardEmployees(req.body, company);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
