@@ -15,13 +15,11 @@ const generatedPassword = pwdGenerator.generate({
 	strict: true,
 });
 
-export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: string) => {
-	const company = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {benefits: true},
-	});
-
-	const benefitsToArray: string[] = JSON.parse(company?.benefits ? company.benefits : "[]");
+export const employeesCsvToJsonArray = async (
+	csvBuffer: string,
+	companyBenefits: string | null,
+) => {
+	const benefitsToArray: string[] = JSON.parse(companyBenefits ? companyBenefits : "[]");
 	const expectedHeader = [
 		"lastName",
 		"firstName",
