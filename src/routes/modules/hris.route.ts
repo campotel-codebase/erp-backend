@@ -15,7 +15,7 @@ import {
 const hris = express.Router();
 
 hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	const csvBuffer = req.file?.buffer.toString("utf8");
 
 	if (!csvBuffer) {
@@ -31,7 +31,7 @@ hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
 });
 
 hris.post("/onboard-employee", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	try {
 		const result = await onboardEmployee(req.body, companyUuid);
 		res.status(result.status).json(result.data);
@@ -41,7 +41,7 @@ hris.post("/onboard-employee", async (req, res) => {
 });
 
 hris.post("/create-employees", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	try {
 		const result = await onBoardEmployees(req.body, companyUuid);
 		res.status(result.status).json(result.data);
@@ -51,7 +51,7 @@ hris.post("/create-employees", async (req, res) => {
 });
 
 hris.patch("/offboard-employee/:employeeUuid", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
 		const result = await offboardEmployee(req.body, employeeUuid, companyUuid);
@@ -62,7 +62,7 @@ hris.patch("/offboard-employee/:employeeUuid", async (req, res) => {
 });
 
 hris.post("/create-bank-account", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	try {
 		const result = await createBankAccount(req.body, companyUuid);
 		res.status(result.status).json(result.data);
@@ -72,7 +72,7 @@ hris.post("/create-bank-account", async (req, res) => {
 });
 
 hris.patch("/assign-bank-account/:employeeUuid/:bankAccountUuid", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	const {employeeUuid, bankAccountUuid} = req.params;
 	try {
 		const result = await assignBankAccount(employeeUuid, bankAccountUuid, companyUuid);
@@ -83,7 +83,7 @@ hris.patch("/assign-bank-account/:employeeUuid/:bankAccountUuid", async (req, re
 });
 
 hris.get("/employees", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	try {
 		const result = await employees(companyUuid);
 		res.status(result.status).json(result.data);
@@ -93,7 +93,7 @@ hris.get("/employees", async (req, res) => {
 });
 
 hris.get("/search-employee", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	const keyword = req.query.keyword;
 	try {
 		const result = await searchEmployee(companyUuid, keyword);
@@ -104,7 +104,7 @@ hris.get("/search-employee", async (req, res) => {
 });
 
 hris.get("/employee/:employeeUuid", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
 		const result = await employee(companyUuid, employeeUuid);
@@ -115,7 +115,7 @@ hris.get("/employee/:employeeUuid", async (req, res) => {
 });
 
 hris.get("/org-chart-tree/:employeeUuid", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
+	const companyUuid = req.authCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
 		const result = await orgChartTree(companyUuid, employeeUuid);

@@ -7,6 +7,7 @@ export type authCredentialsType = {
 	company: {
 		id: number;
 		uuid: string;
+		benefits: string | null;
 	};
 	user: {
 		id: number;
