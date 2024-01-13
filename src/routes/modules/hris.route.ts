@@ -72,9 +72,9 @@ hris.patch("/assign-bank-account/:employeeUuid", async (req, res) => {
 });
 
 hris.get("/employees", async (req, res) => {
-	const companyUuid = req.authCreds.company.uuid;
+	const company = req.authCreds.company.uuid;
 	try {
-		const result = await employees(companyUuid);
+		const result = await employees(company);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -82,10 +82,10 @@ hris.get("/employees", async (req, res) => {
 });
 
 hris.get("/search-employee", async (req, res) => {
-	const companyUuid = req.authCreds.company.uuid;
+	const company = req.authCreds.company.uuid;
 	const keyword = req.query.keyword;
 	try {
-		const result = await searchEmployee(companyUuid, keyword);
+		const result = await searchEmployee(company, keyword);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -93,10 +93,10 @@ hris.get("/search-employee", async (req, res) => {
 });
 
 hris.get("/employee/:employeeUuid", async (req, res) => {
-	const companyUuid = req.authCreds.company.uuid;
+	const company = req.authCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
-		const result = await employee(companyUuid, employeeUuid);
+		const result = await employee(company, employeeUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -104,10 +104,10 @@ hris.get("/employee/:employeeUuid", async (req, res) => {
 });
 
 hris.get("/org-chart-tree/:employeeUuid", async (req, res) => {
-	const companyUuid = req.authCreds.company.uuid;
+	const company = req.authCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
-		const result = await orgChartTree(companyUuid, employeeUuid);
+		const result = await orgChartTree(company, employeeUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
