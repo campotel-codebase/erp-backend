@@ -1,0 +1,19 @@
+<mjml>
+  <mj-body>
+    <!-- Header -->
+    <mj-section background-color="#000000">
+      <mj-column>
+        <mj-text color="white" font-size="24px">Campotel</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Title -->
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="18px">{{ title }}</mj-text>
+        <!-- Additional Text Message -->
+        <mj-text font-size="16px">{{ msg }}</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
