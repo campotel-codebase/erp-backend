@@ -6,6 +6,8 @@ import {offBoardType} from "../../../types/modules/hris/employees";
 import {bankAccountType} from "../../../types/modules/hris/payroll";
 import {Prisma} from "@prisma/client";
 import {generatePassword, hashPassword} from "../../utils/password.util";
+import {authCredentialsType} from "../../../types/jwt-payload";
+import {emailContent} from "../../utils/email.util";
 
 export const employeesCsvToJsonArray = async (
 	csvBuffer: string,
@@ -71,7 +73,7 @@ export const employeesCsvToJsonArray = async (
 
 export const onboardEmployee = async (
 	body: {employee: Prisma.EmployeeCreateInput; reportingToId: number},
-	companyId: number,
+	company: authCredentialsType["company"],
 ) => {
 	const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
 	const {benefits, hiredDate, ...rest} = body.employee;
@@ -87,12 +89,21 @@ export const onboardEmployee = async (
 			benefits: benefitsToString,
 			password: tempPassword,
 			uuid: await generateUuid(),
-			Company: {connect: {id: companyId}},
+			Company: {connect: {id: company.id}},
 			ReportingTo: {
 				connect: {id: body.reportingToId},
 			},
 		},
 	});
+	const sendTo = {
+		to: newEmployee.email,
+		subject: "newly hired",
+		text: {
+			title: `Welcome ${newEmployee.fullName} to ${company.name}`,
+			msg: `temporary erp portal password: ${tempPassword}`,
+		},
+	};
+	await emailContent(sendTo);
 	return {status: 200, data: {newEmployee, tempPassword}};
 };
 
