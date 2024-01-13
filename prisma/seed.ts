@@ -50,6 +50,7 @@ const seed = async () => {
 				salary: faker.finance.amount(),
 				driverLicense: faker.number.int({min: 100000, max: 999999}).toString(),
 				taxId: faker.number.int({min: 100000, max: 999999}).toString(),
+				hiredDate: faker.date.recent(),
 			};
 		}),
 	});

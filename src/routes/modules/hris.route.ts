@@ -3,7 +3,6 @@ import {uploadCsv} from "../../middlewares/multer.middleware";
 import {
 	assignBankAccount,
 	createBankAccount,
-	createEmployee,
 	createEmployees,
 	employee,
 	employees,
@@ -31,10 +30,10 @@ hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
 	}
 });
 
-hris.post("/create-employee", async (req, res) => {
+hris.post("/onboard-employee", async (req, res) => {
 	const companyUuid = req.authorization.companyUuid;
 	try {
-		const result = await createEmployee(req.body, companyUuid);
+		const result = await onboardEmployee(req.body, companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -45,17 +44,6 @@ hris.post("/create-employees", async (req, res) => {
 	const companyUuid = req.authorization.companyUuid;
 	try {
 		const result = await createEmployees(req.body, companyUuid);
-		res.status(result.status).json(result.data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
-
-hris.patch("/onboard-employee/:employeeUuid", async (req, res) => {
-	const companyUuid = req.authorization.companyUuid;
-	const {employeeUuid} = req.params;
-	try {
-		const result = await onboardEmployee(req.body, employeeUuid, companyUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

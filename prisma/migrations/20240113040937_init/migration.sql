@@ -54,6 +54,8 @@ CREATE TABLE [dbo].[Employee] (
     [companyId] INT NOT NULL,
     [reportingToId] INT,
     [uuid] NVARCHAR(1000) NOT NULL,
+    [isPortalOpen] TINYINT NOT NULL CONSTRAINT [Employee_isPortalOpen_df] DEFAULT 1,
+    [password] VARCHAR(255) NOT NULL,
     [lastName] VARCHAR(30) NOT NULL,
     [firstName] VARCHAR(30) NOT NULL,
     [nickname] VARCHAR(30),
@@ -63,16 +65,12 @@ CREATE TABLE [dbo].[Employee] (
     [birthday] DATETIME2 NOT NULL,
     [fullName] VARCHAR(100),
     [middleName] VARCHAR(30),
-    [isPortalOpen] TINYINT NOT NULL CONSTRAINT [Employee_isPortalOpen_df] DEFAULT 0,
-    [password] VARCHAR(255) NOT NULL,
     [avatar] NVARCHAR(1000),
     [bloodType] VARCHAR(20),
-    [driverLicense] VARCHAR(100),
-    [taxId] VARCHAR(100),
-    [hiredDate] DATETIME2,
+    [hiredDate] DATETIME2 NOT NULL,
     [lastHiredDate] DATETIME2,
     [isRehired] TINYINT NOT NULL CONSTRAINT [Employee_isRehired_df] DEFAULT 0,
-    [isActive] TINYINT NOT NULL CONSTRAINT [Employee_isActive_df] DEFAULT 0,
+    [isActive] TINYINT NOT NULL CONSTRAINT [Employee_isActive_df] DEFAULT 1,
     [payType] VARCHAR(10),
     [employmentType] VARCHAR(255),
     [employeeCompanyId] NVARCHAR(1000),
@@ -82,6 +80,8 @@ CREATE TABLE [dbo].[Employee] (
     [department] VARCHAR(255),
     [talentSegment] VARCHAR(255),
     [benefits] VARCHAR(255),
+    [driverLicense] VARCHAR(100),
+    [taxId] VARCHAR(100),
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [Employee_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT [Employee_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Employee_uuid_key] UNIQUE NONCLUSTERED ([uuid]),
@@ -141,10 +141,10 @@ CREATE NONCLUSTERED INDEX [Employee_fullName_idx] ON [dbo].[Employee]([fullName]
 ALTER TABLE [dbo].[User] ADD CONSTRAINT [User_companyId_fkey] FOREIGN KEY ([companyId]) REFERENCES [dbo].[Company]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE [dbo].[Employee] ADD CONSTRAINT [Employee_reportingToId_fkey] FOREIGN KEY ([reportingToId]) REFERENCES [dbo].[Employee]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE [dbo].[Employee] ADD CONSTRAINT [Employee_companyId_fkey] FOREIGN KEY ([companyId]) REFERENCES [dbo].[Company]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE [dbo].[Employee] ADD CONSTRAINT [Employee_companyId_fkey] FOREIGN KEY ([companyId]) REFERENCES [dbo].[Company]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE [dbo].[Employee] ADD CONSTRAINT [Employee_reportingToId_fkey] FOREIGN KEY ([reportingToId]) REFERENCES [dbo].[Employee]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE [dbo].[BankAccount] ADD CONSTRAINT [BankAccount_employeeId_fkey] FOREIGN KEY ([employeeId]) REFERENCES [dbo].[Employee]([id]) ON DELETE CASCADE ON UPDATE CASCADE;

@@ -2,7 +2,7 @@ import {parse} from "csv-parse";
 import prisma from "../../../libs/prisma";
 import {generateUuid} from "../../utils/uuid.util";
 import {formatISO} from "date-fns";
-import {offBoardType, onBoardType} from "../../../types/modules/hris/employees";
+import {offBoardType} from "../../../types/modules/hris/employees";
 import {bankAccountType} from "../../../types/modules/hris/payroll";
 import {Prisma} from "@prisma/client";
 import pwdGenerator from "generate-password";
@@ -79,27 +79,32 @@ export const employeesCsvToJsonArray = async (csvBuffer: string, companyUuid: st
 	return {status: 200, data: parseCsv};
 };
 
-export const createEmployee = async (body: Prisma.EmployeeCreateInput, companyUuid: string) => {
+export const onboardEmployee = async (
+	body: {employee: Prisma.EmployeeCreateInput; reportingToId: number},
+	companyUuid: string,
+) => {
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
 		select: {id: true},
 	});
 	if (company) {
-		const fullName = `${body.lastName} ${body.firstName} ${body.middleName}`;
-		const {department, jobTitle, talentSegment, benefits, ...rest} = body;
+		const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
+		const {benefits, hiredDate, ...rest} = body.employee;
 		const benefitsToString = JSON.stringify(benefits);
 
 		const newEmployee = await prisma.employee.create({
 			data: {
 				...rest,
 				fullName,
-				department,
-				jobTitle,
-				talentSegment,
+				hiredDate,
+				lastHiredDate: formatISO(hiredDate),
 				benefits: benefitsToString,
 				password: await hashPassword(generatedPassword),
 				uuid: await generateUuid(),
 				Company: {connect: {id: company.id}},
+				ReportingTo: {
+					connect: {id: body.reportingToId},
+				},
 			},
 		});
 		return {status: 200, data: {newEmployee, generatedPassword}};
@@ -141,39 +146,6 @@ export const createEmployees = async (
 		return {status: 200, data: newEmployees};
 	} else {
 		return {status: 404, data: "company not found"};
-	}
-};
-
-export const onboardEmployee = async (
-	body: onBoardType,
-	employeeUuid: string,
-	companyUuid: string,
-) => {
-	const {reportingToId, hiredDate, ...rest} = body;
-	const company = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {
-			Employee: {
-				where: {uuid: employeeUuid, isActive: 0},
-			},
-		},
-	});
-	if (company?.Employee[0]) {
-		const newBoardedEmployee = await prisma.employee.update({
-			where: {uuid: employeeUuid},
-			data: {
-				...rest,
-				hiredDate: formatISO(hiredDate),
-				lastHiredDate: formatISO(hiredDate),
-				isActive: 1,
-				ReportingTo: {
-					connect: {id: reportingToId},
-				},
-			},
-		});
-		return {status: 200, data: newBoardedEmployee};
-	} else {
-		return {status: 404, data: "employee not found"};
 	}
 };
 
