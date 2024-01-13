@@ -128,7 +128,6 @@ export const offboardEmployee = async (
 	employeeUuid: string,
 	companyUuid: string,
 ) => {
-	// TODO make a middlware for this kind of query
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
 		select: {
