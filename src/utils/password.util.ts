@@ -7,6 +7,7 @@ import path from "path";
 import {transporter} from "../../configs/email.config";
 import {addHours, formatISO} from "date-fns";
 import {generateUuid} from "./uuid.util";
+import pwdGenerator from "generate-password";
 const templatePath = path.join(__dirname, "../../mjml/password-reset.mjml");
 
 const emailContent = async (sendTo: any) => {
@@ -79,3 +80,10 @@ export const verifyResetUuidForPwd = async (uuid: string) => {
 		throw new Error("invalid link");
 	}
 };
+
+export const generatePassword = pwdGenerator.generate({
+	length: 10,
+	numbers: true,
+	symbols: true,
+	strict: true,
+});

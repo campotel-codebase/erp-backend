@@ -5,16 +5,7 @@ import {formatISO} from "date-fns";
 import {offBoardType} from "../../../types/modules/hris/employees";
 import {bankAccountType} from "../../../types/modules/hris/payroll";
 import {Prisma} from "@prisma/client";
-import pwdGenerator from "generate-password";
-import {hashPassword} from "../../utils/password.util";
-
-//TODO make this is as a utils
-const generatedPassword = pwdGenerator.generate({
-	length: 10,
-	numbers: true,
-	symbols: true,
-	strict: true,
-});
+import {generatePassword, hashPassword} from "../../utils/password.util";
 
 export const employeesCsvToJsonArray = async (
 	csvBuffer: string,
@@ -85,6 +76,7 @@ export const onboardEmployee = async (
 	const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
 	const {benefits, hiredDate, ...rest} = body.employee;
 	const benefitsToString = JSON.stringify(benefits);
+	const tempPassword = generatePassword;
 
 	const newEmployee = await prisma.employee.create({
 		data: {
@@ -93,7 +85,7 @@ export const onboardEmployee = async (
 			hiredDate,
 			lastHiredDate: formatISO(hiredDate),
 			benefits: benefitsToString,
-			password: await hashPassword(generatedPassword),
+			password: tempPassword,
 			uuid: await generateUuid(),
 			Company: {connect: {id: companyId}},
 			ReportingTo: {
@@ -101,7 +93,7 @@ export const onboardEmployee = async (
 			},
 		},
 	});
-	return {status: 200, data: {newEmployee, generatedPassword}};
+	return {status: 200, data: {newEmployee, tempPassword}};
 };
 
 export const onBoardEmployees = async (
@@ -121,7 +113,7 @@ export const onBoardEmployees = async (
 				lastHiredDate: formatISO(hiredDate),
 				benefits: benefitsToString,
 				uuid: await generateUuid(),
-				password: await hashPassword(generatedPassword),
+				password: await hashPassword(generatePassword),
 			};
 		}),
 	);
