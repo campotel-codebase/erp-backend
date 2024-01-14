@@ -10,14 +10,14 @@ declare module "express-serve-static-core" {
 }
 
 export const authorization = async (req: Request, res: Response, next: NextFunction) => {
-	const secret = process.env.AUTH_KEY;
-	const authHeader = req.headers.authorization;
-	if (secret) {
-		if (authHeader) {
-			const token = authHeader.split(" ")[1];
-			const tokenProperties = jwt.verify(token, secret);
-			const tokenPayload = tokenProperties as jwtPayloadType;
-			try {
+	try {
+		const secret = process.env.AUTH_KEY;
+		const authHeader = req.headers.authorization;
+		if (secret) {
+			if (authHeader) {
+				const token = authHeader.split(" ")[1];
+				const tokenProperties = jwt.verify(token, secret);
+				const tokenPayload = tokenProperties as jwtPayloadType;
 				const validatePayload = await prisma.company.findUniqueOrThrow({
 					where: {uuid: tokenPayload.companyUuid},
 					select: {
@@ -50,13 +50,13 @@ export const authorization = async (req: Request, res: Response, next: NextFunct
 				};
 				req.authCreds = prepData;
 				next();
-			} catch (error: any) {
-				res.status(401).json({error: error.message});
+			} else {
+				res.status(401).json("undefined auth header");
 			}
 		} else {
-			res.status(401).json("undefined auth header");
+			res.status(401).json("undefined token secret");
 		}
-	} else {
-		res.status(401).json("undefined token secret");
+	} catch (error: any) {
+		res.status(401).json({error: error.message});
 	}
 };
