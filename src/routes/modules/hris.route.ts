@@ -41,7 +41,7 @@ hris.post("/onboard-employee", async (req, res) => {
 });
 
 hris.post("/onboard-employees", uniqueEmails, uniquePhoneNumbers, async (req, res) => {
-	const company = req.authCreds.company.id;
+	const company = req.authCreds.company;
 	try {
 		const result = await onBoardEmployees(req.body, company);
 		res.status(result.status).json(result.data);

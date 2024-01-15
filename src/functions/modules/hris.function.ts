@@ -110,7 +110,7 @@ export const onboardEmployee = async (
 
 export const onBoardEmployees = async (
 	body: Prisma.EmployeeCreateManyInput[],
-	companyId: number,
+	company: authCredentialsType["company"],
 ) => {
 	const employees = await Promise.all(
 		body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
@@ -119,18 +119,40 @@ export const onBoardEmployees = async (
 			const benefitsToString = JSON.stringify(benefits);
 			return {
 				...rest,
-				companyId: companyId,
+				companyId: company.id,
 				fullName,
 				hiredDate,
 				lastHiredDate: formatISO(hiredDate),
 				benefits: benefitsToString,
 				uuid: await generateUuid(),
-				password: await hashPassword(generatePassword),
+				password: generatePassword,
+			};
+		}),
+	);
+	const hashPasswords = await Promise.all(
+		employees.map(async (employee: Prisma.EmployeeCreateManyInput) => {
+			const {password, ...rest} = employee;
+			return {
+				...rest,
+				password: await hashPassword(password),
 			};
 		}),
 	);
 	const newEmployees = await prisma.employee.createMany({
-		data: employees,
+		data: hashPasswords,
+	});
+	employees.forEach(async (employee: Prisma.EmployeeCreateManyInput) => {
+		const {fullName, password, email, ...rest} = employee;
+		const sendTo = {
+			to: email,
+			subject: "newly hired",
+			text: {
+				title: `Welcome ${fullName} to ${company.name}`,
+				msg: `temporary erp portal password: ${password}`,
+			},
+			usedFor: "notification",
+		};
+		await emailContent(sendTo);
 	});
 	return {status: 200, data: newEmployees};
 };
