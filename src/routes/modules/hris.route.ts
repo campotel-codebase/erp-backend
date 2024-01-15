@@ -11,6 +11,7 @@ import {
 	orgChartTree,
 	searchEmployee,
 } from "../../functions/modules/hris.function";
+import {uniqueEmails, uniquePhoneNumbers} from "../../middlewares/employee.middleware";
 const hris = express.Router();
 
 hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
@@ -39,7 +40,7 @@ hris.post("/onboard-employee", async (req, res) => {
 	}
 });
 
-hris.post("/onboard-employees", async (req, res) => {
+hris.post("/onboard-employees", uniqueEmails, uniquePhoneNumbers, async (req, res) => {
 	const company = req.authCreds.company.id;
 	try {
 		const result = await onBoardEmployees(req.body, company);
