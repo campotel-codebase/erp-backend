@@ -11,7 +11,12 @@ import {
 	orgChartTree,
 	searchEmployee,
 } from "../../functions/modules/hris.function";
-import {uniqueEmails, uniquePhoneNumbers} from "../../middlewares/employee.middleware";
+import {
+	isEmployeeEmailUsable,
+	isEmployeePhoneNumberUsable,
+	uniqueEmails,
+	uniquePhoneNumbers,
+} from "../../middlewares/employee.middleware";
 const hris = express.Router();
 
 hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
@@ -30,15 +35,20 @@ hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
 	}
 });
 
-hris.post("/onboard-employee", async (req, res) => {
-	const company = req.authCreds.company;
-	try {
-		const result = await onboardEmployee(req.body, company);
-		res.status(result.status).json(result.data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+hris.post(
+	"/onboard-employee",
+	isEmployeeEmailUsable,
+	isEmployeePhoneNumberUsable,
+	async (req, res) => {
+		const company = req.authCreds.company;
+		try {
+			const result = await onboardEmployee(req.body, company);
+			res.status(result.status).json(result.data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 
 hris.post("/onboard-employees", uniqueEmails, uniquePhoneNumbers, async (req, res) => {
 	const company = req.authCreds.company;
