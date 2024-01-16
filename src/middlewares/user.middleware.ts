@@ -1,7 +1,7 @@
 import prisma from "../../libs/prisma";
 import {Request, Response, NextFunction} from "express";
 
-export const isEmailUsable = async (req: Request, res: Response, next: NextFunction) => {
+export const isUserEmailUsable = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const email = await prisma.user.findUnique({
 			where: {email: req.body.email},
@@ -16,17 +16,17 @@ export const isEmailUsable = async (req: Request, res: Response, next: NextFunct
 	}
 };
 
-// export const isEmailExists = async (req: Request, res: Response, next: NextFunction) => {
-// 	try {
-// 		const email = await prisma.user.findUnique({
-// 			where: {email: req.body.email},
-// 		});
-// 		if (email) {
-// 			next();
-// 		} else {
-// 			res.status(404).json("email not found");
-// 		}
-// 	} catch (error: any) {
-// 		res.status(500).json({error: error.message});
-// 	}
-// };
+export const isUserEmailExists = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const email = await prisma.user.findUnique({
+			where: {email: req.body.email},
+		});
+		if (email) {
+			next();
+		} else {
+			res.status(404).json("email not found");
+		}
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+};

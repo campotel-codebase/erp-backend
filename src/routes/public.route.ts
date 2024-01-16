@@ -5,10 +5,10 @@ import {
 	employeeResetPwd,
 	employeeSignIn,
 } from "../functions/portal/employee.function";
-import {isEmailUsable} from "../middlewares/user.middleware";
+import {isUserEmailExists, isUserEmailUsable} from "../middlewares/user.middleware";
 const publicRoute = express.Router();
 
-publicRoute.post("/user/sign-up", isEmailUsable, async (req, res) => {
+publicRoute.post("/user/sign-up", isUserEmailUsable, async (req, res) => {
 	try {
 		const result = await userSignUp(req.body);
 		res.status(result.status).json(result.data);
@@ -24,7 +24,7 @@ publicRoute.post("/user/sign-in", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
-publicRoute.post("/user/forgot-password", async (req, res) => {
+publicRoute.post("/user/forgot-password", isUserEmailExists, async (req, res) => {
 	try {
 		const result = await userPwdResetLink(req.body.email);
 		res.status(result.status).json(result.data);

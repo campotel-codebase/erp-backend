@@ -67,16 +67,8 @@ export const userSignIn = async (body: userSignInType) => {
 };
 
 export const userPwdResetLink = async (email: string) => {
-	const isExists = await prisma.user.findUnique({
-		where: {email},
-		select: {uuid: true},
-	});
-	if (isExists) {
-		await sendResetLinkForPwd(email, "user");
-		return {status: 200, data: "password reset link was sent to your email address"};
-	} else {
-		return {status: 404, data: "email not found"};
-	}
+	await sendResetLinkForPwd(email, "user");
+	return {status: 200, data: "password reset link was sent to your email address"};
 };
 
 export const userResetPwd = async (body: {uuid: string; newPassword: string}) => {
