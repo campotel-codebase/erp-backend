@@ -5,9 +5,10 @@ import {
 	employeeResetPwd,
 	employeeSignIn,
 } from "../functions/portal/employee.function";
+import {isEmailUsable} from "../middlewares/user.middleware";
 const publicRoute = express.Router();
 
-publicRoute.post("/user/sign-up", async (req, res) => {
+publicRoute.post("/user/sign-up", isEmailUsable, async (req, res) => {
 	try {
 		const result = await userSignUp(req.body);
 		res.status(result.status).json(result.data);
