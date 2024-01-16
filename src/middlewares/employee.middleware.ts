@@ -52,3 +52,37 @@ export const uniquePhoneNumbers = async (req: Request, res: Response, next: Next
 		res.status(500).json({error: error.message});
 	}
 };
+
+export const isEmployeeEmailUsable = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const email = await prisma.employee.findUnique({
+			where: {email: req.body.employee.email},
+		});
+		if (email) {
+			res.status(409).json("email already in use");
+		} else {
+			next();
+		}
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+};
+
+export const isEmployeePhoneNumberUsable = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const phoneNumber = await prisma.employee.findUnique({
+			where: {phoneNumber: req.body.employee.phoneNumber},
+		});
+		if (phoneNumber) {
+			res.status(409).json("phone number already in use");
+		} else {
+			next();
+		}
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+};

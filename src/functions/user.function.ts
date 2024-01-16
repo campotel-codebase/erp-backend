@@ -10,35 +10,27 @@ import {
 import {generateUuid} from "../utils/uuid.util";
 
 export const userSignUp = async (body: userSignUpType) => {
-	const isEmailExists = await prisma.user.findUnique({
-		where: {email: body.email},
-		select: {id: true},
-	});
-	if (isEmailExists) {
-		return {status: 409, data: "email already in use"};
-	} else {
-		const newUser = await prisma.company.create({
-			data: {
-				uuid: await generateUuid(),
-				name: body.companyName,
-				User: {
-					create: {
-						uuid: await generateUuid(),
-						lastName: body.lastName,
-						firstName: body.firstName,
-						email: body.email,
-						password: await hashPassword(body.password),
-					},
+	const newUser = await prisma.company.create({
+		data: {
+			uuid: await generateUuid(),
+			name: body.companyName,
+			User: {
+				create: {
+					uuid: await generateUuid(),
+					lastName: body.lastName,
+					firstName: body.firstName,
+					email: body.email,
+					password: await hashPassword(body.password),
 				},
 			},
-			include: {User: true},
-		});
-		const jwt = generateJwt({companyUuid: newUser.uuid, userUuid: newUser.User[0].uuid});
-		if (jwt) {
-			return {status: 200, data: jwt};
-		} else {
-			return {status: 400, data: "fail to generate token"};
-		}
+		},
+		include: {User: true},
+	});
+	const jwt = generateJwt({companyUuid: newUser.uuid, userUuid: newUser.User[0].uuid});
+	if (jwt) {
+		return {status: 200, data: jwt};
+	} else {
+		return {status: 400, data: "fail to generate token"};
 	}
 };
 
@@ -75,16 +67,8 @@ export const userSignIn = async (body: userSignInType) => {
 };
 
 export const userPwdResetLink = async (email: string) => {
-	const isExists = await prisma.user.findUnique({
-		where: {email},
-		select: {uuid: true},
-	});
-	if (isExists) {
-		await sendResetLinkForPwd(email, "user");
-		return {status: 200, data: "password reset link was sent to your email address"};
-	} else {
-		return {status: 404, data: "email not found"};
-	}
+	await sendResetLinkForPwd(email, "user");
+	return {status: 200, data: "password reset link was sent to your email address"};
 };
 
 export const userResetPwd = async (body: {uuid: string; newPassword: string}) => {
