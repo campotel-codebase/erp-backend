@@ -11,6 +11,7 @@ import {
 import {EmployeeAuthCredentialsType} from "../../../types/jwt-payload";
 import {generateUuid} from "../../utils/uuid.util";
 import {formatISO} from "date-fns";
+import {emailContent} from "../../utils/email.util";
 
 export const employeeSignIn = async (body: employeeSignInType) => {
 	const employeeAccount = await prisma.employee.findUnique({
@@ -88,6 +89,7 @@ export const createLeaveRequest = async (
 	body: Prisma.LeaveRequestCreateInput,
 	employee: EmployeeAuthCredentialsType["employee"],
 ) => {
+	// ! BUG Should only create if the routing approval is correctly define
 	const {uuid, Employee, from, to, resumeOn, ...rest} = body;
 	const newLeaveRequest = await prisma.leaveRequest.create({
 		data: {
@@ -102,10 +104,23 @@ export const createLeaveRequest = async (
 		},
 		select: {
 			Employee: {
-				select: {ReportingTo: true},
+				select: {ReportingTo: true, fullName: true},
 			},
 		},
 	});
-	// send to email here
-	return {status: 200, data: newLeaveRequest};
+	if (newLeaveRequest.Employee.ReportingTo) {
+		const sendTo = {
+			to: newLeaveRequest.Employee.ReportingTo.email,
+			subject: "Leave request",
+			text: {
+				title: `Dear ${newLeaveRequest.Employee.ReportingTo.suffix} ${newLeaveRequest.Employee.ReportingTo.fullName}`,
+				msg: `i ${newLeaveRequest.Employee.fullName} is requesting a leave to your approval`,
+			},
+			usedFor: "notification",
+		};
+		await emailContent(sendTo);
+		return {status: 200, data: "request has been sent successfully"};
+	} else {
+		return {status: 409, data: "default routing approval is only applicable if you have a IS"};
+	}
 };
