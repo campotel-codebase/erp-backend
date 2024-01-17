@@ -127,17 +127,18 @@ model EmploymentHistory {
 }
 
 model LeaveRequest {
-  id                  Int      @id @default(autoincrement())
-  employeeId          Int
-  uuid                String   @unique
-  from                DateTime
-  to                  DateTime
-  numberOfWorkingDays Int
-  resume              DateTime
-  reasons             String?
-  absenceType         String   @db.VarChar(20)
-  isPaid              Int
-  isHrNoted           Int      @default(0) @db.TinyInt
-  Employee            Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  createdAt           DateTime @default(now())
+  id                    Int      @id @default(autoincrement())
+  employeeId            Int
+  uuid                  String   @unique
+  from                  DateTime
+  to                    DateTime
+  numberOfWorkingDays   Int
+  resumeOn              DateTime
+  reasons               String?
+  absenceType           String   @db.VarChar(20)
+  isPaid                Int
+  isHrNoted             Int      @default(0) @db.TinyInt
+  Employee              Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  CustomRoutingApproval String   @db.VarChar(255)
+  createdAt             DateTime @default(now())
 }
