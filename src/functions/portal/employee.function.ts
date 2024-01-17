@@ -1,3 +1,4 @@
+import {Prisma} from "@prisma/client";
 import prisma from "../../../libs/prisma";
 import {employeeSignInType} from "../../../types/modules/hris/employees";
 import {generateJwt} from "../../utils/jwt.util";
@@ -7,6 +8,9 @@ import {
 	sendResetLinkForPwd,
 	hashPassword,
 } from "../../utils/password.util";
+import {EmployeeAuthCredentialsType} from "../../../types/jwt-payload";
+import {generateUuid} from "../../utils/uuid.util";
+import {formatISO} from "date-fns";
 
 export const employeeSignIn = async (body: employeeSignInType) => {
 	const employeeAccount = await prisma.employee.findUnique({
@@ -77,4 +81,31 @@ export const employeeResetPwd = async (body: {uuid: string; newPassword: string}
 	} else {
 		return {status: 400, data: "fail to reset password"};
 	}
+};
+
+// need 2 scenario default approval and custom
+export const createLeaveRequest = async (
+	body: Prisma.LeaveRequestCreateInput,
+	employee: EmployeeAuthCredentialsType["employee"],
+) => {
+	const {uuid, Employee, from, to, resumeOn, ...rest} = body;
+	const newLeaveRequest = await prisma.leaveRequest.create({
+		data: {
+			uuid: await generateUuid(),
+			Employee: {
+				connect: {id: employee.id},
+			},
+			from: formatISO(from),
+			to: formatISO(to),
+			resumeOn: formatISO(resumeOn),
+			...rest,
+		},
+		select: {
+			Employee: {
+				select: {ReportingTo: true},
+			},
+		},
+	});
+	// send to email here
+	return {status: 200, data: newLeaveRequest};
 };
