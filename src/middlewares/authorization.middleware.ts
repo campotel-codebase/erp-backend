@@ -1,15 +1,20 @@
 import prisma from "../../libs/prisma";
 import {Request, Response, NextFunction} from "express";
 import jwt from "jsonwebtoken";
-import {authCredentialsType, jwtPayloadType} from "../../types/jwt-payload";
+import {
+	EmployeeAuthCredentialsType,
+	jwtPayloadType,
+	userAuthCredentialsType,
+} from "../../types/jwt-payload";
 
 declare module "express-serve-static-core" {
 	interface Request {
-		authCreds: authCredentialsType;
+		userAuthCreds: userAuthCredentialsType;
+		employeeAuthCreds: EmployeeAuthCredentialsType;
 	}
 }
 
-export const authorization = async (req: Request, res: Response, next: NextFunction) => {
+export const userAuth = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const secret = process.env.AUTH_KEY;
 		const authHeader = req.headers.authorization;
@@ -36,7 +41,7 @@ export const authorization = async (req: Request, res: Response, next: NextFunct
 						},
 					},
 				});
-				const prepData: authCredentialsType = {
+				const prepData: userAuthCredentialsType = {
 					company: {
 						id: validatePayload.id,
 						uuid: validatePayload.uuid,
@@ -48,7 +53,7 @@ export const authorization = async (req: Request, res: Response, next: NextFunct
 						uuid: validatePayload.User[0].uuid,
 					},
 				};
-				req.authCreds = prepData;
+				req.userAuthCreds = prepData;
 				next();
 			} else {
 				res.status(401).json("undefined auth header");
