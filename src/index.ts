@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import cors from "cors";
 import prisma from "../libs/prisma";
-import {userAuth} from "./middlewares/authorization.middleware";
+import {employeeAuth, userAuth} from "./middlewares/authorization.middleware";
 import publicRoute from "./routes/public.route";
 import user from "./routes/user.route";
 import config from "./routes/config.route";
@@ -22,7 +22,7 @@ app.use("/public/api", publicRoute);
 app.use("/api/user", userAuth, user);
 app.use("/api/config", userAuth, config);
 app.use("/api/module/hris", userAuth, hris);
-app.use("/api/portal", userAuth, portal);
+app.use("/api/portal", employeeAuth, portal);
 
 const listeningTo = () => {
 	console.log("🚀 Server ready at: http://localhost:" + port);

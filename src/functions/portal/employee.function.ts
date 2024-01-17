@@ -9,29 +9,29 @@ import {
 } from "../../utils/password.util";
 
 export const employeeSignIn = async (body: employeeSignInType) => {
-	const userAccount = await prisma.employee.findUnique({
+	const employeeAccount = await prisma.employee.findUnique({
 		where: {email: body.email},
 		select: {uuid: true, password: true, isPortalOpen: true},
 	});
-	if (userAccount) {
-		if (userAccount.isPortalOpen) {
-			const isPasswordMatch = await verifyHashedPassword(userAccount.password, body.password);
+	if (employeeAccount) {
+		if (employeeAccount.isPortalOpen) {
+			const isPasswordMatch = await verifyHashedPassword(employeeAccount.password, body.password);
 			if (isPasswordMatch) {
-				const user = await prisma.employee.findUnique({
+				const employee = await prisma.employee.findUnique({
 					where: {
-						uuid: userAccount.uuid,
+						uuid: employeeAccount.uuid,
 					},
 					include: {Company: {select: {uuid: true}}},
 				});
-				if (user) {
-					const jwt = generateJwt({companyUuid: user.Company.uuid, userUuid: user.uuid});
+				if (employee) {
+					const jwt = generateJwt({companyUuid: employee.Company.uuid, userUuid: employee.uuid});
 					if (jwt) {
 						return {status: 200, data: jwt};
 					} else {
 						return {status: 400, data: "fail to generate token"};
 					}
 				} else {
-					return {status: 400, data: "fail to query user"};
+					return {status: 400, data: "fail to query employee"};
 				}
 			} else {
 				return {status: 401, data: "incorrect password"};
