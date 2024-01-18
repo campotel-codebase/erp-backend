@@ -85,7 +85,6 @@ export const employeeResetPwd = async (body: {uuid: string; newPassword: string}
 	}
 };
 
-// need 2 scenario default approval and custom
 export const createLeaveRequest = async (
 	body: Prisma.LeaveRequestCreateInput,
 	employee: EmployeeAuthCredentialsType["employee"],
@@ -104,6 +103,7 @@ export const createLeaveRequest = async (
 		resumeOn: formatISO(resumeOn),
 	};
 	if (isApprovalDefault === 0) {
+		// custom routing
 		const approvalsArr: approvedByType[] = JSON.parse(customApproval);
 		approvalList.push(...approvalsArr);
 		const newLeaveRequest = await prisma.leaveRequest.create({
@@ -113,14 +113,31 @@ export const createLeaveRequest = async (
 				...prepData,
 				...rest,
 			},
+			select: {uuid: true},
 		});
-		// send it to email
+		approvalList.forEach(async (reportingTo) => {
+			console.log(reportingTo);
+			
+			const sendTo = {
+				to: reportingTo.email,
+				subject: "Leave request",
+				text: {
+					title: `Dear ${reportingTo.suffix} ${reportingTo.fullName}`,
+					msg: `i ${employee.fullName} is requesting a leave to your approval: ${newLeaveRequest.uuid}`,
+				},
+				usedFor: "notification",
+			};
+			await emailContent(sendTo);
+		});
 		return {status: 200, data: newLeaveRequest};
 	} else {
 		if (reportingTo) {
+			// default routing
 			approvalList.push({
 				uuid: reportingTo.uuid,
-				name: reportingTo.fullName,
+				suffix: reportingTo.suffix,
+				fullName: reportingTo.fullName,
+				email: reportingTo.email,
 				status: 0,
 				date: null,
 				reason: null,
