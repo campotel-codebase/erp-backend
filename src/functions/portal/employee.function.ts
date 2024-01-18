@@ -193,7 +193,7 @@ export const viewLeaveRequest = async (leaveRequestUuid: string) => {
 export const validateLeaveRequest = async (
 	leaveRequestUuid: string,
 	employee: EmployeeAuthCredentialsType["employee"],
-	body: {status: number; reason: string | null},
+	body: {status: string; reason: string | null},
 ) => {
 	const approvalList = await prisma.leaveRequest.findUnique({
 		where: {uuid: leaveRequestUuid},
