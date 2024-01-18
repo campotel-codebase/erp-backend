@@ -20,7 +20,7 @@ import {
 const hris = express.Router();
 
 hris.post("/import-employees", uploadCsv.single("csv"), async (req, res) => {
-	const company = req.authCreds.company.benefits;
+	const company = req.userAuthCreds.company.benefits;
 	const csvBuffer = req.file?.buffer.toString("utf8");
 
 	if (!csvBuffer) {
@@ -40,7 +40,7 @@ hris.post(
 	isEmployeeEmailUsable,
 	isEmployeePhoneNumberUsable,
 	async (req, res) => {
-		const company = req.authCreds.company;
+		const company = req.userAuthCreds.company;
 		try {
 			const result = await onboardEmployee(req.body, company);
 			res.status(result.status).json(result.data);
@@ -51,7 +51,7 @@ hris.post(
 );
 
 hris.post("/onboard-employees", uniqueEmails, uniquePhoneNumbers, async (req, res) => {
-	const company = req.authCreds.company;
+	const company = req.userAuthCreds.company;
 	try {
 		const result = await onBoardEmployees(req.body, company);
 		res.status(result.status).json(result.data);
@@ -61,7 +61,7 @@ hris.post("/onboard-employees", uniqueEmails, uniquePhoneNumbers, async (req, re
 });
 
 hris.patch("/offboard-employee/:employeeUuid", async (req, res) => {
-	const company = req.authCreds.company.uuid;
+	const company = req.userAuthCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
 		const result = await offboardEmployee(req.body, employeeUuid, company);
@@ -72,7 +72,7 @@ hris.patch("/offboard-employee/:employeeUuid", async (req, res) => {
 });
 
 hris.patch("/assign-bank-account/:employeeUuid", async (req, res) => {
-	const company = req.authCreds.company.uuid;
+	const company = req.userAuthCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
 		const result = await assignBankAccount(req.body, employeeUuid, company);
@@ -83,7 +83,7 @@ hris.patch("/assign-bank-account/:employeeUuid", async (req, res) => {
 });
 
 hris.get("/employees", async (req, res) => {
-	const company = req.authCreds.company.uuid;
+	const company = req.userAuthCreds.company.uuid;
 	try {
 		const result = await employees(company);
 		res.status(result.status).json(result.data);
@@ -93,7 +93,7 @@ hris.get("/employees", async (req, res) => {
 });
 
 hris.get("/search-employee", async (req, res) => {
-	const company = req.authCreds.company.uuid;
+	const company = req.userAuthCreds.company.uuid;
 	const keyword = req.query.keyword;
 	try {
 		const result = await searchEmployee(company, keyword);
@@ -104,7 +104,7 @@ hris.get("/search-employee", async (req, res) => {
 });
 
 hris.get("/employee/:employeeUuid", async (req, res) => {
-	const company = req.authCreds.company.uuid;
+	const company = req.userAuthCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
 		const result = await employee(company, employeeUuid);

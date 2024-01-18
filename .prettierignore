@@ -3,3 +3,4 @@ node_modules/
 **/*.json
 **/*.env
 src/mjml/*.mjml
+types/**/*

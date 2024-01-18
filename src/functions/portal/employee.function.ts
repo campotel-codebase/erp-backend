@@ -1,3 +1,4 @@
+import {Prisma} from "@prisma/client";
 import prisma from "../../../libs/prisma";
 import {employeeSignInType} from "../../../types/modules/hris/employees";
 import {generateJwt} from "../../utils/jwt.util";
@@ -7,31 +8,36 @@ import {
 	sendResetLinkForPwd,
 	hashPassword,
 } from "../../utils/password.util";
+import {EmployeeAuthCredentialsType} from "../../../types/jwt-payload";
+import {generateUuid} from "../../utils/uuid.util";
+import {formatISO} from "date-fns";
+import {emailContent} from "../../utils/email.util";
+import {approvedByType} from "../../../types/portal/request";
 
 export const employeeSignIn = async (body: employeeSignInType) => {
-	const userAccount = await prisma.employee.findUnique({
+	const employeeAccount = await prisma.employee.findUnique({
 		where: {email: body.email},
 		select: {uuid: true, password: true, isPortalOpen: true},
 	});
-	if (userAccount) {
-		if (userAccount.isPortalOpen) {
-			const isPasswordMatch = await verifyHashedPassword(userAccount.password, body.password);
+	if (employeeAccount) {
+		if (employeeAccount.isPortalOpen) {
+			const isPasswordMatch = await verifyHashedPassword(employeeAccount.password, body.password);
 			if (isPasswordMatch) {
-				const user = await prisma.employee.findUnique({
+				const employee = await prisma.employee.findUnique({
 					where: {
-						uuid: userAccount.uuid,
+						uuid: employeeAccount.uuid,
 					},
 					include: {Company: {select: {uuid: true}}},
 				});
-				if (user) {
-					const jwt = generateJwt({companyUuid: user.Company.uuid, userUuid: user.uuid});
+				if (employee) {
+					const jwt = generateJwt({companyUuid: employee.Company.uuid, userUuid: employee.uuid});
 					if (jwt) {
 						return {status: 200, data: jwt};
 					} else {
 						return {status: 400, data: "fail to generate token"};
 					}
 				} else {
-					return {status: 400, data: "fail to query user"};
+					return {status: 400, data: "fail to query employee"};
 				}
 			} else {
 				return {status: 401, data: "incorrect password"};
@@ -76,5 +82,150 @@ export const employeeResetPwd = async (body: {uuid: string; newPassword: string}
 		return {status: 200, data: "password reset successfully"};
 	} else {
 		return {status: 400, data: "fail to reset password"};
+	}
+};
+
+export const createLeaveRequest = async (
+	body: Prisma.LeaveRequestCreateInput,
+	employee: EmployeeAuthCredentialsType["employee"],
+) => {
+	const {uuid, Employee, from, to, resumeOn, approvedBy, isApprovalDefault, ...rest} = body;
+	const customApproval = JSON.stringify(approvedBy);
+	const prepData = {
+		uuid: await generateUuid(),
+		Employee: {
+			connect: {id: employee.id},
+		},
+		from: formatISO(from),
+		to: formatISO(to),
+		resumeOn: formatISO(resumeOn),
+	};
+
+	if (isApprovalDefault === 0) {
+		const employeesToApprove = await prisma.employee.findMany({
+			where: {
+				uuid: {
+					in: JSON.parse(customApproval),
+				},
+			},
+			select: {
+				uuid: true,
+				suffix: true,
+				fullName: true,
+				email: true,
+			},
+		});
+		const tags: approvedByType[] = employeesToApprove.map((reportingTo) => {
+			return {
+				...reportingTo,
+				status: "pending",
+				date: null,
+				reason: null,
+			};
+		});
+		const newLeaveRequest = await prisma.leaveRequest.create({
+			data: {
+				approvedBy: JSON.stringify(tags),
+				isApprovalDefault,
+				...prepData,
+				...rest,
+			},
+		});
+		tags.forEach(async (reportingTo) => {
+			const sendTo = {
+				to: reportingTo.email,
+				subject: "Leave request",
+				text: {
+					title: `Dear ${reportingTo.suffix} ${reportingTo.fullName}`,
+					msg: `i ${employee.fullName} is requesting a leave to your approval: ${newLeaveRequest.uuid}`,
+				},
+				usedFor: "notification",
+			};
+			await emailContent(sendTo);
+		});
+		return {status: 200, data: newLeaveRequest};
+	} else {
+		const employeeReportingTo = employee.reportingTo();
+		if (employeeReportingTo) {
+			// default routing
+			const tags: approvedByType[] = [
+				{
+					uuid: employeeReportingTo.uuid,
+					suffix: employeeReportingTo.suffix,
+					fullName: employeeReportingTo.fullName,
+					email: employeeReportingTo.email,
+					status: "pending",
+					date: null,
+					reason: null,
+				},
+			];
+			const newLeaveRequest = await prisma.leaveRequest.create({
+				data: {
+					approvedBy: JSON.stringify(tags),
+					...prepData,
+					...rest,
+				},
+				select: {uuid: true},
+			});
+			const sendTo = {
+				to: tags[0].email,
+				subject: "Leave request",
+				text: {
+					title: `Dear ${tags[0].suffix} ${tags[0].fullName}`,
+					msg: `i ${employee.fullName} is requesting a leave to your approval: ${newLeaveRequest.uuid}`,
+				},
+				usedFor: "notification",
+			};
+			await emailContent(sendTo);
+			return {status: 200, data: "request has been sent successfully"};
+		} else {
+			return {status: 409, data: "default routing approval is only applicable if you have a IS"};
+		}
+	}
+};
+
+export const viewLeaveRequest = async (leaveRequestUuid: string) => {
+	// TODO needs  to ve secured
+	const leaveRequest = await prisma.leaveRequest.findUnique({
+		where: {uuid: leaveRequestUuid},
+	});
+	return {status: 200, data: leaveRequest};
+};
+
+export const validateLeaveRequest = async (
+	leaveRequestUuid: string,
+	employee: EmployeeAuthCredentialsType["employee"],
+	body: {status: string; reason: string | null},
+) => {
+	const approvalList = await prisma.leaveRequest.findUnique({
+		where: {uuid: leaveRequestUuid},
+		select: {approvedBy: true},
+	});
+	if (approvalList) {
+		const approvalArr: approvedByType[] = JSON.parse(approvalList.approvedBy);
+		const approvedIt = approvalArr.map((employeeToApprove) => {
+			const {uuid, status, date, reason, ...rest} = employeeToApprove;
+			if (uuid === employee.uuid) {
+				return {
+					uuid,
+					status: body.status,
+					reason: body.reason,
+					date: formatISO(new Date()),
+					...rest,
+				};
+			}
+			return employeeToApprove;
+		});
+		if (approvedIt.length !== 0) {
+			const updateLeave = await prisma.leaveRequest.update({
+				where: {uuid: leaveRequestUuid},
+				data: {approvedBy: JSON.stringify(approvedIt)},
+			});
+			return {status: 200, data: updateLeave};
+		} else {
+			return {status: 204, data: "approval list cant be null"};
+		}
+	} else {
+		return {status: 404, data: "leave request not found"};
 	}
 };

@@ -6,7 +6,7 @@ import {offBoardType} from "../../../types/modules/hris/employees";
 import {bankAccountType} from "../../../types/modules/hris/payroll";
 import {Prisma} from "@prisma/client";
 import {generatePassword, hashPassword} from "../../utils/password.util";
-import {authCredentialsType} from "../../../types/jwt-payload";
+import {userAuthCredentialsType} from "../../../types/jwt-payload";
 import {emailContent} from "../../utils/email.util";
 
 export const employeesCsvToJsonArray = async (
@@ -73,7 +73,7 @@ export const employeesCsvToJsonArray = async (
 
 export const onboardEmployee = async (
 	body: {employee: Prisma.EmployeeCreateInput; reportingToId: number},
-	company: authCredentialsType["company"],
+	company: userAuthCredentialsType["company"],
 ) => {
 	const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
 	const {benefits, hiredDate, ...rest} = body.employee;
@@ -110,7 +110,7 @@ export const onboardEmployee = async (
 
 export const onBoardEmployees = async (
 	body: Prisma.EmployeeCreateManyInput[],
-	company: authCredentialsType["company"],
+	company: userAuthCredentialsType["company"],
 ) => {
 	const employees = await Promise.all(
 		body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
