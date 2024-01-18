@@ -148,15 +148,17 @@ export const createLeaveRequest = async (
 		const employeeReportingTo = employee.reportingTo();
 		if (employeeReportingTo) {
 			// default routing
-			const tags = {
-				uuid: employeeReportingTo.uuid,
-				suffix: employeeReportingTo.suffix,
-				fullName: employeeReportingTo.fullName,
-				email: employeeReportingTo.email,
-				status: "pending",
-				date: null,
-				reason: null,
-			};
+			const tags: approvedByType[] = [
+				{
+					uuid: employeeReportingTo.uuid,
+					suffix: employeeReportingTo.suffix,
+					fullName: employeeReportingTo.fullName,
+					email: employeeReportingTo.email,
+					status: "pending",
+					date: null,
+					reason: null,
+				},
+			];
 			const newLeaveRequest = await prisma.leaveRequest.create({
 				data: {
 					approvedBy: JSON.stringify(tags),
@@ -166,10 +168,10 @@ export const createLeaveRequest = async (
 				select: {uuid: true},
 			});
 			const sendTo = {
-				to: tags.email,
+				to: tags[0].email,
 				subject: "Leave request",
 				text: {
-					title: `Dear ${tags.suffix} ${tags.fullName}`,
+					title: `Dear ${tags[0].suffix} ${tags[0].fullName}`,
 					msg: `i ${employee.fullName} is requesting a leave to your approval: ${newLeaveRequest.uuid}`,
 				},
 				usedFor: "notification",
