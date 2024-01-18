@@ -89,15 +89,17 @@ export const createLeaveRequest = async (
 	body: Prisma.LeaveRequestCreateInput,
 	employee: EmployeeAuthCredentialsType["employee"],
 ) => {
-	const {uuid, Employee, from, to, resumeOn, ...rest} = body;
+	const {uuid, Employee, from, to, resumeOn, approvedBy, ...rest} = body;
 	const reportingTo = employee.reportingTo();
 	if (reportingTo) {
+		const employeeToApprove = [{name: reportingTo.fullName, status: 0, date: null}];
 		const newLeaveRequest = await prisma.leaveRequest.create({
 			data: {
 				uuid: await generateUuid(),
 				Employee: {
 					connect: {id: employee.id},
 				},
+				approvedBy: JSON.stringify(employeeToApprove),
 				from: formatISO(from),
 				to: formatISO(to),
 				resumeOn: formatISO(resumeOn),
@@ -109,7 +111,7 @@ export const createLeaveRequest = async (
 			subject: "Leave request",
 			text: {
 				title: `Dear ${reportingTo.suffix} ${reportingTo.fullName}`,
-				msg: `i ${employee.fullName} is requesting a leave to your approval`,
+				msg: `i ${employee.fullName} is requesting a leave to your approval: ${newLeaveRequest.uuid}`,
 			},
 			usedFor: "notification",
 		};
@@ -118,4 +120,12 @@ export const createLeaveRequest = async (
 	} else {
 		return {status: 409, data: "default routing approval is only applicable if you have a IS"};
 	}
+};
+
+export const viewLeaveRequest = async (leaveRequestUuid: string) => {
+	// TODO needs  to ve secured
+	const leaveRequest = await prisma.leaveRequest.findUnique({
+		where: {uuid: leaveRequestUuid},
+	});
+	return {status: 200, data: leaveRequest};
 };

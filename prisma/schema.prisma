@@ -138,6 +138,7 @@ model LeaveRequest {
   absenceType           String   @db.VarChar(20)
   isPaid                Int
   isHrNoted             Int      @default(0) @db.TinyInt
+  approvedBy            String   @db.VarChar(255)
   Employee              Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   customRoutingApproval String?  @db.VarChar(255)
   createdAt             DateTime @default(now())
