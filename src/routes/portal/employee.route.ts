@@ -7,15 +7,23 @@ import {
 const portal = express.Router();
 
 portal.post("/create/leave-request", async (req, res) => {
-	const company = req.employeeAuthCreds.employee;
-	const result = await createLeaveRequest(req.body, company);
-	res.status(result.status).json(result.data);
+	try {
+		const company = req.employeeAuthCreds.employee;
+		const result = await createLeaveRequest(req.body, company);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
 });
 
 portal.get("/view/leave-request/:leaveRequestUuid", async (req, res) => {
-	const {leaveRequestUuid} = req.params;
-	const result = await viewLeaveRequest(leaveRequestUuid);
-	res.status(result.status).json(result.data);
+	try {
+		const {leaveRequestUuid} = req.params;
+		const result = await viewLeaveRequest(leaveRequestUuid);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
 });
 
 portal.patch("/validate/leave-request/:leaveRequestUuid", async (req, res) => {
