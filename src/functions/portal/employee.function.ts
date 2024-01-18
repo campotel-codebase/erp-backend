@@ -91,7 +91,7 @@ export const createLeaveRequest = async (
 ) => {
 	let approvalList: approvedByType[] = [];
 	const {uuid, Employee, from, to, resumeOn, approvedBy, isApprovalDefault, ...rest} = body;
-	const reportingTo = employee.reportingTo();
+	const employeeReportingTo = employee.reportingTo();
 	const customApproval = JSON.stringify(approvedBy);
 	const prepData = {
 		uuid: await generateUuid(),
@@ -102,6 +102,7 @@ export const createLeaveRequest = async (
 		to: formatISO(to),
 		resumeOn: formatISO(resumeOn),
 	};
+
 	if (isApprovalDefault === 0) {
 		// custom routing
 		const approvalsArr: approvedByType[] = JSON.parse(customApproval);
@@ -116,8 +117,6 @@ export const createLeaveRequest = async (
 			select: {uuid: true},
 		});
 		approvalList.forEach(async (reportingTo) => {
-			console.log(reportingTo);
-			
 			const sendTo = {
 				to: reportingTo.email,
 				subject: "Leave request",
@@ -129,15 +128,15 @@ export const createLeaveRequest = async (
 			};
 			await emailContent(sendTo);
 		});
-		return {status: 200, data: newLeaveRequest};
+		return {status: 200, data: "request has been sent successfully"};
 	} else {
-		if (reportingTo) {
+		if (employeeReportingTo) {
 			// default routing
 			approvalList.push({
-				uuid: reportingTo.uuid,
-				suffix: reportingTo.suffix,
-				fullName: reportingTo.fullName,
-				email: reportingTo.email,
+				uuid: employeeReportingTo.uuid,
+				suffix: employeeReportingTo.suffix,
+				fullName: employeeReportingTo.fullName,
+				email: employeeReportingTo.email,
 				status: 0,
 				date: null,
 				reason: null,
@@ -148,7 +147,9 @@ export const createLeaveRequest = async (
 					...prepData,
 					...rest,
 				},
+				select: {uuid: true},
 			});
+			const reportingTo = approvalList[0];
 			const sendTo = {
 				to: reportingTo.email,
 				subject: "Leave request",
