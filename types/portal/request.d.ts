@@ -1,0 +1,1 @@
+export type approvedByType = {uuid: string; name: string | null, status: number, date: Date | null | string, reason: string | null}

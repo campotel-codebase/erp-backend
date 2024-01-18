@@ -12,6 +12,7 @@ import {EmployeeAuthCredentialsType} from "../../../types/jwt-payload";
 import {generateUuid} from "../../utils/uuid.util";
 import {formatISO} from "date-fns";
 import {emailContent} from "../../utils/email.util";
+import {approvedByType} from "../../../types/portal/request";
 
 export const employeeSignIn = async (body: employeeSignInType) => {
 	const employeeAccount = await prisma.employee.findUnique({
@@ -92,7 +93,9 @@ export const createLeaveRequest = async (
 	const {uuid, Employee, from, to, resumeOn, approvedBy, ...rest} = body;
 	const reportingTo = employee.reportingTo();
 	if (reportingTo) {
-		const employeeToApprove = [{name: reportingTo.fullName, status: 0, date: null}];
+		const employeeToApprove: approvedByType[] = [
+			{uuid: reportingTo.uuid, name: reportingTo.fullName, status: 0, date: null, reason: null},
+		];
 		const newLeaveRequest = await prisma.leaveRequest.create({
 			data: {
 				uuid: await generateUuid(),
@@ -128,4 +131,42 @@ export const viewLeaveRequest = async (leaveRequestUuid: string) => {
 		where: {uuid: leaveRequestUuid},
 	});
 	return {status: 200, data: leaveRequest};
+};
+
+export const validateLeaveRequest = async (
+	leaveRequestUuid: string,
+	employee: EmployeeAuthCredentialsType["employee"],
+	body: {status: number; reason: string | null},
+) => {
+	const approvalList = await prisma.leaveRequest.findUnique({
+		where: {uuid: leaveRequestUuid},
+		select: {approvedBy: true},
+	});
+	if (approvalList) {
+		const approvalArr: approvedByType[] = JSON.parse(approvalList.approvedBy);
+		const approvedIt = approvalArr.map((employeeToApprove) => {
+			const {uuid, status, date, reason, ...rest} = employeeToApprove;
+			if (uuid === employee.uuid) {
+				return {
+					uuid,
+					status: body.status,
+					reason: body.reason,
+					date: formatISO(new Date()),
+					...rest,
+				};
+			}
+			return employeeToApprove;
+		});
+		if (approvedIt.length !== 0) {
+			const updateLeave = await prisma.leaveRequest.update({
+				where: {uuid: leaveRequestUuid},
+				data: {approvedBy: JSON.stringify(approvedIt)},
+			});
+			return {status: 200, data: updateLeave};
+		} else {
+			return {status: 204, data: "approval list cant be null"};
+		}
+	} else {
+		return {status: 404, data: "leave request not found"};
+	}
 };
