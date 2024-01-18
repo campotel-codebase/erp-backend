@@ -1,1 +1,1 @@
-export type approvedByType = { uuid: string; suffix: string,  fullName: string | null, email: string, status: number, date: Date | null | string, reason: string | null }
+export type approvedByType = { uuid: string; suffix: string,  fullName: string | null, email: string, status: string, date: Date | null | string, reason: string | null }

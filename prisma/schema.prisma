@@ -129,6 +129,7 @@ model EmploymentHistory {
 model LeaveRequest {
   id                  Int      @id @default(autoincrement())
   employeeId          Int
+  status              String   @default("pending") @db.VarChar(20)
   uuid                String   @unique
   from                DateTime
   to                  DateTime
@@ -138,7 +139,7 @@ model LeaveRequest {
   absenceType         String   @db.VarChar(20)
   isPaid              Int
   isHrNoted           Int      @default(0) @db.TinyInt
-  approvedBy          String   @db.VarChar(255)
+  approvedBy          String   @db.Text
   Employee            Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   isApprovalDefault   Int      @default(1) @db.TinyInt
   createdAt           DateTime @default(now())

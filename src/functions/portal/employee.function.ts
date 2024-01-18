@@ -89,9 +89,7 @@ export const createLeaveRequest = async (
 	body: Prisma.LeaveRequestCreateInput,
 	employee: EmployeeAuthCredentialsType["employee"],
 ) => {
-	let approvalList: approvedByType[] = [];
 	const {uuid, Employee, from, to, resumeOn, approvedBy, isApprovalDefault, ...rest} = body;
-	const employeeReportingTo = employee.reportingTo();
 	const customApproval = JSON.stringify(approvedBy);
 	const prepData = {
 		uuid: await generateUuid(),
@@ -104,19 +102,36 @@ export const createLeaveRequest = async (
 	};
 
 	if (isApprovalDefault === 0) {
-		// custom routing
-		const approvalsArr: approvedByType[] = JSON.parse(customApproval);
-		approvalList.push(...approvalsArr);
+		const employeesToApprove = await prisma.employee.findMany({
+			where: {
+				uuid: {
+					in: JSON.parse(customApproval),
+				},
+			},
+			select: {
+				uuid: true,
+				suffix: true,
+				fullName: true,
+				email: true,
+			},
+		});
+		const tags: approvedByType[] = employeesToApprove.map((reportingTo) => {
+			return {
+				...reportingTo,
+				status: "pending",
+				date: null,
+				reason: null,
+			};
+		});
 		const newLeaveRequest = await prisma.leaveRequest.create({
 			data: {
-				approvedBy: JSON.stringify(approvalList),
+				approvedBy: JSON.stringify(tags),
 				isApprovalDefault,
 				...prepData,
 				...rest,
 			},
-			select: {uuid: true},
 		});
-		approvalList.forEach(async (reportingTo) => {
+		tags.forEach(async (reportingTo) => {
 			const sendTo = {
 				to: reportingTo.email,
 				subject: "Leave request",
@@ -128,33 +143,33 @@ export const createLeaveRequest = async (
 			};
 			await emailContent(sendTo);
 		});
-		return {status: 200, data: "request has been sent successfully"};
+		return {status: 200, data: newLeaveRequest};
 	} else {
+		const employeeReportingTo = employee.reportingTo();
 		if (employeeReportingTo) {
 			// default routing
-			approvalList.push({
+			const tags = {
 				uuid: employeeReportingTo.uuid,
 				suffix: employeeReportingTo.suffix,
 				fullName: employeeReportingTo.fullName,
 				email: employeeReportingTo.email,
-				status: 0,
+				status: "pending",
 				date: null,
 				reason: null,
-			});
+			};
 			const newLeaveRequest = await prisma.leaveRequest.create({
 				data: {
-					approvedBy: JSON.stringify(approvalList),
+					approvedBy: JSON.stringify(tags),
 					...prepData,
 					...rest,
 				},
 				select: {uuid: true},
 			});
-			const reportingTo = approvalList[0];
 			const sendTo = {
-				to: reportingTo.email,
+				to: tags.email,
 				subject: "Leave request",
 				text: {
-					title: `Dear ${reportingTo.suffix} ${reportingTo.fullName}`,
+					title: `Dear ${tags.suffix} ${tags.fullName}`,
 					msg: `i ${employee.fullName} is requesting a leave to your approval: ${newLeaveRequest.uuid}`,
 				},
 				usedFor: "notification",
