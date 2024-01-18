@@ -26,5 +26,12 @@ export type EmployeeAuthCredentialsType = {
 	employee: {
 		id: number;
 		uuid: string;
+		fullName: string | null;
+		reportingTo:(() => {
+			uuid: string;
+			suffix: string;
+			fullName: string | null;
+			email: string;
+		} | null);
 	};
 };

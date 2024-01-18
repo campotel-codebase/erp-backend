@@ -87,6 +87,10 @@ export const employeeAuth = async (req: Request, res: Response, next: NextFuncti
 					select: {
 						id: true,
 						uuid: true,
+						fullName: true,
+						ReportingTo: {
+							select: {uuid: true, suffix: true, fullName: true, email: true},
+						},
 					},
 				},
 			},
@@ -101,6 +105,19 @@ export const employeeAuth = async (req: Request, res: Response, next: NextFuncti
 			employee: {
 				id: validatePayload.Employee[0].id,
 				uuid: validatePayload.Employee[0].uuid,
+				fullName: validatePayload.Employee[0].fullName,
+				reportingTo: () => {
+					if (validatePayload.Employee[0].ReportingTo) {
+						return {
+							uuid: validatePayload.Employee[0].ReportingTo.uuid,
+							suffix: validatePayload.Employee[0].ReportingTo.suffix,
+							fullName: validatePayload.Employee[0].ReportingTo?.fullName,
+							email: validatePayload.Employee[0].ReportingTo.email,
+						};
+					} else {
+						return null;
+					}
+				},
 			},
 		};
 		req.employeeAuthCreds = prepData;

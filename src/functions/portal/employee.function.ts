@@ -89,32 +89,27 @@ export const createLeaveRequest = async (
 	body: Prisma.LeaveRequestCreateInput,
 	employee: EmployeeAuthCredentialsType["employee"],
 ) => {
-	// ! BUG Should only create if the routing approval is correctly define
 	const {uuid, Employee, from, to, resumeOn, ...rest} = body;
-	const newLeaveRequest = await prisma.leaveRequest.create({
-		data: {
-			uuid: await generateUuid(),
-			Employee: {
-				connect: {id: employee.id},
+	const reportingTo = employee.reportingTo();
+	if (reportingTo) {
+		const newLeaveRequest = await prisma.leaveRequest.create({
+			data: {
+				uuid: await generateUuid(),
+				Employee: {
+					connect: {id: employee.id},
+				},
+				from: formatISO(from),
+				to: formatISO(to),
+				resumeOn: formatISO(resumeOn),
+				...rest,
 			},
-			from: formatISO(from),
-			to: formatISO(to),
-			resumeOn: formatISO(resumeOn),
-			...rest,
-		},
-		select: {
-			Employee: {
-				select: {ReportingTo: true, fullName: true},
-			},
-		},
-	});
-	if (newLeaveRequest.Employee.ReportingTo) {
+		});
 		const sendTo = {
-			to: newLeaveRequest.Employee.ReportingTo.email,
+			to: reportingTo.email,
 			subject: "Leave request",
 			text: {
-				title: `Dear ${newLeaveRequest.Employee.ReportingTo.suffix} ${newLeaveRequest.Employee.ReportingTo.fullName}`,
-				msg: `i ${newLeaveRequest.Employee.fullName} is requesting a leave to your approval`,
+				title: `Dear ${reportingTo.suffix} ${reportingTo.fullName}`,
+				msg: `i ${employee.fullName} is requesting a leave to your approval`,
 			},
 			usedFor: "notification",
 		};
