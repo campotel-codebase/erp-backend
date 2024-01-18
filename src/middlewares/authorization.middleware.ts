@@ -95,24 +95,28 @@ export const employeeAuth = async (req: Request, res: Response, next: NextFuncti
 				},
 			},
 		});
+		const company = validatePayload;
+		const employee = validatePayload.Employee[0];
+		const reportingTo = validatePayload.Employee[0].ReportingTo;
+
 		const prepData: EmployeeAuthCredentialsType = {
 			company: {
-				id: validatePayload.id,
-				uuid: validatePayload.uuid,
-				name: validatePayload.name,
-				benefits: validatePayload.benefits,
+				id: company.id,
+				uuid: company.uuid,
+				name: company.name,
+				benefits: company.benefits,
 			},
 			employee: {
-				id: validatePayload.Employee[0].id,
-				uuid: validatePayload.Employee[0].uuid,
-				fullName: validatePayload.Employee[0].fullName,
+				id: employee.id,
+				uuid: employee.uuid,
+				fullName: employee.fullName,
 				reportingTo: () => {
-					if (validatePayload.Employee[0].ReportingTo) {
+					if (reportingTo) {
 						return {
-							uuid: validatePayload.Employee[0].ReportingTo.uuid,
-							suffix: validatePayload.Employee[0].ReportingTo.suffix,
-							fullName: validatePayload.Employee[0].ReportingTo?.fullName,
-							email: validatePayload.Employee[0].ReportingTo.email,
+							uuid: reportingTo.uuid,
+							suffix: reportingTo.suffix,
+							fullName: reportingTo?.fullName,
+							email: reportingTo.email,
 						};
 					} else {
 						return null;
