@@ -17,7 +17,7 @@ COPY build/. .
 COPY .env .env
 
 # Copy the Prisma schema file
-COPY prisma/schema.prisma prisma/schema.prisma
+COPY prisma/schema.prisma schema.prisma
 
 #Copy assets
 COPY mjml/ mjml/
