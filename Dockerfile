@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a parent image
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Set the working directory in the container
 WORKDIR /usr/app
@@ -10,8 +10,19 @@ COPY package*.json ./
 # Install app dependencies
 RUN npm install
 
-# Copy the current directory contents into the container at /usr/app
+# Copy the build artifacts
 COPY build/. . 
+
+# Copy the .env file
+COPY .env .env
+
+# Copy the Prisma schema file
+COPY prisma/schema.prisma prisma/schema.prisma
+
+#Copy assets
+COPY mjml/ mjml/
+COPY public/ public/
+
 
 # Generate Prisma client
 RUN npx prisma generate
