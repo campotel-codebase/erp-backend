@@ -5,10 +5,10 @@ services:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "xYm9Cek412ZY"
+      MSSQL_SA_PASSWORD: "${DB_USER_PASSWORD}"
       MSSQL_PID: "Express"
     ports:
-      - "1433:1433"
+      - "${DB_PORT}:${DB_PORT}"
 
   maildev:
     container_name: maildev-container
@@ -34,4 +34,4 @@ services:
       - database
       - maildev
     ports:
-      - "3000:3000"
+      - "${EXPRESS_PORT}:${EXPRESS_PORT}"
