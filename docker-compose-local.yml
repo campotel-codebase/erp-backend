@@ -25,3 +25,13 @@ services:
       driver: "json-file"
       options:
         max-size: "1m"
+
+  express-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+      - maildev
+    ports:
+      - "3000:3000"
