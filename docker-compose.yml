@@ -2,6 +2,7 @@ version: "3.8"
 services:
   database:
     container_name: MSSQL-container
+    hostname: mssql-erp
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       ACCEPT_EULA: "Y"

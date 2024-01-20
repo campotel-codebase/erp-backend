@@ -49,6 +49,14 @@
 			"problemMatcher": [],
 			"label": "npm: studio",
 			"detail": "npx prisma studio"
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build",
+			"detail": "tsc --sourceMap false"
 		}
 	]
 }

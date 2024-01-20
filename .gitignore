@@ -1,7 +1,5 @@
 node_modules/
 build/
-*.env*
-
 public/*
 !public/.gitkeep
 !public/avatar/.gitkeep
