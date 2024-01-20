@@ -26,25 +26,18 @@ app.use("/api/portal", employeeAuth, portal);
 
 const server = () => {
 	const host = `http://localhost:${port}`;
-	console.log(`🚀 Server ready at: ${host}`);
+	console.log(`Server ready at: ${host}`);
 };
 const database = async () => {
 	try {
-		await prisma.$connect();
-		console.log("⭐️ Database connection is established!");
+		await prisma.$queryRaw`SELECT 1 as result`;
+		console.log("Database connection is established!");
 	} catch (error: any) {
 		console.log("Error connecting to the database: ", error);
-		process.exit(1);
-	} finally {
-		await prisma.$disconnect();
 	}
 };
 
-database().then(() => {
-	app.listen(port, server);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-	console.error("Unhandled Rejection at:", promise, "reason:", reason);
-	process.exit(1);
+app.listen(port, async () => {
+	server();
+	await database();
 });
