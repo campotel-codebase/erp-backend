@@ -28,7 +28,8 @@ services:
       options:
         max-size: "1m"
 
-  express-app:
+  server:
+    container_name: express-container
     build:
       context: .
       dockerfile: Dockerfile
