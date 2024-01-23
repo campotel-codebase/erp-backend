@@ -1,7 +1,6 @@
 {
   "name": "erp-backend",
   "version": "1.0.0",
-  "license": "MIT",
   "scripts": {
     "start": "nodemon --exec ts-node src/index.ts",
     "studio": "npx prisma studio",
