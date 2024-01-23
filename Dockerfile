@@ -5,6 +5,7 @@ FROM node:20-alpine
 WORKDIR /usr/app
 
 # Copy package.json and package-lock.json to the working directory
+# ! if lock file is included it will not install nmp
 COPY package*.json ./
 
 # Install app dependencies
@@ -12,14 +13,8 @@ RUN npm install
 
 # Copy the build artifacts
 COPY build/. . 
-
-# Copy the .env file
 COPY .env .env
-
-# Copy the Prisma schema file
 COPY prisma/schema.prisma schema.prisma
-
-#Copy assets
 COPY mjml/ mjml/
 COPY public/ public/
 
