@@ -29,7 +29,7 @@ RUN npx prisma generate
 
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE $EXPRESS_PORT
 
 # Command to run your application
 CMD ["node","src/index.js"]

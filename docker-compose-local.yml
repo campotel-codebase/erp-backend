@@ -3,7 +3,7 @@ services:
 
   database:
     container_name: MSSQL-container
-    hostname: ${DB_HOST}
+    hostname: mssql-erp
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       ACCEPT_EULA: "Y"
@@ -27,14 +27,3 @@ services:
       driver: "json-file"
       options:
         max-size: "1m"
-
-  server:
-    container_name: express-container
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - database
-      - maildev
-    ports:
-      - "${EXPRESS_PORT}:${EXPRESS_PORT}"
