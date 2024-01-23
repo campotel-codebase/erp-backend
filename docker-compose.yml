@@ -1,14 +1,16 @@
 version: "3.8"
 services:
+
   database:
     container_name: MSSQL-container
+    hostname: mssql-erp
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "xYm9Cek412ZY"
+      MSSQL_SA_PASSWORD: "${DB_USER_PASSWORD}"
       MSSQL_PID: "Express"
     ports:
-      - "1433:1433"
+      - "${DB_PORT}:${DB_PORT}"
 
   maildev:
     container_name: maildev-container
@@ -25,3 +27,14 @@ services:
       driver: "json-file"
       options:
         max-size: "1m"
+
+  server:
+    container_name: express-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+      - maildev
+    ports:
+      - "${EXPRESS_PORT}:${EXPRESS_PORT}"
