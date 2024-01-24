@@ -141,19 +141,18 @@ export const onBoardEmployees = async (
 	const newEmployees = await prisma.employee.createMany({
 		data: hashPasswords,
 	});
-	employees.forEach(async (employee: Prisma.EmployeeCreateManyInput) => {
-		const {fullName, password, email, ...rest} = employee;
+	for (const employee of employees) {
 		const sendTo = {
-			to: email,
+			to: employee.email,
 			subject: "newly hired",
 			text: {
-				title: `Welcome ${fullName} to ${company.name}`,
-				msg: `temporary erp portal password: ${password}`,
+				title: `Welcome ${employee.fullName} to ${company.name}`,
+				msg: `Temporary ERP portal password: ${employee.password}`,
 			},
 			usedFor: "notification",
 		};
 		await emailContent(sendTo);
-	});
+	}
 	return {status: 200, data: newEmployees};
 };
 
