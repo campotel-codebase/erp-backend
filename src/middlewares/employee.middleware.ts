@@ -3,7 +3,9 @@ import prisma from "../../libs/prisma";
 import {Request, Response, NextFunction} from "express";
 
 export const uniqueEmails = async (req: Request, res: Response, next: NextFunction) => {
-	const emailFromCsv = req.body.map((employee: Prisma.EmployeeCreateInput) => employee.email);
+	const emailFromCsv: string[] = req.body.map(
+		(employee: Prisma.EmployeeCreateInput) => employee.email,
+	);
 	try {
 		const emails = await prisma.employee.findMany({
 			where: {
@@ -26,7 +28,7 @@ export const uniqueEmails = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const uniquePhoneNumbers = async (req: Request, res: Response, next: NextFunction) => {
-	const phoneNumberFromCsv = req.body.map(
+	const phoneNumberFromCsv: string[] = req.body.map(
 		(employee: Prisma.EmployeeCreateInput) => employee.phoneNumber,
 	);
 	try {
