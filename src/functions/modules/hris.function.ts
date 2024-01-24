@@ -84,7 +84,7 @@ export const onboardEmployee = async (
 		data: {
 			...rest,
 			fullName,
-			hiredDate,
+			hiredDate: formatISO(hiredDate),
 			lastHiredDate: formatISO(hiredDate),
 			benefits: benefitsToString,
 			password: await hashPassword(tempPassword),

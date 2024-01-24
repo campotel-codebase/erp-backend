@@ -124,8 +124,4 @@ hris.get("/org-chart-tree/:employeeUuid", async (req, res) => {
 	}
 });
 
-hris.get("/employee/tenure/:employeeUuid", async (req, res) => {
-	res.json("tenure");
-});
-
 export default hris;
