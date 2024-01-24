@@ -8,6 +8,7 @@ import {Prisma} from "@prisma/client";
 import {generatePassword, hashPassword} from "../../utils/password.util";
 import {userAuthCredentialsType} from "../../../types/jwt-payload";
 import {emailContent} from "../../utils/email.util";
+import {calculateTenure} from "../../utils/tenure.util";
 
 export const employeesCsvToJsonArray = async (
 	csvBuffer: string,
@@ -84,7 +85,7 @@ export const onboardEmployee = async (
 		data: {
 			...rest,
 			fullName,
-			hiredDate,
+			hiredDate: formatISO(hiredDate),
 			lastHiredDate: formatISO(hiredDate),
 			benefits: benefitsToString,
 			password: await hashPassword(tempPassword),
@@ -342,4 +343,25 @@ export const orgChartTree = async (employeeUuid: string) => {
 	});
 
 	return {status: 200, data: selectedChart};
+};
+
+export const calculateEmployeeTenure = async (employeeUuid: string, companyUuid: string) => {
+	const employee = await prisma.company.findUnique({
+		where: {uuid: companyUuid},
+		select: {
+			Employee: {
+				where: {
+					uuid: employeeUuid,
+				},
+			},
+		},
+	});
+
+	const startDate = employee?.Employee[0].hiredDate;
+	if (startDate) {
+		const tenureCalculation = calculateTenure(startDate);
+		return tenureCalculation;
+	} else {
+		return "employee is null";
+	}
 };

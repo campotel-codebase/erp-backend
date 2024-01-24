@@ -10,6 +10,7 @@ import {
 	onboardEmployee,
 	orgChartTree,
 	searchEmployee,
+	calculateEmployeeTenure,
 } from "../../functions/modules/hris.function";
 import {
 	isEmployeeEmailUsable,
@@ -124,8 +125,15 @@ hris.get("/org-chart-tree/:employeeUuid", async (req, res) => {
 	}
 });
 
-hris.get("/employee/tenure/:employeeUuid", async (req, res) => {
-	res.json("tenure");
+hris.get("/employee-tenure/:employeeUuid", async (req, res) => {
+	const company = req.userAuthCreds.company.uuid;
+	const {employeeUuid} = req.params;
+	try {
+		const result = await calculateEmployeeTenure(employeeUuid, company);
+		res.json(result);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
 });
 
 export default hris;
