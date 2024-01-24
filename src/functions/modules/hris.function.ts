@@ -344,24 +344,3 @@ export const orgChartTree = async (employeeUuid: string) => {
 
 	return {status: 200, data: selectedChart};
 };
-
-export const calculateEmployeeTenure = async (employeeUuid: string, companyUuid: string) => {
-	const employee = await prisma.company.findUnique({
-		where: {uuid: companyUuid},
-		select: {
-			Employee: {
-				where: {
-					uuid: employeeUuid,
-				},
-			},
-		},
-	});
-
-	const startDate = employee?.Employee[0].hiredDate;
-	if (startDate) {
-		const tenureCalculation = calculateTenure(startDate);
-		return tenureCalculation;
-	} else {
-		return "employee is null";
-	}
-};
