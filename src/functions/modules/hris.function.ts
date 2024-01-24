@@ -8,7 +8,6 @@ import {Prisma} from "@prisma/client";
 import {generatePassword, hashPassword} from "../../utils/password.util";
 import {userAuthCredentialsType} from "../../../types/jwt-payload";
 import {emailContent} from "../../utils/email.util";
-import {calculateTenure} from "../../utils/tenure.util";
 
 export const employeesCsvToJsonArray = async (
 	csvBuffer: string,
