@@ -131,18 +131,18 @@ export const createLeaveRequest = async (
 				...rest,
 			},
 		});
-		tags.forEach(async (reportingTo) => {
+		for (const reportingTo of tags) {
 			const sendTo = {
 				to: reportingTo.email,
 				subject: "Leave request",
 				text: {
 					title: `Dear ${reportingTo.suffix} ${reportingTo.fullName}`,
-					msg: `i ${employee.fullName} is requesting a leave to your approval: ${newLeaveRequest.uuid}`,
+					msg: `I ${employee.fullName} am requesting a leave for your approval: ${newLeaveRequest.uuid}`,
 				},
 				usedFor: "notification",
 			};
 			await emailContent(sendTo);
-		});
+		}
 		return {status: 200, data: newLeaveRequest};
 	} else {
 		const employeeReportingTo = employee.reportingTo();
