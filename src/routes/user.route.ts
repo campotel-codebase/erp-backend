@@ -1,5 +1,5 @@
 import express from "express";
-import {profile, updateAvatar} from "../functions/user.function";
+import {profile, updateAvatar, updateProfile} from "../functions/user.function";
 import {uploadImage} from "../middlewares/multer.middleware";
 const user = express.Router();
 
@@ -7,6 +7,16 @@ user.get("/profile", async (req, res) => {
 	const userUuid = req.userAuthCreds.user.uuid;
 	try {
 		const result = await profile(userUuid);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
+user.patch("/update-profile", async (req, res) => {
+	const userUuid = req.userAuthCreds.user.uuid;
+	try {
+		const result = await updateProfile(req.body, userUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
