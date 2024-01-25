@@ -11,6 +11,7 @@ import {
 	orgChartTree,
 	searchEmployee,
 	updateEmployee,
+	updateEmploymentHistory,
 } from "../../functions/modules/hris.function";
 import {
 	isEmployeeEmailUsable,
@@ -134,4 +135,15 @@ hris.patch("/update-employee/:employeeUuid", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
+
+hris.patch("/update-employment-history/:employmentHistoryUuid", async (req, res) => {
+	const {employmentHistoryUuid} = req.params;
+	try {
+		const result = await updateEmploymentHistory(req.body, employmentHistoryUuid);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+
 export default hris;
