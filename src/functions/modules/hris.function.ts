@@ -349,9 +349,24 @@ export const orgChartTree = async (employeeUuid: string) => {
 	return {status: 200, data: selectedChart};
 };
 
-export const updateEmployee = async (body: Prisma.EmployeeUpdateInput, employeeUuid: string) => {
+export const updateEmployee = async (
+	body: Prisma.EmployeeUpdateInput,
+	companyUuid: string,
+	employeeUuid: string,
+) => {
+	const company = await prisma.company.findUniqueOrThrow({
+		where: {uuid: companyUuid},
+		select: {
+			Employee: {
+				where: {
+					uuid: employeeUuid,
+				},
+				select: {uuid: true},
+			},
+		},
+	});
 	const updatedEmployee = await prisma.employee.update({
-		where: {uuid: employeeUuid},
+		where: {uuid: company.Employee[0].uuid},
 		data: body,
 	});
 	return {status: 200, data: updatedEmployee};

@@ -128,9 +128,10 @@ hris.get("/org-chart-tree/:employeeUuid", async (req, res) => {
 });
 
 hris.patch("/update-employee/:employeeUuid", async (req, res) => {
+	const company = req.userAuthCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
-		const result = await updateEmployee(req.body, employeeUuid);
+		const result = await updateEmployee(req.body, company, employeeUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
