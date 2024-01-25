@@ -53,7 +53,7 @@ hris.get("/find/employee", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
-hris.get("/get/OrgChart", async (req, res) => {
+hris.get("/get/org-chart", async (req, res) => {
 	try {
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -112,7 +112,7 @@ hris.post("/make/employee", async (req, res) => {
 	Patch requests
 */
 
-hris.patch("/update/offboardEmployee/:employeeUuid", async (req, res) => {
+hris.patch("/update/offboard-employee/:employeeUuid", async (req, res) => {
 	const company = req.userAuthCreds.company;
 	const {employeeUuid} = req.params;
 	const {body} = req.body;
@@ -124,7 +124,7 @@ hris.patch("/update/offboardEmployee/:employeeUuid", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
-hris.patch("/update/assignBankAccountToEmployee/:employeeUuid", async (req, res) => {
+hris.patch("/update/assign-bank-account-to-employee/:employeeUuid", async (req, res) => {
 	const company = req.userAuthCreds.company;
 	const {employeeUuid} = req.params;
 	const {body} = req.body;
@@ -148,7 +148,7 @@ hris.patch("/update/employee/:employeeUuid", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
-hris.patch("/update/employmentHistory/:employmentHistoryUuid", async (req, res) => {
+hris.patch("/update/employment-history/:employmentHistoryUuid", async (req, res) => {
 	const company = req.userAuthCreds.company;
 	const {employmentHistoryUuid} = req.params;
 	const {body} = req.body;
@@ -160,7 +160,7 @@ hris.patch("/update/employmentHistory/:employmentHistoryUuid", async (req, res) 
 		res.status(500).json({error: error.message});
 	}
 });
-hris.patch("/update/bankAccount/:bankAccountUuid", async (req, res) => {
+hris.patch("/update/bank-account/:bankAccountUuid", async (req, res) => {
 	const company = req.userAuthCreds.company;
 	const {bankAccountUuid} = req.params;
 	const {body} = req.body;
