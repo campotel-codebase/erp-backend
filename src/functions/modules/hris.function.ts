@@ -196,6 +196,9 @@ export const offboardEmployee = async (
 					Employee: {
 						connect: {id: newOffBoardedEmployee.id},
 					},
+					Company: {
+						connect: {id: company.id},
+					},
 				},
 			});
 			return {status: 200, data: "employee offboarded successfully"};
@@ -215,6 +218,7 @@ export const assignBankAccount = async (
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
 		select: {
+			id: true,
 			Employee: {
 				where: {uuid: employeeUuid, isActive: 1},
 			},
@@ -236,6 +240,9 @@ export const assignBankAccount = async (
 					connect: {
 						id: newPayrollForEmployee.id,
 					},
+				},
+				Company: {
+					connect: {id: company.id},
 				},
 			},
 		});
@@ -342,9 +349,24 @@ export const orgChartTree = async (employeeUuid: string) => {
 	return {status: 200, data: selectedChart};
 };
 
-export const updateEmployee = async (body: Prisma.EmployeeUpdateInput, employeeUuid: string) => {
+export const updateEmployee = async (
+	body: Prisma.EmployeeUpdateInput,
+	companyUuid: string,
+	employeeUuid: string,
+) => {
+	const company = await prisma.company.findUniqueOrThrow({
+		where: {uuid: companyUuid},
+		select: {
+			Employee: {
+				where: {
+					uuid: employeeUuid,
+				},
+				select: {uuid: true},
+			},
+		},
+	});
 	const updatedEmployee = await prisma.employee.update({
-		where: {uuid: employeeUuid},
+		where: {uuid: company.Employee[0].uuid},
 		data: body,
 	});
 	return {status: 200, data: updatedEmployee};
@@ -352,21 +374,46 @@ export const updateEmployee = async (body: Prisma.EmployeeUpdateInput, employeeU
 
 export const updateEmploymentHistory = async (
 	body: Prisma.EmploymentHistoryUpdateInput,
+	companyUuid: string,
 	employmentHistoryUuid: string,
 ) => {
+	const {offBoarding, ...rest} = body;
+	const company = await prisma.company.findUniqueOrThrow({
+		where: {uuid: companyUuid},
+		select: {
+			EmploymentHistory: {
+				where: {
+					uuid: employmentHistoryUuid,
+				},
+				select: {uuid: true},
+			},
+		},
+	});
 	const updatedEmploymentHistory = await prisma.employmentHistory.update({
-		where: {uuid: employmentHistoryUuid},
-		data: body,
+		where: {uuid: company.EmploymentHistory[0].uuid},
+		data: {offBoarding: formatISO(offBoarding as Date), ...rest},
 	});
 	return {status: 200, data: updatedEmploymentHistory};
 };
 
 export const updateBankAccount = async (
 	body: Prisma.BankAccountUpdateInput,
+	companyUuid: string,
 	bankAccountUuid: string,
 ) => {
+	const company = await prisma.company.findUniqueOrThrow({
+		where: {uuid: companyUuid},
+		select: {
+			BankAccount: {
+				where: {
+					uuid: bankAccountUuid,
+				},
+				select: {uuid: true},
+			},
+		},
+	});
 	const updatedBankAccount = await prisma.bankAccount.update({
-		where: {uuid: bankAccountUuid},
+		where: {uuid: company.BankAccount[0].uuid},
 		data: body,
 	});
 	return {status: 200, data: updatedBankAccount};

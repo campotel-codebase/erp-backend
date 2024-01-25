@@ -16,18 +16,20 @@ model PasswordReset {
 }
 
 model Company {
-  id              Int        @id @default(autoincrement())
-  uuid            String     @unique
-  isActive        Int        @default(1) @db.TinyInt
-  name            String     @db.VarChar(255)
-  jobTitles       String?    @db.VarChar(255)
-  departments     String?    @db.VarChar(255)
-  talentSegments  String?    @db.VarChar(255)
-  employmentTypes String?    @db.VarChar(255)
-  benefits        String?    @db.VarChar(255)
-  User            User[]
-  Employee        Employee[]
-  createdAt       DateTime   @default(now())
+  id                Int                 @id @default(autoincrement())
+  uuid              String              @unique
+  isActive          Int                 @default(1) @db.TinyInt
+  name              String              @db.VarChar(255)
+  jobTitles         String?             @db.VarChar(255)
+  departments       String?             @db.VarChar(255)
+  talentSegments    String?             @db.VarChar(255)
+  employmentTypes   String?             @db.VarChar(255)
+  benefits          String?             @db.VarChar(255)
+  User              User[]
+  Employee          Employee[]
+  EmploymentHistory EmploymentHistory[]
+  BankAccount       BankAccount[]
+  createdAt         DateTime            @default(now())
 }
 
 model User {
@@ -102,27 +104,31 @@ model Employee {
 }
 
 model BankAccount {
-  id            Int       @id @default(autoincrement())
-  employeeId    Int?
-  uuid          String    @unique
-  bankName      String    @db.VarChar(255)
-  accountNumber String    @db.VarChar(255)
-  cardNumber    String    @db.VarChar(255)
-  accountType   String    @db.VarChar(255)
-  isActive      Int       @default(0) @db.TinyInt
-  Employee      Employee? @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  createdAt     DateTime  @default(now())
+  id            Int      @id @default(autoincrement())
+  employeeId    Int
+  companyId     Int
+  uuid          String   @unique
+  bankName      String   @db.VarChar(255)
+  accountNumber String   @db.VarChar(255)
+  cardNumber    String   @db.VarChar(255)
+  accountType   String   @db.VarChar(255)
+  isActive      Int      @default(0) @db.TinyInt
+  Employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  Company       Company  @relation(fields: [companyId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @default(now())
 }
 
 model EmploymentHistory {
   id          Int      @id @default(autoincrement())
   uuid        String   @unique
   employeeId  Int
+  companyId   Int
   onBoarding  DateTime
   offBoarding DateTime
   reason      String   @db.VarChar(255)
   remarks     String?  @db.VarChar(255)
   Employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  Company     Company  @relation(fields: [companyId], references: [id], onUpdate: NoAction, onDelete: NoAction)
   createdAt   DateTime @default(now())
 }
 

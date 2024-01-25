@@ -128,9 +128,10 @@ hris.get("/org-chart-tree/:employeeUuid", async (req, res) => {
 });
 
 hris.patch("/update-employee/:employeeUuid", async (req, res) => {
+	const company = req.userAuthCreds.company.uuid;
 	const {employeeUuid} = req.params;
 	try {
-		const result = await updateEmployee(req.body, employeeUuid);
+		const result = await updateEmployee(req.body, company, employeeUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -138,9 +139,10 @@ hris.patch("/update-employee/:employeeUuid", async (req, res) => {
 });
 
 hris.patch("/update-employment-history/:employmentHistoryUuid", async (req, res) => {
+	const company = req.userAuthCreds.company.uuid;
 	const {employmentHistoryUuid} = req.params;
 	try {
-		const result = await updateEmploymentHistory(req.body, employmentHistoryUuid);
+		const result = await updateEmploymentHistory(req.body, company, employmentHistoryUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -148,9 +150,10 @@ hris.patch("/update-employment-history/:employmentHistoryUuid", async (req, res)
 });
 
 hris.patch("/update-bank-account/:bankAccountUuid", async (req, res) => {
+	const company = req.userAuthCreds.company.uuid;
 	const {bankAccountUuid} = req.params;
 	try {
-		const result = await updateBankAccount(req.body, bankAccountUuid);
+		const result = await updateBankAccount(req.body, company, bankAccountUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
