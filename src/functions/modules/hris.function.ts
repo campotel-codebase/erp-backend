@@ -85,7 +85,6 @@ export const onboardEmployee = async (
 			...rest,
 			fullName,
 			hiredDate: formatISO(hiredDate),
-			lastHiredDate: formatISO(hiredDate),
 			benefits: benefitsToString,
 			password: await hashPassword(tempPassword),
 			uuid: await generateUuid(),
@@ -122,7 +121,6 @@ export const onBoardEmployees = async (
 				companyId: company.id,
 				fullName,
 				hiredDate,
-				lastHiredDate: formatISO(hiredDate),
 				benefits: benefitsToString,
 				uuid: await generateUuid(),
 				password: generatePassword,
@@ -341,4 +339,12 @@ export const orgChartTree = async (employeeUuid: string) => {
 	});
 
 	return {status: 200, data: selectedChart};
+};
+
+export const updateEmployee = async (body: Prisma.EmployeeUpdateInput, employeeUuid: string) => {
+	const updatedEmployee = await prisma.employee.update({
+		where: {uuid: employeeUuid},
+		data: body,
+	});
+	return {status: 200, data: updatedEmployee};
 };

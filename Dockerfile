@@ -5,7 +5,6 @@ FROM node:20-alpine
 WORKDIR /usr/app
 
 # Copy package.json and package-lock.json to the working directory
-# ! if lock file is included it will not install node_modules
 COPY package*.json ./
 
 # Install app dependencies
