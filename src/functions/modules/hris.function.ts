@@ -188,6 +188,7 @@ export const offboardEmployee = async (
 		if (newOffBoardedEmployee.hiredDate) {
 			await prisma.employmentHistory.create({
 				data: {
+					uuid: await generateUuid(),
 					offBoarding: formatISO(body.offBoarding),
 					onBoarding: newOffBoardedEmployee.hiredDate,
 					reason: body.reason,
@@ -347,4 +348,15 @@ export const updateEmployee = async (body: Prisma.EmployeeUpdateInput, employeeU
 		data: body,
 	});
 	return {status: 200, data: updatedEmployee};
+};
+
+export const updateEmploymentHistory = async (
+	body: Prisma.EmploymentHistoryUpdateInput,
+	employmentHistoryUuid: string,
+) => {
+	const updatedEmploymentHistory = await prisma.employmentHistory.update({
+		where: {uuid: employmentHistoryUuid},
+		data: body,
+	});
+	return {status: 200, data: updatedEmploymentHistory};
 };

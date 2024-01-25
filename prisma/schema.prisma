@@ -116,6 +116,7 @@ model BankAccount {
 
 model EmploymentHistory {
   id          Int      @id @default(autoincrement())
+  uuid        String   @unique
   employeeId  Int
   onBoarding  DateTime
   offBoarding DateTime
