@@ -73,7 +73,6 @@ model Employee {
 
   // employment
   hiredDate            DateTime
-  lastHiredDate        DateTime?
   isRehired            Int                 @default(0) @db.TinyInt
   isActive             Int                 @default(1) @db.TinyInt
   payType              String?             @db.VarChar(10)
