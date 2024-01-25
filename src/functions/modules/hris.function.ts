@@ -218,6 +218,7 @@ export const assignBankAccount = async (
 	const company = await prisma.company.findUnique({
 		where: {uuid: companyUuid},
 		select: {
+			id: true,
 			Employee: {
 				where: {uuid: employeeUuid, isActive: 1},
 			},
@@ -239,6 +240,9 @@ export const assignBankAccount = async (
 					connect: {
 						id: newPayrollForEmployee.id,
 					},
+				},
+				Company: {
+					connect: {id: company.id},
 				},
 			},
 		});
@@ -379,10 +383,22 @@ export const updateEmploymentHistory = async (
 
 export const updateBankAccount = async (
 	body: Prisma.BankAccountUpdateInput,
+	companyUuid: string,
 	bankAccountUuid: string,
 ) => {
+	const company = await prisma.company.findUniqueOrThrow({
+		where: {uuid: companyUuid},
+		select: {
+			BankAccount: {
+				where: {
+					uuid: bankAccountUuid,
+				},
+				select: {uuid: true},
+			},
+		},
+	});
 	const updatedBankAccount = await prisma.bankAccount.update({
-		where: {uuid: bankAccountUuid},
+		where: {uuid: company.BankAccount[0].uuid},
 		data: body,
 	});
 	return {status: 200, data: updatedBankAccount};

@@ -149,9 +149,10 @@ hris.patch("/update-employment-history/:employmentHistoryUuid", async (req, res)
 });
 
 hris.patch("/update-bank-account/:bankAccountUuid", async (req, res) => {
+	const company = req.userAuthCreds.company.uuid;
 	const {bankAccountUuid} = req.params;
 	try {
-		const result = await updateBankAccount(req.body, bankAccountUuid);
+		const result = await updateBankAccount(req.body, company, bankAccountUuid);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

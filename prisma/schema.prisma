@@ -28,6 +28,7 @@ model Company {
   User              User[]
   Employee          Employee[]
   EmploymentHistory EmploymentHistory[]
+  BankAccount       BankAccount[]
   createdAt         DateTime            @default(now())
 }
 
@@ -103,16 +104,18 @@ model Employee {
 }
 
 model BankAccount {
-  id            Int       @id @default(autoincrement())
-  employeeId    Int?
-  uuid          String    @unique
-  bankName      String    @db.VarChar(255)
-  accountNumber String    @db.VarChar(255)
-  cardNumber    String    @db.VarChar(255)
-  accountType   String    @db.VarChar(255)
-  isActive      Int       @default(0) @db.TinyInt
-  Employee      Employee? @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  createdAt     DateTime  @default(now())
+  id            Int      @id @default(autoincrement())
+  employeeId    Int
+  companyId     Int
+  uuid          String   @unique
+  bankName      String   @db.VarChar(255)
+  accountNumber String   @db.VarChar(255)
+  cardNumber    String   @db.VarChar(255)
+  accountType   String   @db.VarChar(255)
+  isActive      Int      @default(0) @db.TinyInt
+  Employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  Company       Company  @relation(fields: [companyId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  createdAt     DateTime @default(now())
 }
 
 model EmploymentHistory {
