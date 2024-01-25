@@ -360,3 +360,14 @@ export const updateEmploymentHistory = async (
 	});
 	return {status: 200, data: updatedEmploymentHistory};
 };
+
+export const updateBankAccount = async (
+	body: Prisma.BankAccountUpdateInput,
+	bankAccountUuid: string,
+) => {
+	const updatedBankAccount = await prisma.bankAccount.update({
+		where: {uuid: bankAccountUuid},
+		data: body,
+	});
+	return {status: 200, data: updatedBankAccount};
+};
