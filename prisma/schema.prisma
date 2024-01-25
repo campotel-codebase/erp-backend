@@ -16,18 +16,19 @@ model PasswordReset {
 }
 
 model Company {
-  id              Int        @id @default(autoincrement())
-  uuid            String     @unique
-  isActive        Int        @default(1) @db.TinyInt
-  name            String     @db.VarChar(255)
-  jobTitles       String?    @db.VarChar(255)
-  departments     String?    @db.VarChar(255)
-  talentSegments  String?    @db.VarChar(255)
-  employmentTypes String?    @db.VarChar(255)
-  benefits        String?    @db.VarChar(255)
-  User            User[]
-  Employee        Employee[]
-  createdAt       DateTime   @default(now())
+  id                Int                 @id @default(autoincrement())
+  uuid              String              @unique
+  isActive          Int                 @default(1) @db.TinyInt
+  name              String              @db.VarChar(255)
+  jobTitles         String?             @db.VarChar(255)
+  departments       String?             @db.VarChar(255)
+  talentSegments    String?             @db.VarChar(255)
+  employmentTypes   String?             @db.VarChar(255)
+  benefits          String?             @db.VarChar(255)
+  User              User[]
+  Employee          Employee[]
+  EmploymentHistory EmploymentHistory[]
+  createdAt         DateTime            @default(now())
 }
 
 model User {
@@ -118,11 +119,13 @@ model EmploymentHistory {
   id          Int      @id @default(autoincrement())
   uuid        String   @unique
   employeeId  Int
+  companyId   Int
   onBoarding  DateTime
   offBoarding DateTime
   reason      String   @db.VarChar(255)
   remarks     String?  @db.VarChar(255)
   Employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  Company     Company  @relation(fields: [companyId], references: [id], onUpdate: NoAction, onDelete: NoAction)
   createdAt   DateTime @default(now())
 }
 

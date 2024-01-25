@@ -196,6 +196,9 @@ export const offboardEmployee = async (
 					Employee: {
 						connect: {id: newOffBoardedEmployee.id},
 					},
+					Company: {
+						connect: {id: company.id},
+					},
 				},
 			});
 			return {status: 200, data: "employee offboarded successfully"};
@@ -352,11 +355,24 @@ export const updateEmployee = async (body: Prisma.EmployeeUpdateInput, employeeU
 
 export const updateEmploymentHistory = async (
 	body: Prisma.EmploymentHistoryUpdateInput,
+	companyUuid: string,
 	employmentHistoryUuid: string,
 ) => {
+	const {offBoarding, ...rest} = body;
+	const company = await prisma.company.findUniqueOrThrow({
+		where: {uuid: companyUuid},
+		select: {
+			EmploymentHistory: {
+				where: {
+					uuid: employmentHistoryUuid,
+				},
+				select: {uuid: true},
+			},
+		},
+	});
 	const updatedEmploymentHistory = await prisma.employmentHistory.update({
-		where: {uuid: employmentHistoryUuid},
-		data: body,
+		where: {uuid: company.EmploymentHistory[0].uuid},
+		data: {offBoarding: formatISO(offBoarding as Date), ...rest},
 	});
 	return {status: 200, data: updatedEmploymentHistory};
 };
