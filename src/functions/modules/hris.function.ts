@@ -340,3 +340,11 @@ export const orgChartTree = async (employeeUuid: string) => {
 
 	return {status: 200, data: selectedChart};
 };
+
+export const updateEmployee = async (body: Prisma.EmployeeUpdateInput, employeeUuid: string) => {
+	const updatedEmployee = await prisma.employee.update({
+		where: {uuid: employeeUuid},
+		data: body,
+	});
+	return {status: 200, data: updatedEmployee};
+};

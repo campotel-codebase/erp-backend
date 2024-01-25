@@ -10,6 +10,7 @@ import {
 	onboardEmployee,
 	orgChartTree,
 	searchEmployee,
+	updateEmployee,
 } from "../../functions/modules/hris.function";
 import {
 	isEmployeeEmailUsable,
@@ -124,4 +125,13 @@ hris.get("/org-chart-tree/:employeeUuid", async (req, res) => {
 	}
 });
 
+hris.patch("/update-employee/:employeeUuid", async (req, res) => {
+	const {employeeUuid} = req.params;
+	try {
+		const result = await updateEmployee(req.body, employeeUuid);
+		res.status(result.status).json(result.data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
 export default hris;
