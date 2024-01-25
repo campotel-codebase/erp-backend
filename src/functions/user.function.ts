@@ -1,3 +1,4 @@
+import {Prisma} from "@prisma/client";
 import prisma from "../../libs/prisma";
 import {userSignInType, userSignUpType} from "../../types/user";
 import {generateJwt} from "../utils/jwt.util";
@@ -101,6 +102,14 @@ export const profile = async (uuid: string) => {
 	} else {
 		return {status: 404, data: "user not found"};
 	}
+};
+
+export const updateProfile = async (body: Prisma.UserUpdateInput, currentUserUuid: string) => {
+	const updatedUser = await prisma.user.update({
+		where: {uuid: currentUserUuid},
+		data: body,
+	});
+	return {status: 200, data: updatedUser};
 };
 
 export const updateAvatar = async (imgSrc: string, currentUserUuid: string) => {
