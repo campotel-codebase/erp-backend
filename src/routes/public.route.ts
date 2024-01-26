@@ -1,11 +1,11 @@
 import express from "express";
 import {userSignIn, userSignUp, userPwdResetLink, userResetPwd} from "../functions/user.function";
+import {isUserEmailExists, isUserEmailUsable} from "../middlewares/user.middleware";
 import {
 	employeePwdResetLink,
 	employeeResetPwd,
 	employeeSignIn,
-} from "../functions/portal/employee.function";
-import {isUserEmailExists, isUserEmailUsable} from "../middlewares/user.middleware";
+} from "../functions/portal/post.portal.function";
 const publicRoute = express.Router();
 
 publicRoute.post("/user/sign-up", isUserEmailUsable, async (req, res) => {
