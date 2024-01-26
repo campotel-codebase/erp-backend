@@ -47,6 +47,7 @@ export const userAuth = async (req: Request, res: Response, next: NextFunction) 
 					select: {
 						id: true,
 						uuid: true,
+						avatar: true,
 					},
 				},
 			},
@@ -61,6 +62,7 @@ export const userAuth = async (req: Request, res: Response, next: NextFunction) 
 			user: {
 				id: validatePayload.User[0].id,
 				uuid: validatePayload.User[0].uuid,
+				avatar: validatePayload.User[0].avatar,
 			},
 		};
 		req.userAuthCreds = prepData;

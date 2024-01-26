@@ -9,6 +9,8 @@ import {
 	verifyResetUuidForPwd,
 } from "../utils/password.util";
 import {generateUuid} from "../utils/uuid.util";
+import {unlink} from "fs/promises";
+import {userAuthCredentialsType} from "../../types/jwt-payload";
 
 export const userSignUp = async (body: userSignUpType) => {
 	const newUser = await prisma.company.create({
@@ -112,11 +114,16 @@ export const updateUserProfile = async (body: Prisma.UserUpdateInput, currentUse
 	return {status: 200, data: updatedUser};
 };
 
-export const updateUserAvatar = async (imgSrc: string, currentUserUuid: string) => {
+export const updateUserAvatar = async (imgSrc: string, user: userAuthCredentialsType["user"]) => {
+	if (user.avatar) {
+		const currentAvatarFileName = user.avatar.split("/").pop();
+		const currentAvatarPath = `public/avatar/${currentAvatarFileName}`;
+		await unlink(currentAvatarPath);
+	}
 	const newAvatar = await prisma.user.update({
-		where: {uuid: currentUserUuid},
+		where: {uuid: user.uuid},
 		data: {avatar: imgSrc},
 		select: {avatar: true},
 	});
-	return {status: 200, data: "avatar updated successfully"};
+	return {status: 200, data: newAvatar.avatar};
 };
