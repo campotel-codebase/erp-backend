@@ -8,6 +8,9 @@ import {
 } from "../functions/portal/post.portal.function";
 const publicRoute = express.Router();
 
+/* 
+	Post requests
+*/
 publicRoute.post("/user/sign-up", isUserEmailUsable, async (req, res) => {
 	try {
 		const result = await userSignUp(req.body);
@@ -66,5 +69,8 @@ publicRoute.post("/employee/reset-password", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
+/* 
+	Post requests
+*/
 
 export default publicRoute;
