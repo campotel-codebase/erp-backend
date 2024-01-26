@@ -1,13 +1,16 @@
 import express from "express";
 import {userSignIn, userSignUp, userPwdResetLink, userResetPwd} from "../functions/user.function";
+import {isUserEmailExists, isUserEmailUsable} from "../middlewares/user.middleware";
 import {
 	employeePwdResetLink,
 	employeeResetPwd,
 	employeeSignIn,
-} from "../functions/portal/employee.function";
-import {isUserEmailExists, isUserEmailUsable} from "../middlewares/user.middleware";
+} from "../functions/portal/post.portal.function";
 const publicRoute = express.Router();
 
+/* 
+	Post requests
+*/
 publicRoute.post("/user/sign-up", isUserEmailUsable, async (req, res) => {
 	try {
 		const result = await userSignUp(req.body);
@@ -66,5 +69,8 @@ publicRoute.post("/employee/reset-password", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
+/* 
+	Post requests
+*/
 
 export default publicRoute;

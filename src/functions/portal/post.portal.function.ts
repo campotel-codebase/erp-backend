@@ -1,18 +1,18 @@
-import {Prisma} from "@prisma/client";
+import {formatISO} from "date-fns";
 import prisma from "../../../libs/prisma";
 import {employeeSignInType} from "../../../types/modules/hris/employees";
+import {approvedByType} from "../../../types/portal/request";
+import {emailContent} from "../../utils/email.util";
 import {generateJwt} from "../../utils/jwt.util";
 import {
+	hashPassword,
+	sendResetLinkForPwd,
 	verifyHashedPassword,
 	verifyResetUuidForPwd,
-	sendResetLinkForPwd,
-	hashPassword,
 } from "../../utils/password.util";
-import {EmployeeAuthCredentialsType} from "../../../types/jwt-payload";
 import {generateUuid} from "../../utils/uuid.util";
-import {formatISO} from "date-fns";
-import {emailContent} from "../../utils/email.util";
-import {approvedByType} from "../../../types/portal/request";
+import {Prisma} from "@prisma/client";
+import {EmployeeAuthCredentialsType} from "../../../types/jwt-payload";
 
 export const employeeSignIn = async (body: employeeSignInType) => {
 	const employeeAccount = await prisma.employee.findUnique({
@@ -49,6 +49,7 @@ export const employeeSignIn = async (body: employeeSignInType) => {
 		return {status: 404, data: "account not found"};
 	}
 };
+
 export const employeePwdResetLink = async (email: string) => {
 	const isExists = await prisma.employee.findUnique({
 		where: {email},
@@ -65,6 +66,7 @@ export const employeePwdResetLink = async (email: string) => {
 		return {status: 404, data: "email not found"};
 	}
 };
+
 export const employeeResetPwd = async (body: {uuid: string; newPassword: string}) => {
 	const {uuid, newPassword} = body;
 	const isVerify = await verifyResetUuidForPwd(uuid);
@@ -85,7 +87,7 @@ export const employeeResetPwd = async (body: {uuid: string; newPassword: string}
 	}
 };
 
-export const createLeaveRequest = async (
+export const makeLeaveRequest = async (
 	body: Prisma.LeaveRequestCreateInput,
 	employee: EmployeeAuthCredentialsType["employee"],
 ) => {
@@ -181,51 +183,5 @@ export const createLeaveRequest = async (
 		} else {
 			return {status: 409, data: "default routing approval is only applicable if you have a IS"};
 		}
-	}
-};
-
-export const viewLeaveRequest = async (leaveRequestUuid: string) => {
-	// TODO needs  to ve secured
-	const leaveRequest = await prisma.leaveRequest.findUnique({
-		where: {uuid: leaveRequestUuid},
-	});
-	return {status: 200, data: leaveRequest};
-};
-
-export const validateLeaveRequest = async (
-	leaveRequestUuid: string,
-	employee: EmployeeAuthCredentialsType["employee"],
-	body: {status: string; reason: string | null},
-) => {
-	const approvalList = await prisma.leaveRequest.findUnique({
-		where: {uuid: leaveRequestUuid},
-		select: {approvedBy: true},
-	});
-	if (approvalList) {
-		const approvalArr: approvedByType[] = JSON.parse(approvalList.approvedBy);
-		const approvedIt = approvalArr.map((employeeToApprove) => {
-			const {uuid, status, date, reason, ...rest} = employeeToApprove;
-			if (uuid === employee.uuid) {
-				return {
-					uuid,
-					status: body.status,
-					reason: body.reason,
-					date: formatISO(new Date()),
-					...rest,
-				};
-			}
-			return employeeToApprove;
-		});
-		if (approvedIt.length !== 0) {
-			const updateLeave = await prisma.leaveRequest.update({
-				where: {uuid: leaveRequestUuid},
-				data: {approvedBy: JSON.stringify(approvedIt)},
-			});
-			return {status: 200, data: updateLeave};
-		} else {
-			return {status: 204, data: "approval list cant be null"};
-		}
-	} else {
-		return {status: 404, data: "leave request not found"};
 	}
 };

@@ -7,6 +7,9 @@ import {
 } from "../functions/config.function";
 const config = express.Router();
 
+/* 
+	Patch requests
+*/
 config.patch("/departments", async (req, res) => {
 	const companyUuid = req.userAuthCreds.company.uuid;
 	const toString = JSON.stringify(req.body.departments);
@@ -59,5 +62,7 @@ config.patch("/benefits", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
-
+/* 
+	Patch requests
+*/
 export default config;
