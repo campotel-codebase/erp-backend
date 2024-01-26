@@ -92,7 +92,7 @@ export const userResetPwd = async (body: {uuid: string; newPassword: string}) =>
 	}
 };
 
-export const profile = async (uuid: string) => {
+export const getUserProfile = async (uuid: string) => {
 	const profile = await prisma.user.findUnique({
 		where: {uuid},
 	});
@@ -104,7 +104,7 @@ export const profile = async (uuid: string) => {
 	}
 };
 
-export const updateProfile = async (body: Prisma.UserUpdateInput, currentUserUuid: string) => {
+export const updateUserProfile = async (body: Prisma.UserUpdateInput, currentUserUuid: string) => {
 	const updatedUser = await prisma.user.update({
 		where: {uuid: currentUserUuid},
 		data: body,
@@ -112,7 +112,7 @@ export const updateProfile = async (body: Prisma.UserUpdateInput, currentUserUui
 	return {status: 200, data: updatedUser};
 };
 
-export const updateAvatar = async (imgSrc: string, currentUserUuid: string) => {
+export const updateUserAvatar = async (imgSrc: string, currentUserUuid: string) => {
 	const newAvatar = await prisma.user.update({
 		where: {uuid: currentUserUuid},
 		data: {avatar: imgSrc},
