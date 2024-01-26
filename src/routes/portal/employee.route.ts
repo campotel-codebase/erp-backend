@@ -40,7 +40,7 @@ portal.get("/view/leave-request/:leaveRequestUuid", async (req, res) => {
 /* 
 	Patch requests
 */
-portal.patch("/update/respond/leave-request/:leaveRequestUuid", async (req, res) => {
+portal.patch("/respond/leave-request/:leaveRequestUuid", async (req, res) => {
 	const {leaveRequestUuid} = req.params;
 	const employee = req.employeeAuthCreds.employee;
 	const {body} = req;
