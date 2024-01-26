@@ -40,14 +40,14 @@ user.patch("/update/user-profile", async (req, res) => {
 	Put requests
 */
 user.put("/update/user-avatar", uploadImage.single("avatar"), async (req, res) => {
-	const userUuid = req.userAuthCreds.user.uuid;
+	const user = req.userAuthCreds.user;
 	const url = req.protocol + "://" + req.get("host");
 	const fileName = req.file?.filename;
 	const filePath = "/public/avatar/";
 	const imgSrc = url + filePath + fileName;
 
 	try {
-		const result = await updateUserAvatar(imgSrc, userUuid);
+		const result = await updateUserAvatar(imgSrc, user);
 		res.status(result.status).json(result.data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

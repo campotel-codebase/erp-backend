@@ -13,6 +13,7 @@ export type userAuthCredentialsType = {
 	user: {
 		id: number;
 		uuid: string;
+		avatar: string | null
 	};
 };
 
