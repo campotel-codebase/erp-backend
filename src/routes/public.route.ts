@@ -6,7 +6,7 @@ import {
 	employeeResetPwd,
 	employeeSignIn,
 } from "../functions/portal/post.portal.function";
-import {signUpValidationSchema} from "../validator-schemas/user.validator-schema";
+import {signInValidationSchema, signUpValidationSchema} from "../validator/user.validator";
 import {expressValidatorResult} from "../middlewares/express-validator.middleware";
 const publicRoute = express.Router();
 
@@ -26,14 +26,19 @@ publicRoute.post(
 		}
 	},
 );
-publicRoute.post("/user/sign-in", async (req, res) => {
-	try {
-		const result = await userSignIn(req.body);
-		res.status(result.status).json(result.data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+publicRoute.post(
+	"/user/sign-in",
+	signInValidationSchema,
+	expressValidatorResult,
+	async (req: Request, res: Response) => {
+		try {
+			const result = await userSignIn(req.body);
+			res.status(result.status).json(result.data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 publicRoute.post("/user/forgot-password", isUserEmailExists, async (req, res) => {
 	try {
 		const result = await userPwdResetLink(req.body.email);

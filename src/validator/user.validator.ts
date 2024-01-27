@@ -1,5 +1,5 @@
 import {checkSchema} from "express-validator";
-import prisma from "../../libs/prisma";
+import {userCheckEmailValidator} from "./customs/email.custom-validator";
 
 const commonSchema = {
 	isString: true,
@@ -23,10 +23,7 @@ export const signUpValidationSchema = checkSchema({
 	email: {
 		custom: {
 			options: async (value: string) => {
-				const isEmailUsed = await prisma.user.findUnique({
-					where: {email: value},
-					select: {email: true},
-				});
+				const isEmailUsed = await userCheckEmailValidator(value);
 				if (isEmailUsed) {
 					throw new Error("E-mail already in use");
 				}
@@ -41,5 +38,23 @@ export const signUpValidationSchema = checkSchema({
 			options: {min: 8},
 			errorMessage: "Password is required and should be at least 8 characters",
 		},
+	},
+});
+
+export const signInValidationSchema = checkSchema({
+	email: {
+		custom: {
+			options: async (value: string) => {
+				const isEmailUsed = await userCheckEmailValidator(value);
+				if (!isEmailUsed) {
+					throw new Error("E-mail does not exists");
+				}
+			},
+		},
+		isEmail: true,
+		errorMessage: "Email address is required and must be valid",
+	},
+	password: {
+		...commonSchema,
 	},
 });
