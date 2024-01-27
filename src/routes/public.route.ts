@@ -7,11 +7,12 @@ import {
 } from "../functions/portal/post.portal.function";
 import {expressValidatorResult} from "../middlewares/express-validator.middleware";
 import {
-	signInVS,
-	signUpVS,
+	userSignInVS,
+	userSignUpVS,
 	userForgotPasswordVS,
 	userResetPasswordVS,
 } from "../validator/user.validator";
+import {employeeSignInVS} from "../validator/employee.validator";
 const publicRoute = express.Router();
 
 /* 
@@ -19,7 +20,7 @@ const publicRoute = express.Router();
 */
 publicRoute.post(
 	"/user/sign-up",
-	signUpVS,
+	userSignUpVS,
 	expressValidatorResult,
 	async (req: Request, res: Response) => {
 		try {
@@ -32,7 +33,7 @@ publicRoute.post(
 );
 publicRoute.post(
 	"/user/sign-in",
-	signInVS,
+	userSignInVS,
 	expressValidatorResult,
 	async (req: Request, res: Response) => {
 		try {
@@ -73,14 +74,19 @@ publicRoute.post(
 );
 
 // Portal
-publicRoute.post("/employee/sign-in", async (req, res) => {
-	try {
-		const result = await employeeSignIn(req.body);
-		res.status(result.status).json(result.data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+publicRoute.post(
+	"/employee/sign-in",
+	employeeSignInVS,
+	expressValidatorResult,
+	async (req: Request, res: Response) => {
+		try {
+			const result = await employeeSignIn(req.body);
+			res.status(result.status).json(result.data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 publicRoute.post("/employee/forgot-password", async (req, res) => {
 	try {
 		const result = await employeePwdResetLink(req.body.email);

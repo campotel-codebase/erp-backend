@@ -2,7 +2,7 @@ import {checkSchema} from "express-validator";
 import {commonStringRule, passwordRule} from "./common.validator";
 import {userCheckEmailValidator, userCheckResetPasswordUuidValidator} from "./custom.validator";
 
-export const signUpVS = checkSchema({
+export const userSignUpVS = checkSchema({
 	companyName: {
 		...commonStringRule,
 		errorMessage: "Company name is required and must be a valid string",
@@ -30,7 +30,7 @@ export const signUpVS = checkSchema({
 	password: passwordRule,
 });
 
-export const signInVS = checkSchema({
+export const userSignInVS = checkSchema({
 	email: {
 		custom: {
 			options: async (value: string) => {

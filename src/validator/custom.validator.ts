@@ -13,3 +13,11 @@ export const userCheckResetPasswordUuidValidator = async (value: string) => {
 		select: {uuid: true},
 	});
 };
+
+/* Employee */
+export const employeeCheckEmailValidator = async (value: string) => {
+	return await prisma.employee.findUnique({
+		where: {email: value},
+		select: {email: true},
+	});
+};
