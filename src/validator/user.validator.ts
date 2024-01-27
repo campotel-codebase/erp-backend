@@ -1,23 +1,18 @@
 import {checkSchema} from "express-validator";
-import {userCheckEmailValidator} from "./customs/email.custom-validator";
+import {commonStringRule, passwordRule} from "./common.validator";
+import {userCheckEmailValidator, userCheckResetPasswordUuidValidator} from "./custom.validator";
 
-const commonSchema = {
-	isString: true,
-	notEmpty: true,
-	trim: true,
-};
-
-export const signUpValidationSchema = checkSchema({
+export const signUpVS = checkSchema({
 	companyName: {
-		...commonSchema,
+		...commonStringRule,
 		errorMessage: "Company name is required and must be a valid string",
 	},
 	lastName: {
-		...commonSchema,
+		...commonStringRule,
 		errorMessage: "Last name is required and must be a valid string",
 	},
 	firstName: {
-		...commonSchema,
+		...commonStringRule,
 		errorMessage: "First name is required and must be a valid string",
 	},
 	email: {
@@ -32,16 +27,10 @@ export const signUpValidationSchema = checkSchema({
 		isEmail: true,
 		errorMessage: "Email address is required and must be valid",
 	},
-	password: {
-		...commonSchema,
-		isLength: {
-			options: {min: 8},
-			errorMessage: "Password is required and should be at least 8 characters",
-		},
-	},
+	password: passwordRule,
 });
 
-export const signInValidationSchema = checkSchema({
+export const signInVS = checkSchema({
 	email: {
 		custom: {
 			options: async (value: string) => {
@@ -54,7 +43,35 @@ export const signInValidationSchema = checkSchema({
 		isEmail: true,
 		errorMessage: "Email address is required and must be valid",
 	},
-	password: {
-		...commonSchema,
+	password: passwordRule,
+});
+
+export const userForgotPasswordVS = checkSchema({
+	email: {
+		custom: {
+			options: async (value: string) => {
+				const isEmailUsed = await userCheckEmailValidator(value);
+				if (!isEmailUsed) {
+					throw new Error("E-mail does not exists");
+				}
+			},
+		},
+		isEmail: true,
+		errorMessage: "Email address is required and must be valid",
+	},
+});
+
+export const userResetPasswordVS = checkSchema({
+	newPassword: passwordRule,
+	passwordResetUuid: {
+		...commonStringRule,
+		custom: {
+			options: async (value: string) => {
+				const isPasswordResetUuidExists = await userCheckResetPasswordUuidValidator(value);
+				if (!isPasswordResetUuidExists) {
+					throw new Error("reset token does not exists");
+				}
+			},
+		},
 	},
 });
