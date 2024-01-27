@@ -1,6 +1,6 @@
 import express, {Request, Response} from "express";
 import {userSignIn, userSignUp, userPwdResetLink, userResetPwd} from "../functions/user.function";
-import {isUserEmailExists, isUserEmailUsable} from "../middlewares/user.middleware";
+import {isUserEmailExists} from "../middlewares/user.middleware";
 import {
 	employeePwdResetLink,
 	employeeResetPwd,
@@ -17,7 +17,6 @@ publicRoute.post(
 	"/user/sign-up",
 	signUpValidationSchema,
 	expressValidatorResult,
-	isUserEmailUsable,
 	async (req: Request, res: Response) => {
 		try {
 			const result = await userSignUp(req.body);

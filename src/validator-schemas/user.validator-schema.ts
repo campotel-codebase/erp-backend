@@ -22,9 +22,9 @@ export const signUpValidationSchema = checkSchema({
 	},
 	email: {
 		custom: {
-			options: async () => {
+			options: async (value: string) => {
 				const isEmailUsed = await prisma.user.findUnique({
-					where: {email: "mainassdsdssdssSD@gmail.com"},
+					where: {email: value},
 					select: {email: true},
 				});
 				if (isEmailUsed) {
@@ -36,8 +36,7 @@ export const signUpValidationSchema = checkSchema({
 		errorMessage: "Email address is required and must be valid",
 	},
 	password: {
-		notEmpty: true,
-		trim: true,
+		...commonSchema,
 		isLength: {
 			options: {min: 8},
 			errorMessage: "Password is required and should be at least 8 characters",
