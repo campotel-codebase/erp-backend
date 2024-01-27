@@ -12,7 +12,7 @@ import {
 	userForgotPasswordVS,
 	userResetPasswordVS,
 } from "../validator/user.validator";
-import {employeeSignInVS} from "../validator/employee.validator";
+import {EmployeeForgotPasswordVS, employeeSignInVS} from "../validator/employee.validator";
 const publicRoute = express.Router();
 
 /* 
@@ -87,14 +87,19 @@ publicRoute.post(
 		}
 	},
 );
-publicRoute.post("/employee/forgot-password", async (req, res) => {
-	try {
-		const result = await employeePwdResetLink(req.body.email);
-		res.status(result.status).json(result.data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+publicRoute.post(
+	"/employee/forgot-password",
+	EmployeeForgotPasswordVS,
+	expressValidatorResult,
+	async (req: Request, res: Response) => {
+		try {
+			const result = await employeePwdResetLink(req.body.email);
+			res.status(result.status).json(result.data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 publicRoute.post("/employee/reset-password", async (req, res) => {
 	try {
 		const result = await employeeResetPwd(req.body);

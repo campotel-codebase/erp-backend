@@ -17,3 +17,18 @@ export const employeeSignInVS = checkSchema({
 	},
 	password: passwordRule,
 });
+
+export const EmployeeForgotPasswordVS = checkSchema({
+	email: {
+		custom: {
+			options: async (value: string) => {
+				const isEmailUsed = await employeeCheckEmailValidator(value);
+				if (!isEmailUsed) {
+					throw new Error("E-mail does not exists");
+				}
+			},
+		},
+		isEmail: true,
+		errorMessage: "Email address is required and must be valid",
+	},
+});
