@@ -8,6 +8,8 @@ import {
 } from "../functions/portal/post.portal.function";
 import {signInValidationSchema, signUpValidationSchema} from "../validator/user.validator";
 import {expressValidatorResult} from "../middlewares/express-validator.middleware";
+import {body} from "express-validator";
+import {userCheckEmailValidator} from "../validator/customs/email.custom-validator";
 const publicRoute = express.Router();
 
 /* 
@@ -39,14 +41,27 @@ publicRoute.post(
 		}
 	},
 );
-publicRoute.post("/user/forgot-password", isUserEmailExists, async (req, res) => {
-	try {
-		const result = await userPwdResetLink(req.body.email);
-		res.status(result.status).json(result.data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+publicRoute.post(
+	"/user/forgot-password",
+	body("email")
+		.isString()
+		.notEmpty()
+		.custom(async (value: string) => {
+			const isEmailUsed = await userCheckEmailValidator(value);
+			if (!isEmailUsed) {
+				throw new Error("E-mail does not exists");
+			}
+		}),
+	expressValidatorResult,
+	async (req, res) => {
+		try {
+			const result = await userPwdResetLink(req.body.email);
+			res.status(result.status).json(result.data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 publicRoute.post("/user/reset-password", async (req, res) => {
 	try {
 		const result = await userResetPwd(req.body);
