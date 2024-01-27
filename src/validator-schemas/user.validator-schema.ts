@@ -1,4 +1,5 @@
 import {checkSchema} from "express-validator";
+import prisma from "../../libs/prisma";
 
 const commonSchema = {
 	isString: true,
@@ -20,6 +21,17 @@ export const signUpValidationSchema = checkSchema({
 		errorMessage: "First name is required and must be a valid string",
 	},
 	email: {
+		custom: {
+			options: async () => {
+				const isEmailUsed = await prisma.user.findUnique({
+					where: {email: "mainassdsdssdssSD@gmail.com"},
+					select: {email: true},
+				});
+				if (isEmailUsed) {
+					throw new Error("E-mail already in use");
+				}
+			},
+		},
 		isEmail: true,
 		errorMessage: "Email address is required and must be valid",
 	},
