@@ -6,7 +6,7 @@ const commonSchema = {
 	trim: true,
 };
 
-export const signUpValidator = checkSchema({
+export const signUpValidationSchema = checkSchema({
 	companyName: {
 		...commonSchema,
 		errorMessage: "Company name is required and must be a valid string",

@@ -6,8 +6,8 @@ import {
 	employeeResetPwd,
 	employeeSignIn,
 } from "../functions/portal/post.portal.function";
-import {signUpValidator} from "../validators/sign-up.validators";
-import {validationResult} from "express-validator";
+import {signUpValidationSchema} from "../validator-schemas/user.validator-schema";
+import {expressValidatorResult} from "../middlewares/express-validator.middleware";
 const publicRoute = express.Router();
 
 /* 
@@ -15,14 +15,10 @@ const publicRoute = express.Router();
 */
 publicRoute.post(
 	"/user/sign-up",
-	signUpValidator,
+	signUpValidationSchema,
+	expressValidatorResult,
 	isUserEmailUsable,
 	async (req: Request, res: Response) => {
-		const errors = validationResult(req);
-		if (!errors.isEmpty()) {
-			return res.status(400).json({errors: errors.array()});
-		}
-
 		try {
 			const result = await userSignUp(req.body);
 			res.status(result.status).json(result.data);
