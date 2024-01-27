@@ -67,9 +67,9 @@ export const employeePwdResetLink = async (email: string) => {
 	}
 };
 
-export const employeeResetPwd = async (body: {uuid: string; newPassword: string}) => {
-	const {uuid, newPassword} = body;
-	const isVerify = await verifyResetUuidForPwd(uuid);
+export const employeeResetPwd = async (body: {newPassword: string}, passwordResetUuid: string) => {
+	const {newPassword} = body;
+	const isVerify = await verifyResetUuidForPwd(passwordResetUuid);
 	if (isVerify.result === true) {
 		const hashedPassword = await hashPassword(newPassword);
 		await prisma.employee.update({
@@ -78,7 +78,7 @@ export const employeeResetPwd = async (body: {uuid: string; newPassword: string}
 			select: {uuid: true},
 		});
 		await prisma.passwordReset.delete({
-			where: {uuid},
+			where: {uuid: passwordResetUuid},
 			select: {uuid: true},
 		});
 		return {status: 200, data: "password reset successfully"};

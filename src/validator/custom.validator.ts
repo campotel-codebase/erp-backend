@@ -7,7 +7,7 @@ export const userCheckEmailValidator = async (value: string) => {
 	});
 };
 
-export const userCheckResetPasswordUuidValidator = async (value: string) => {
+export const checkResetPasswordUuidValidator = async (value: string) => {
 	return await prisma.passwordReset.findUnique({
 		where: {uuid: value},
 		select: {uuid: true},

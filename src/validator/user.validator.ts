@@ -1,6 +1,6 @@
 import {checkSchema} from "express-validator";
 import {commonStringRule, passwordRule} from "./common.validator";
-import {userCheckEmailValidator, userCheckResetPasswordUuidValidator} from "./custom.validator";
+import {userCheckEmailValidator} from "./custom.validator";
 
 export const userSignUpVS = checkSchema({
 	companyName: {
@@ -58,20 +58,5 @@ export const userForgotPasswordVS = checkSchema({
 		},
 		isEmail: true,
 		errorMessage: "Email address is required and must be valid",
-	},
-});
-
-export const userResetPasswordVS = checkSchema({
-	newPassword: passwordRule,
-	passwordResetUuid: {
-		...commonStringRule,
-		custom: {
-			options: async (value: string) => {
-				const isPasswordResetUuidExists = await userCheckResetPasswordUuidValidator(value);
-				if (!isPasswordResetUuidExists) {
-					throw new Error("reset token does not exists");
-				}
-			},
-		},
 	},
 });

@@ -6,13 +6,9 @@ import {
 	employeeSignIn,
 } from "../functions/portal/post.portal.function";
 import {expressValidatorResult} from "../middlewares/express-validator.middleware";
-import {
-	userSignInVS,
-	userSignUpVS,
-	userForgotPasswordVS,
-	userResetPasswordVS,
-} from "../validator/user.validator";
+import {userSignInVS, userSignUpVS, userForgotPasswordVS} from "../validator/user.validator";
 import {EmployeeForgotPasswordVS, employeeSignInVS} from "../validator/employee.validator";
+import {resetPasswordVS} from "../validator/common.validator";
 const publicRoute = express.Router();
 
 /* 
@@ -59,7 +55,7 @@ publicRoute.post(
 );
 publicRoute.post(
 	"/user/reset-password/:passwordResetUuid",
-	userResetPasswordVS,
+	resetPasswordVS,
 	expressValidatorResult,
 	async (req: Request, res: Response) => {
 		const {passwordResetUuid} = req.params;
@@ -100,14 +96,21 @@ publicRoute.post(
 		}
 	},
 );
-publicRoute.post("/employee/reset-password", async (req, res) => {
-	try {
-		const result = await employeeResetPwd(req.body);
-		res.status(result.status).json(result.data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+publicRoute.post(
+	"/employee/reset-password/:passwordResetUuid",
+	resetPasswordVS,
+	expressValidatorResult,
+	async (req: Request, res: Response) => {
+		const {passwordResetUuid} = req.params;
+		const {body} = req;
+		try {
+			const result = await employeeResetPwd(body, passwordResetUuid);
+			res.status(result.status).json(result.data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 /* 
 	Post requests
 */
