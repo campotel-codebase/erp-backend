@@ -73,6 +73,7 @@ export const makeEmployees = async (
 	company: userAuthCredentialsType["company"],
 	body: Prisma.EmployeeCreateManyInput[],
 ) => {
+	// reporting to needs to be imported here
 	const employees = await Promise.all(
 		body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
 			const {department, jobTitle, talentSegment, benefits, hiredDate, ...rest} = employee;
@@ -121,16 +122,11 @@ export const makeEmployee = async (
 	body: {employee: Prisma.EmployeeCreateInput; reportingToId: number},
 ) => {
 	const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
-	const {benefits, hiredDate, ...rest} = body.employee;
-	const benefitsToString = JSON.stringify(benefits);
 	const tempPassword = generatePassword;
-
 	const newEmployee = await prisma.employee.create({
 		data: {
-			...rest,
+			...body.employee,
 			fullName,
-			hiredDate: formatISO(hiredDate),
-			benefits: benefitsToString,
 			password: await hashPassword(tempPassword),
 			uuid: await generateUuid(),
 			Company: {connect: {id: company.id}},

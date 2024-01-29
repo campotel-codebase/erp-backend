@@ -1,4 +1,4 @@
-import express from "express";
+import express, {Request, Response} from "express";
 import {
 	findEmployee,
 	getEmployee,
@@ -24,6 +24,8 @@ import {
 	uniqueEmails,
 	uniquePhoneNumbers,
 } from "../../middlewares/employee.middleware";
+import {makeEmployeeVS} from "../../validator/modules/hris.validator";
+import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
 
 const hris = express.Router();
 
@@ -106,9 +108,9 @@ hris.post("/make/employees", uniqueEmails, uniquePhoneNumbers, async (req, res) 
 });
 hris.post(
 	"/make/employee",
-	isEmployeeEmailUsable,
-	isEmployeePhoneNumberUsable,
-	async (req, res) => {
+	makeEmployeeVS,
+	expressValidatorResult,
+	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const {body} = req;
 

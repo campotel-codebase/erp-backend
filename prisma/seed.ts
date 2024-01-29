@@ -3,7 +3,7 @@ import {faker} from "@faker-js/faker";
 import {hashPassword} from "../src/utils/password.util";
 
 const seed = async () => {
-	const hashedPassword = await hashPassword("secret");
+	const hashedPassword = await hashPassword("superSecret");
 
 	// seeds
 	const newCompany = await prisma.company.create({

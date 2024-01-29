@@ -21,3 +21,9 @@ export const employeeCheckEmailValidator = async (value: string) => {
 		select: {email: true},
 	});
 };
+export const employeeCheckPhoneNumberValidator = async (value: string) => {
+	return await prisma.employee.findUnique({
+		where: {phoneNumber: value},
+		select: {phoneNumber: true},
+	});
+};

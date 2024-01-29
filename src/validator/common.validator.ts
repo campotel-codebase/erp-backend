@@ -1,5 +1,6 @@
 import {checkSchema} from "express-validator";
 import {checkResetPasswordUuidValidator} from "./custom.validator";
+import {formatISO} from "date-fns";
 
 export const commonStringRule = {
 	isString: true,
@@ -29,3 +30,15 @@ export const resetPasswordVS = checkSchema({
 		},
 	},
 });
+
+export const dateRule = {
+	isISO8601: {
+		bail: true,
+		errorMessage: "Please use ISO 8601 format",
+	},
+	toDate: true,
+	notEmpty: true,
+	customSanitizer: {
+		options: (value: Date) => formatISO(value),
+	},
+};
