@@ -1,5 +1,5 @@
 import {checkSchema} from "express-validator";
-import {passwordRule} from "./common.validator";
+import {passwordRule, emailRule} from "./common.validator";
 import {employeeCheckEmailValidator} from "./custom.validator";
 
 export const employeeSignInVS = checkSchema({
@@ -8,12 +8,10 @@ export const employeeSignInVS = checkSchema({
 			options: async (value: string) => {
 				const isEmailUsed = await employeeCheckEmailValidator(value);
 				if (!isEmailUsed) {
-					throw new Error("E-mail does not exists");
+					throw new Error("does not exists");
 				}
 			},
 		},
-		isEmail: true,
-		errorMessage: "Email address is required and must be valid",
 	},
 	password: passwordRule,
 });
@@ -24,11 +22,9 @@ export const EmployeeForgotPasswordVS = checkSchema({
 			options: async (value: string) => {
 				const isEmailUsed = await employeeCheckEmailValidator(value);
 				if (!isEmailUsed) {
-					throw new Error("E-mail does not exists");
+					throw new Error("does not exists");
 				}
 			},
 		},
-		isEmail: true,
-		errorMessage: "Email address is required and must be valid",
 	},
 });

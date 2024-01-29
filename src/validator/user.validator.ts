@@ -1,5 +1,5 @@
 import {checkSchema} from "express-validator";
-import {commonStringRule, passwordRule} from "./common.validator";
+import {commonStringRule, passwordRule, emailRule} from "./common.validator";
 import {userCheckEmailValidator} from "./custom.validator";
 
 export const userSignUpVS = checkSchema({
@@ -16,16 +16,15 @@ export const userSignUpVS = checkSchema({
 		errorMessage: "First name is required and must be a valid string",
 	},
 	email: {
+		...emailRule,
 		custom: {
 			options: async (value: string) => {
 				const isEmailUsed = await userCheckEmailValidator(value);
 				if (isEmailUsed) {
-					throw new Error("E-mail already in use");
+					throw new Error("already in use");
 				}
 			},
 		},
-		isEmail: true,
-		errorMessage: "Email address is required and must be valid",
 	},
 	password: passwordRule,
 });
@@ -36,12 +35,10 @@ export const userSignInVS = checkSchema({
 			options: async (value: string) => {
 				const isEmailUsed = await userCheckEmailValidator(value);
 				if (!isEmailUsed) {
-					throw new Error("E-mail does not exists");
+					throw new Error("does not exists");
 				}
 			},
 		},
-		isEmail: true,
-		errorMessage: "Email address is required and must be valid",
 	},
 	password: passwordRule,
 });
@@ -52,11 +49,9 @@ export const userForgotPasswordVS = checkSchema({
 			options: async (value: string) => {
 				const isEmailUsed = await userCheckEmailValidator(value);
 				if (!isEmailUsed) {
-					throw new Error("E-mail does not exists");
+					throw new Error("does not exists");
 				}
 			},
 		},
-		isEmail: true,
-		errorMessage: "Email address is required and must be valid",
 	},
 });

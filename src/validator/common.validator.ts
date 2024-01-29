@@ -16,6 +16,18 @@ export const passwordRule = {
 	},
 };
 
+export const emailRule = {
+	isEmail: {
+		bail: true,
+		errorMessage: "invalid value provided",
+	},
+	isLength: {
+		bail: true,
+		options: {max: 100},
+		errorMessage: "must not exceed 100 characters",
+	},
+};
+
 export const resetPasswordVS = checkSchema({
 	newPassword: passwordRule,
 	passwordResetUuid: {

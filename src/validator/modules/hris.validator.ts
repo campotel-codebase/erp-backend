@@ -1,5 +1,5 @@
 import {checkSchema} from "express-validator";
-import {commonStringRule, dateRule} from "../common.validator";
+import {commonStringRule, dateRule, emailRule} from "../common.validator";
 import {formatISO} from "date-fns";
 import {employeeCheckEmailValidator, employeeCheckPhoneNumberValidator} from "../custom.validator";
 
@@ -29,16 +29,15 @@ export const makeEmployeeVS = checkSchema({
 		errorMessage: "Suffix is required and must be valid",
 	},
 	"employee.email": {
+		...emailRule,
 		custom: {
 			options: async (value: string) => {
 				const isEmailUsed = await employeeCheckEmailValidator(value);
 				if (isEmailUsed) {
-					throw new Error("E-mail already in use");
+					throw new Error("already in use");
 				}
 			},
 		},
-		isEmail: true,
-		errorMessage: "Email address is required and must be valid",
 	},
 	"employee.phoneNumber": {
 		custom: {
