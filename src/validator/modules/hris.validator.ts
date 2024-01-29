@@ -87,7 +87,16 @@ export const makeEmployeeVS = checkSchema({
 		...commonStringRule,
 	},
 	"employee.driverLicense": {
-		...commonStringRule,
+		trim: true,
+		optional: {
+			options: {
+				values: "null",
+			},
+		},
+		custom: {
+			bail: true,
+			options: (value) => optionalStringValidator(value),
+		},
 	},
 	"employee.taxId": {
 		...commonStringRule,
@@ -113,5 +122,10 @@ export const makeEmployeeVS = checkSchema({
 	reportingToId: {
 		isInt: true,
 		toInt: true,
+		optional: {
+			options: {
+				values: "null",
+			},
+		},
 	},
 });
