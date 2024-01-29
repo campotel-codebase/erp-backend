@@ -14,6 +14,12 @@ export const checkResetPasswordUuidValidator = async (value: string) => {
 	});
 };
 
+export const optionalStringValidator = (value: null | string) => {
+	if (typeof value !== "string" || value === "") {
+		throw new Error("field must be a non-empty string");
+	}
+};
+
 /* Employee */
 export const employeeCheckEmailValidator = async (value: string) => {
 	return await prisma.employee.findUnique({

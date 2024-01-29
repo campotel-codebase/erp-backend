@@ -7,7 +7,11 @@ import {
 	phoneNumberRule,
 } from "../common.validator";
 import {formatISO} from "date-fns";
-import {employeeCheckEmailValidator, employeeCheckPhoneNumberValidator} from "../custom.validator";
+import {
+	employeeCheckEmailValidator,
+	employeeCheckPhoneNumberValidator,
+	optionalStringValidator,
+} from "../custom.validator";
 
 export const makeEmployeeVS = checkSchema({
 	"employee.lastName": {
@@ -17,19 +21,33 @@ export const makeEmployeeVS = checkSchema({
 		...personNameRule,
 	},
 	"employee.middleName": {
-		optional: true,
-		isString: true,
 		trim: true,
+		optional: {
+			options: {
+				values: "null",
+			},
+		},
+		custom: {
+			bail: true,
+			options: (value) => optionalStringValidator(value),
+		},
 		isLength: {
 			bail: true,
 			options: {max: 30},
-			errorMessage: "must not exceed 100 characters",
+			errorMessage: "must not exceed 30 characters",
 		},
 	},
 	"employee.nickname": {
-		optional: true,
-		isString: true,
 		trim: true,
+		optional: {
+			options: {
+				values: "null",
+			},
+		},
+		custom: {
+			bail: true,
+			options: (value) => optionalStringValidator(value),
+		},
 	},
 	"employee.suffix": {
 		...commonStringRule,
