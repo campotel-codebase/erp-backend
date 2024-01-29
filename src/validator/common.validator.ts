@@ -8,6 +8,17 @@ export const commonStringRule = {
 	trim: true,
 };
 
+export const personNameRule = {
+	isString: true,
+	notEmpty: true,
+	trim: true,
+	isLength: {
+		bail: true,
+		options: {max: 30},
+		errorMessage: "must not exceed 100 characters",
+	},
+};
+
 export const passwordRule = {
 	...commonStringRule,
 	isLength: {

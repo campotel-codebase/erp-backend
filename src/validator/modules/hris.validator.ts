@@ -1,22 +1,24 @@
 import {checkSchema} from "express-validator";
-import {commonStringRule, dateRule, emailRule} from "../common.validator";
+import {commonStringRule, dateRule, emailRule, personNameRule} from "../common.validator";
 import {formatISO} from "date-fns";
 import {employeeCheckEmailValidator, employeeCheckPhoneNumberValidator} from "../custom.validator";
 
 export const makeEmployeeVS = checkSchema({
 	"employee.lastName": {
-		...commonStringRule,
-		errorMessage: "Last Name is required and must be valid",
+		...personNameRule,
 	},
 	"employee.firstName": {
-		...commonStringRule,
-		errorMessage: "First Name is required and must be valid",
+		...personNameRule,
 	},
 	"employee.middleName": {
 		optional: true,
 		isString: true,
 		trim: true,
-		errorMessage: "Middle Name is required and must be valid",
+		isLength: {
+			bail: true,
+			options: {max: 30},
+			errorMessage: "must not exceed 100 characters",
+		},
 	},
 	"employee.nickname": {
 		optional: true,
