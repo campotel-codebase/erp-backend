@@ -40,7 +40,6 @@ export const userSignInVS = checkSchema({
 			},
 		},
 	},
-	password: passwordRule,
 });
 
 export const userForgotPasswordVS = checkSchema({

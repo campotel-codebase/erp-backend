@@ -1,5 +1,4 @@
 import {checkSchema} from "express-validator";
-import {passwordRule, emailRule} from "./common.validator";
 import {employeeCheckEmailValidator} from "./custom.validator";
 
 export const employeeSignInVS = checkSchema({
@@ -13,7 +12,6 @@ export const employeeSignInVS = checkSchema({
 			},
 		},
 	},
-	password: passwordRule,
 });
 
 export const EmployeeForgotPasswordVS = checkSchema({
