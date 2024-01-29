@@ -3,14 +3,14 @@ import {checkResetPasswordUuidValidator} from "./custom.validator";
 import {formatISO} from "date-fns";
 
 export const commonStringRule = {
-	isString: true,
 	notEmpty: true,
+	isString: true,
 	trim: true,
 };
 
 export const personNameRule = {
-	isString: true,
 	notEmpty: true,
+	isString: true,
 	trim: true,
 	isLength: {
 		bail: true,
@@ -40,8 +40,8 @@ export const emailRule = {
 };
 
 export const phoneNumberRule = {
-	isString: true,
 	notEmpty: true,
+	isString: true,
 	trim: true,
 	isLength: {
 		bail: true,
@@ -56,7 +56,6 @@ export const dateRule = {
 		errorMessage: "Please use ISO 8601 format",
 	},
 	toDate: true,
-	notEmpty: true,
 	customSanitizer: {
 		options: (value: Date) => formatISO(value),
 	},
