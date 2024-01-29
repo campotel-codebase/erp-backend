@@ -28,14 +28,25 @@ export const passwordRule = {
 };
 
 export const emailRule = {
+	trim: true,
 	isEmail: {
 		bail: true,
-		errorMessage: "invalid value provided",
 	},
 	isLength: {
 		bail: true,
 		options: {max: 100},
 		errorMessage: "must not exceed 100 characters",
+	},
+};
+
+export const phoneNumberRule = {
+	isString: true,
+	notEmpty: true,
+	trim: true,
+	isLength: {
+		bail: true,
+		options: {max: 30},
+		errorMessage: "must not exceed 30 characters",
 	},
 };
 

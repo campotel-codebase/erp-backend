@@ -1,5 +1,11 @@
 import {checkSchema} from "express-validator";
-import {commonStringRule, dateRule, emailRule, personNameRule} from "../common.validator";
+import {
+	commonStringRule,
+	dateRule,
+	emailRule,
+	personNameRule,
+	phoneNumberRule,
+} from "../common.validator";
 import {formatISO} from "date-fns";
 import {employeeCheckEmailValidator, employeeCheckPhoneNumberValidator} from "../custom.validator";
 
@@ -40,6 +46,7 @@ export const makeEmployeeVS = checkSchema({
 		},
 	},
 	"employee.phoneNumber": {
+		...phoneNumberRule,
 		custom: {
 			options: async (value: string) => {
 				const isPhoneNumberUsed = await employeeCheckPhoneNumberValidator(value);
@@ -48,7 +55,6 @@ export const makeEmployeeVS = checkSchema({
 				}
 			},
 		},
-		...commonStringRule,
 	},
 	"employee.birthday": {
 		...dateRule,
