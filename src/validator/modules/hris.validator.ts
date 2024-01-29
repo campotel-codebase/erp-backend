@@ -7,11 +7,7 @@ import {
 	phoneNumberRule,
 } from "../common.validator";
 import {formatISO} from "date-fns";
-import {
-	employeeCheckEmailValidator,
-	employeeCheckPhoneNumberValidator,
-	optionalStringValidator,
-} from "../custom.validator";
+import {employeeCheckEmailValidator, employeeCheckPhoneNumberValidator} from "../custom.validator";
 
 export const makeEmployeeVS = checkSchema({
 	"employee.lastName": {
@@ -27,12 +23,12 @@ export const makeEmployeeVS = checkSchema({
 				values: "null",
 			},
 		},
-		custom: {
+		notEmpty: true,
+		isString: {
 			bail: true,
-			options: (value) => optionalStringValidator(value),
+			errorMessage: "field must be a non-empty string",
 		},
 		isLength: {
-			bail: true,
 			options: {max: 30},
 			errorMessage: "must not exceed 30 characters",
 		},
@@ -44,10 +40,9 @@ export const makeEmployeeVS = checkSchema({
 				values: "null",
 			},
 		},
-		custom: {
-			bail: true,
-			options: (value) => optionalStringValidator(value),
-		},
+		notEmpty: true,
+		isString: true,
+		errorMessage: "field must be a non-empty string",
 	},
 	"employee.suffix": {
 		...commonStringRule,
@@ -93,10 +88,9 @@ export const makeEmployeeVS = checkSchema({
 				values: "null",
 			},
 		},
-		custom: {
-			bail: true,
-			options: (value) => optionalStringValidator(value),
-		},
+		notEmpty: true,
+		isString: true,
+		errorMessage: "field must be a non-empty string",
 	},
 	"employee.taxId": {
 		...commonStringRule,
@@ -120,12 +114,10 @@ export const makeEmployeeVS = checkSchema({
 		},
 	},
 	reportingToId: {
+		notEmpty: {
+			bail: true,
+		},
 		isInt: true,
 		toInt: true,
-		optional: {
-			options: {
-				values: "null",
-			},
-		},
 	},
 });
