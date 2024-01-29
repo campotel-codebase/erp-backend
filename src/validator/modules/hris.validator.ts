@@ -98,4 +98,9 @@ export const makeEmployeeVS = checkSchema({
 		},
 		errorMessage: "Benefits is required and must be valid",
 	},
+	reportingToId: {
+		isInt: true,
+		toInt: true,
+		errorMessage: "Reporting To Id is required and must be valid",
+	},
 });
