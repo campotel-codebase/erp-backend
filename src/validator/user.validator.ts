@@ -1,19 +1,16 @@
 import {checkSchema} from "express-validator";
-import {commonStringRule, passwordRule, emailRule} from "./common.validator";
+import {commonStringRule, passwordRule, emailRule, personNameRule} from "./common.validator";
 import {userCheckEmailValidator} from "./custom.validator";
 
 export const userSignUpVS = checkSchema({
 	companyName: {
 		...commonStringRule,
-		errorMessage: "Company name is required and must be a valid string",
 	},
 	lastName: {
-		...commonStringRule,
-		errorMessage: "Last name is required and must be a valid string",
+		...personNameRule,
 	},
 	firstName: {
-		...commonStringRule,
-		errorMessage: "First name is required and must be a valid string",
+		...personNameRule,
 	},
 	email: {
 		...emailRule,
