@@ -74,17 +74,14 @@ export const makeEmployees = async (
 	body: Prisma.EmployeeCreateManyInput[],
 ) => {
 	// reporting to needs to be imported here
+	// insert this using express-validator
 	const employees = await Promise.all(
 		body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
-			const {department, jobTitle, talentSegment, benefits, hiredDate, ...rest} = employee;
 			const fullName = `${employee.lastName} ${employee.firstName} ${employee.middleName}`;
-			const benefitsToString = JSON.stringify(benefits);
 			return {
-				...rest,
+				...employee,
 				companyId: company.id,
 				fullName,
-				hiredDate,
-				benefits: benefitsToString,
 				uuid: await generateUuid(),
 				password: generatePassword,
 			};
