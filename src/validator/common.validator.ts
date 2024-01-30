@@ -3,17 +3,27 @@ import {checkResetPasswordUuidValidator} from "./custom.validator";
 import {formatISO} from "date-fns";
 
 export const commonStringRule = {
-	notEmpty: true,
-	isString: true,
+	notEmpty: {
+		bail: true,
+		errorMessage: "this field is required",
+	},
+	isString: {
+		errorMessage: "this field must be a type of string",
+	},
 	trim: true,
 };
 
 export const personNameRule = {
-	notEmpty: true,
-	isString: true,
+	notEmpty: {
+		bail: true,
+		errorMessage: "this field is required",
+	},
+	isString: {
+		bail: true,
+		errorMessage: "this field must be a type of string",
+	},
 	trim: true,
 	isLength: {
-		bail: true,
 		options: {max: 30},
 		errorMessage: "must not exceed 100 characters",
 	},
@@ -31,6 +41,7 @@ export const emailRule = {
 	trim: true,
 	isEmail: {
 		bail: true,
+		errorMessage: "must be a valid email",
 	},
 	isLength: {
 		bail: true,
@@ -40,8 +51,14 @@ export const emailRule = {
 };
 
 export const phoneNumberRule = {
-	notEmpty: true,
-	isString: true,
+	notEmpty: {
+		bail: true,
+		errorMessage: "this field is required",
+	},
+	isString: {
+		bail: true,
+		errorMessage: "this field must be a type of string",
+	},
 	trim: true,
 	isLength: {
 		bail: true,

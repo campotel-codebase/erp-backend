@@ -96,7 +96,7 @@ hris.post(
 	expressValidatorResult,
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
-		const {body} = req;
+		const body = req.body.employees;
 
 		try {
 			const {status, data} = await makeEmployees(company, body);
