@@ -1,4 +1,4 @@
-import {checkSchema} from "express-validator";
+import {checkSchema, param} from "express-validator";
 import {checkResetPasswordUuidValidator} from "./custom.validator";
 import {formatISO} from "date-fns";
 
@@ -77,6 +77,8 @@ export const dateRule = {
 		options: (value: Date) => formatISO(value),
 	},
 };
+
+export const paramRule = param().notEmpty().isString().trim();
 
 /* Special ue case */
 export const resetPasswordVS = checkSchema({
