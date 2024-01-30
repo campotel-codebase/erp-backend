@@ -63,15 +63,20 @@ hris.get("/find/employee", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
-hris.get("/get/org-chart/:employeeUuid", async (req, res) => {
-	const {employeeUuid} = req.params;
-	try {
-		const {status, data} = await getOrgChart(employeeUuid);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+hris.get(
+	"/get/org-chart/:employeeUuid",
+	paramRule,
+	expressValidatorResult,
+	async (req: Request, res: Response) => {
+		const employeeUuid = req.params.employeeUuid;
+		try {
+			const {status, data} = await getOrgChart(employeeUuid);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 /* 
 	Get requests
 */
