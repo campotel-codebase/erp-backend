@@ -18,12 +18,7 @@ import {
 	updateEmploymentHistoryData,
 } from "../../functions/modules/hris/patch.hris.function";
 import {uploadCsv} from "../../middlewares/multer.middleware";
-import {
-	isEmployeeEmailUsable,
-	isEmployeePhoneNumberUsable,
-	uniqueEmails,
-	uniquePhoneNumbers,
-} from "../../middlewares/employee.middleware";
+import {uniqueEmails, uniquePhoneNumbers} from "../../middlewares/employee.middleware";
 import {makeEmployeeVS} from "../../validator/modules/hris.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
 
