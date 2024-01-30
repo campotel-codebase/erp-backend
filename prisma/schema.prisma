@@ -70,7 +70,7 @@ model Employee {
   fullName    String?  @db.VarChar(100)
   middleName  String?  @db.VarChar(30)
   avatar      String?
-  bloodType   String?  @db.VarChar(20)
+  bloodType   String   @db.VarChar(20)
   // basic
 
   // employment
@@ -78,13 +78,13 @@ model Employee {
   isRehired            Int                 @default(0) @db.TinyInt
   isActive             Int                 @default(1) @db.TinyInt
   payType              String?             @db.VarChar(10)
-  employmentType       String?             @db.VarChar(255)
-  employeeCompanyId    String?
+  employmentType       String              @db.VarChar(255)
+  employeeCompanyId    String
   tenure               String?
   salary               Decimal             @default(0) @db.Decimal(10, 2)
-  jobTitle             String?             @db.VarChar(255)
-  department           String?             @db.VarChar(255)
-  talentSegment        String?             @db.VarChar(255)
+  jobTitle             String              @db.VarChar(255)
+  department           String              @db.VarChar(255)
+  talentSegment        String              @db.VarChar(255)
   BankAccount          BankAccount[]
   EmploymentHistory    EmploymentHistory[]
   LeaveRequest         LeaveRequest[]
@@ -93,9 +93,9 @@ model Employee {
   // employment
 
   // goverment
-  benefits      String? @db.VarChar(255)
+  benefits      String  @db.VarChar(255)
   driverLicense String? @db.VarChar(100)
-  taxId         String? @db.VarChar(100)
+  taxId         String  @db.VarChar(100)
   // goverment
 
   createdAt DateTime @default(now())
