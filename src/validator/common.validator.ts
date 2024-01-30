@@ -1,4 +1,4 @@
-import {checkSchema, param} from "express-validator";
+import {checkSchema, param, query} from "express-validator";
 import {checkResetPasswordUuidValidator} from "./custom.validator";
 import {formatISO} from "date-fns";
 
@@ -78,8 +78,11 @@ export const dateRule = {
 	},
 };
 
-export const paramRule = param().notEmpty().isString().trim();
-
+export const paramRule = param().notEmpty().isString().withMessage("valid parameter is required"); // ! bug
+export const queryRule = query("keyword")
+	.notEmpty()
+	.trim()
+	.withMessage("valid keyword value is required");
 /* Special ue case */
 export const resetPasswordVS = checkSchema({
 	newPassword: passwordRule,

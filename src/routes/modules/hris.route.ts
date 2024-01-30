@@ -20,7 +20,7 @@ import {
 import {uploadCsv} from "../../middlewares/multer.middleware";
 import {makeEmployeeVS, makeEmployeesVS} from "../../validator/modules/hris.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
-import {paramRule} from "../../validator/common.validator";
+import {paramRule, queryRule} from "../../validator/common.validator";
 
 const hris = express.Router();
 
@@ -52,17 +52,22 @@ hris.get(
 		}
 	},
 );
-hris.get("/find/employee", async (req, res) => {
-	const company = req.userAuthCreds.company;
-	const keyword = req.query.keyword;
+hris.get(
+	"/find/employee",
+	queryRule,
+	expressValidatorResult,
+	async (req: Request, res: Response) => {
+		const company = req.userAuthCreds.company;
+		const keyword = req.query.keyword;
 
-	try {
-		const {status, data} = await findEmployee(company, keyword);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+		try {
+			const {status, data} = await findEmployee(company, keyword);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 hris.get(
 	"/get/org-chart/:employeeUuid",
 	paramRule,
