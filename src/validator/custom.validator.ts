@@ -1,29 +1,45 @@
 import prisma from "../../libs/prisma";
 
 export const userCheckEmailValidator = async (value: string) => {
-	return await prisma.user.findUnique({
-		where: {email: value},
-		select: {email: true},
-	});
+	try {
+		return await prisma.user.findUnique({
+			where: {email: value},
+			select: {email: true},
+		});
+	} catch (error: any) {
+		throw new Error(error);
+	}
 };
 
 export const checkResetPasswordUuidValidator = async (value: string) => {
-	return await prisma.passwordReset.findUnique({
-		where: {uuid: value},
-		select: {uuid: true},
-	});
+	try {
+		return await prisma.passwordReset.findUnique({
+			where: {uuid: value},
+			select: {uuid: true},
+		});
+	} catch (error: any) {
+		throw new Error(error);
+	}
 };
 
 /* Employee */
 export const employeeCheckEmailValidator = async (value: string) => {
-	return await prisma.employee.findUnique({
-		where: {email: value},
-		select: {email: true},
-	});
+	try {
+		return await prisma.employee.findUnique({
+			where: {email: value},
+			select: {email: true},
+		});
+	} catch (error: any) {
+		throw new Error(error);
+	}
 };
 export const employeeCheckPhoneNumberValidator = async (value: string) => {
-	return await prisma.employee.findUnique({
-		where: {phoneNumber: value},
-		select: {phoneNumber: true},
-	});
+	try {
+		return await prisma.employee.findUnique({
+			where: {phoneNumber: value},
+			select: {phoneNumber: true},
+		});
+	} catch (error: any) {
+		throw new Error(error);
+	}
 };

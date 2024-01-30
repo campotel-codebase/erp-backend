@@ -3,7 +3,6 @@ import {parse} from "csv-parse";
 import {userAuthCredentialsType} from "../../../../types/jwt-payload";
 import {generatePassword, hashPassword} from "../../../utils/password.util";
 import prisma from "../../../../libs/prisma";
-import {formatISO} from "date-fns";
 import {generateUuid} from "../../../utils/uuid.util";
 import {emailContent} from "../../../utils/email.util";
 
@@ -74,7 +73,6 @@ export const makeEmployees = async (
 	body: Prisma.EmployeeCreateManyInput[],
 ) => {
 	// reporting to needs to be imported here
-	// insert this using express-validator
 	const employees = await Promise.all(
 		body.map(async (employee: Prisma.EmployeeCreateManyInput) => {
 			const fullName = `${employee.lastName} ${employee.firstName} ${employee.middleName}`;

@@ -18,8 +18,7 @@ import {
 	updateEmploymentHistoryData,
 } from "../../functions/modules/hris/patch.hris.function";
 import {uploadCsv} from "../../middlewares/multer.middleware";
-import {uniqueEmails, uniquePhoneNumbers} from "../../middlewares/employee.middleware";
-import {makeEmployeeVS} from "../../validator/modules/hris.validator";
+import {makeEmployeeVS, makeEmployeesVS} from "../../validator/modules/hris.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
 
 const hris = express.Router();
@@ -90,17 +89,22 @@ hris.post("/import/employees", uploadCsv.single("csv"), async (req, res) => {
 		}
 	}
 });
-hris.post("/make/employees", uniqueEmails, uniquePhoneNumbers, async (req, res) => {
-	const company = req.userAuthCreds.company;
-	const {body} = req;
+hris.post(
+	"/make/employees",
+	makeEmployeesVS,
+	expressValidatorResult,
+	async (req: Request, res: Response) => {
+		const company = req.userAuthCreds.company;
+		const body = req.body.employees;
 
-	try {
-		const {status, data} = await makeEmployees(company, body);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+		try {
+			const {status, data} = await makeEmployees(company, body);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 hris.post(
 	"/make/employee",
 	makeEmployeeVS,

@@ -17,7 +17,6 @@ export const makeEmployeeVS = checkSchema({
 		...personNameRule,
 	},
 	"employee.middleName": {
-		trim: true,
 		optional: {
 			options: {
 				values: "null",
@@ -28,13 +27,13 @@ export const makeEmployeeVS = checkSchema({
 			bail: true,
 			errorMessage: "field must be a non-empty string",
 		},
+		trim: true,
 		isLength: {
 			options: {max: 30},
 			errorMessage: "must not exceed 30 characters",
 		},
 	},
 	"employee.nickname": {
-		trim: true,
 		optional: {
 			options: {
 				values: "null",
@@ -42,6 +41,7 @@ export const makeEmployeeVS = checkSchema({
 		},
 		notEmpty: true,
 		isString: true,
+		trim: true,
 		errorMessage: "field must be a non-empty string",
 	},
 	"employee.suffix": {
@@ -53,7 +53,7 @@ export const makeEmployeeVS = checkSchema({
 			options: async (value: string) => {
 				const isEmailUsed = await employeeCheckEmailValidator(value);
 				if (isEmailUsed) {
-					throw new Error("already in use");
+					throw new Error("email already in use");
 				}
 			},
 		},
@@ -64,7 +64,7 @@ export const makeEmployeeVS = checkSchema({
 			options: async (value: string) => {
 				const isPhoneNumberUsed = await employeeCheckPhoneNumberValidator(value);
 				if (isPhoneNumberUsed) {
-					throw new Error("already in use");
+					throw new Error("phone number already in use");
 				}
 			},
 		},
@@ -107,6 +107,12 @@ export const makeEmployeeVS = checkSchema({
 	"employee.hiredDate": {
 		...dateRule,
 	},
+	"employee.employmentType": {
+		...commonStringRule,
+	},
+	"employees.employeeCompanyId": {
+		...commonStringRule,
+	},
 	"employee.benefits": {
 		notEmpty: true,
 		customSanitizer: {
@@ -119,5 +125,115 @@ export const makeEmployeeVS = checkSchema({
 		},
 		isInt: true,
 		toInt: true,
+	},
+});
+
+export const makeEmployeesVS = checkSchema({
+	employees: {
+		isArray: {
+			bail: true,
+			errorMessage: "must be a valid array",
+		},
+	},
+	"employees.*.lastName": {...personNameRule},
+	"employees.*.firstName": {...personNameRule},
+	"employees.*.middleName": {
+		optional: {
+			options: {
+				values: "null",
+			},
+		},
+		notEmpty: true,
+		isString: {
+			bail: true,
+			errorMessage: "field must be a non-empty string",
+		},
+		trim: true,
+		isLength: {
+			options: {max: 30},
+			errorMessage: "must not exceed 30 characters",
+		},
+	},
+	"employees.*.nickname": {
+		optional: {
+			options: {
+				values: "null",
+			},
+		},
+		notEmpty: true,
+		isString: true,
+		trim: true,
+		errorMessage: "field must be a non-empty string",
+	},
+	"employees.*.suffix": {
+		...commonStringRule,
+	},
+	"employees.*.email": {
+		...emailRule,
+		custom: {
+			options: async (value: string) => {
+				const isEmailUsed = await employeeCheckEmailValidator(value);
+				if (isEmailUsed) {
+					throw new Error(`email ${isEmailUsed.email} already in used`);
+				}
+			},
+		},
+	},
+	"employees.*.phoneNumber": {
+		...phoneNumberRule,
+		custom: {
+			options: async (value: string) => {
+				const isPhoneNumberUsed = await employeeCheckPhoneNumberValidator(value);
+				if (isPhoneNumberUsed) {
+					throw new Error(`phone number ${isPhoneNumberUsed.phoneNumber} already in used`);
+				}
+			},
+		},
+	},
+	"employees.*.birthday": {
+		...dateRule,
+		customSanitizer: {
+			options: (value) => formatISO(value),
+		},
+	},
+	"employees.*.bloodType": {...commonStringRule},
+	"employees.*.salary": {...commonStringRule},
+	"employees.*.driverLicense": {
+		optional: {
+			options: {
+				values: "null",
+			},
+		},
+		notEmpty: true,
+		isString: true,
+		trim: true,
+		errorMessage: "field must be a non-empty string",
+	},
+	"employees.*.taxId": {
+		...commonStringRule,
+	},
+	"employees.*.department": {
+		...commonStringRule,
+	},
+	"employees.*.jobTitle": {
+		...commonStringRule,
+	},
+	"employees.*.talentSegment": {
+		...commonStringRule,
+	},
+	"employees.*.hiredDate": {
+		...dateRule,
+	},
+	"employees.*.employmentType": {
+		...commonStringRule,
+	},
+	"employees.*.employeeCompanyId": {
+		...commonStringRule,
+	},
+	"employees.*.benefits": {
+		notEmpty: true,
+		customSanitizer: {
+			options: (value) => JSON.stringify(value),
+		},
 	},
 });
