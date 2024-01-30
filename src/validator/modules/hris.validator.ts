@@ -121,3 +121,22 @@ export const makeEmployeeVS = checkSchema({
 		toInt: true,
 	},
 });
+
+export const makeEmployeesVS = checkSchema({
+	employees: {
+		isArray: {
+			bail: true,
+			errorMessage: "must be a valid array",
+		},
+		custom: {
+			options: async (value) => {
+				for (const employee of value) {
+					const isEmailUsed = await employeeCheckEmailValidator(employee.email);
+					if (isEmailUsed) {
+						throw new Error(`email ${isEmailUsed.email} is already in used`);
+					}
+				}
+			},
+		},
+	},
+});

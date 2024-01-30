@@ -16,10 +16,14 @@ export const checkResetPasswordUuidValidator = async (value: string) => {
 
 /* Employee */
 export const employeeCheckEmailValidator = async (value: string) => {
-	return await prisma.employee.findUnique({
-		where: {email: value},
-		select: {email: true},
-	});
+	try {
+		return await prisma.employee.findUnique({
+			where: {email: value},
+			select: {email: true},
+		});
+	} catch (error: any) {
+		throw new Error(error);
+	}
 };
 export const employeeCheckPhoneNumberValidator = async (value: string) => {
 	return await prisma.employee.findUnique({
