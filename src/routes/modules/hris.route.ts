@@ -20,7 +20,7 @@ import {
 import {uploadCsv} from "../../middlewares/multer.middleware";
 import {makeEmployeeVS, makeEmployeesVS} from "../../validator/modules/hris.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
-import {paramRule, queryRule} from "../../validator/common.validator";
+import {queryRule} from "../../validator/common.validator";
 
 const hris = express.Router();
 
@@ -36,22 +36,17 @@ hris.get("/get/employees", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
-hris.get(
-	"/get/employee/:employeeUuid",
-	paramRule,
-	expressValidatorResult,
-	async (req: Request, res: Response) => {
-		const company = req.userAuthCreds.company;
-		const employeeUuid = req.params.employeeUuid;
+hris.get("/get/employee/:employeeUuid", async (req: Request, res: Response) => {
+	const company = req.userAuthCreds.company;
+	const employeeUuid = req.params.employeeUuid;
 
-		try {
-			const {status, data} = await getEmployee(company, employeeUuid);
-			res.status(status).json(data);
-		} catch (error: any) {
-			res.status(500).json({error: error.message});
-		}
-	},
-);
+	try {
+		const {status, data} = await getEmployee(company, employeeUuid);
+		res.status(status).json(data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
 hris.get(
 	"/find/employee",
 	queryRule,
@@ -68,20 +63,15 @@ hris.get(
 		}
 	},
 );
-hris.get(
-	"/get/org-chart/:employeeUuid",
-	paramRule,
-	expressValidatorResult,
-	async (req: Request, res: Response) => {
-		const employeeUuid = req.params.employeeUuid;
-		try {
-			const {status, data} = await getOrgChart(employeeUuid);
-			res.status(status).json(data);
-		} catch (error: any) {
-			res.status(500).json({error: error.message});
-		}
-	},
-);
+hris.get("/get/org-chart/:employeeUuid", async (req: Request, res: Response) => {
+	const employeeUuid = req.params.employeeUuid;
+	try {
+		const {status, data} = await getOrgChart(employeeUuid);
+		res.status(status).json(data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
 /* 
 	Get requests
 */
@@ -107,8 +97,7 @@ hris.post("/import/employees", uploadCsv.single("csv"), async (req, res) => {
 });
 hris.post(
 	"/make/employees",
-	makeEmployeesVS,
-	expressValidatorResult,
+	[...makeEmployeesVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const body = req.body.employees;
@@ -123,8 +112,7 @@ hris.post(
 );
 hris.post(
 	"/make/employee",
-	makeEmployeeVS,
-	expressValidatorResult,
+	[...makeEmployeeVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const {body} = req;
