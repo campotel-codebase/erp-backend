@@ -97,8 +97,7 @@ hris.post("/import/employees", uploadCsv.single("csv"), async (req, res) => {
 });
 hris.post(
 	"/make/employees",
-	makeEmployeesVS,
-	expressValidatorResult,
+	[...makeEmployeesVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const body = req.body.employees;
@@ -113,8 +112,7 @@ hris.post(
 );
 hris.post(
 	"/make/employee",
-	makeEmployeeVS,
-	expressValidatorResult,
+	[...makeEmployeeVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const {body} = req;

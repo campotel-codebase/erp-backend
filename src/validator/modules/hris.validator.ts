@@ -110,7 +110,7 @@ export const makeEmployeeVS = checkSchema({
 	"employee.employmentType": {
 		...commonStringRule,
 	},
-	"employees.employeeCompanyId": {
+	"employee.employeeCompanyId": {
 		...commonStringRule,
 	},
 	"employee.benefits": {
