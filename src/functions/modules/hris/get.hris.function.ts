@@ -59,11 +59,25 @@ export const findEmployee = async (
 	return {status: 200, data: employees};
 };
 
-export const getOrgChart = async (employeeUuid: string) => {
+export const getOrgChart = async (
+	company: userAuthCredentialsType["company"],
+	employeeUuid: string,
+) => {
+	const employeeInCompany = await prisma.company.findUniqueOrThrow({
+		where: {uuid: company.uuid},
+		select: {
+			Employee: {
+				where: {
+					uuid: employeeUuid,
+				},
+				select: {uuid: true},
+			},
+		},
+	});
 	const getEmployeeWithReports = async (uuid: string): Promise<any> => {
 		const employee = await prisma.employee.findUnique({
 			where: {
-				uuid: uuid,
+				uuid,
 			},
 			select: {
 				id: true,
@@ -95,7 +109,7 @@ export const getOrgChart = async (employeeUuid: string) => {
 		}
 	};
 
-	const selectedChart = await getEmployeeWithReports(employeeUuid);
+	const selectedChart = await getEmployeeWithReports(employeeInCompany.Employee[0].uuid);
 
 	return {status: 200, data: selectedChart};
 };
