@@ -21,6 +21,7 @@ import {uploadCsv} from "../../middlewares/multer.middleware";
 import {makeEmployeeVS, makeEmployeesVS} from "../../validator/modules/hris.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
 import {queryRule} from "../../validator/common.validator";
+import {isEmployeeBelongToCompany} from "../../middlewares/authorization.middleware";
 
 const hris = express.Router();
 
@@ -67,7 +68,7 @@ hris.get("/get/org-chart/:employeeUuid", async (req: Request, res: Response) => 
 	const company = req.userAuthCreds.company;
 	const employeeUuid = req.params.employeeUuid;
 	try {
-		const {status, data} = await getOrgChart(company,employeeUuid);
+		const {status, data} = await getOrgChart(company, employeeUuid);
 		res.status(status).json(data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
@@ -113,7 +114,7 @@ hris.post(
 );
 hris.post(
 	"/make/employee",
-	[...makeEmployeeVS, expressValidatorResult],
+	[...makeEmployeeVS, expressValidatorResult, isEmployeeBelongToCompany],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const {body} = req;

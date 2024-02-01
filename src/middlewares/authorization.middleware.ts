@@ -132,3 +132,32 @@ export const employeeAuth = async (req: Request, res: Response, next: NextFuncti
 		res.status(401).json({error: error.message});
 	}
 };
+
+export const isEmployeeBelongToCompany = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const employee = await prisma.company.findUnique({
+			where: {uuid: req.userAuthCreds.company.uuid},
+			select: {
+				Employee: {
+					where: {
+						id: req.body.reportingToId,
+					},
+					select: {
+						id: true,
+					},
+				},
+			},
+		});
+		if (employee?.Employee.length !== 0) {
+			next();
+		} else {
+			throw new Error("employee assign as IS is does not belong to your company");
+		}
+	} catch (error: any) {
+		res.status(400).json({error: error.message});
+	}
+};
