@@ -60,46 +60,42 @@ export const findEmployee = async (
 };
 
 export const getOrgChart = async (employeeUuid: string) => {
-	// TODO Needs to fetch if  the reporting to is not null
-	const selectedChart = await prisma.employee.findUnique({
-		where: {
-			uuid: employeeUuid,
-		},
-		// CEO
-		select: {
-			id: true,
-			uuid: true,
-			jobTitle: true,
-			fullName: true,
-			// Managers
-			EmployeesReportingTo: {
-				select: {
-					id: true,
-					uuid: true,
-					jobTitle: true,
-					fullName: true,
-					// Group Leaders
-					EmployeesReportingTo: {
-						select: {
-							id: true,
-							uuid: true,
-							jobTitle: true,
-							fullName: true,
-							// Team Leaders
-							EmployeesReportingTo: {
-								select: {
-									id: true,
-									uuid: true,
-									jobTitle: true,
-									fullName: true,
-								},
-							},
-						},
+	const getEmployeeWithReports = async (uuid: string): Promise<any> => {
+		const employee = await prisma.employee.findUnique({
+			where: {
+				uuid: uuid,
+			},
+			select: {
+				id: true,
+				uuid: true,
+				jobTitle: true,
+				fullName: true,
+				EmployeesReportingTo: {
+					select: {
+						id: true,
+						uuid: true,
+						jobTitle: true,
+						fullName: true,
 					},
 				},
 			},
-		},
-	});
+		});
+
+		if (employee && employee.EmployeesReportingTo.length > 0) {
+			const reports = await Promise.all(
+				employee.EmployeesReportingTo.map((report) => getEmployeeWithReports(report.uuid)),
+			);
+
+			return {
+				...employee,
+				EmployeesReportingTo: reports,
+			};
+		} else {
+			return employee;
+		}
+	};
+
+	const selectedChart = await getEmployeeWithReports(employeeUuid);
 
 	return {status: 200, data: selectedChart};
 };
