@@ -59,47 +59,57 @@ export const findEmployee = async (
 	return {status: 200, data: employees};
 };
 
-export const getOrgChart = async (employeeUuid: string) => {
-	// TODO Needs to fetch if  the reporting to is not null
-	const selectedChart = await prisma.employee.findUnique({
-		where: {
-			uuid: employeeUuid,
-		},
-		// CEO
+export const getOrgChart = async (
+	company: userAuthCredentialsType["company"],
+	employeeUuid: string,
+) => {
+	const employeeInCompany = await prisma.company.findUniqueOrThrow({
+		where: {uuid: company.uuid},
 		select: {
-			id: true,
-			uuid: true,
-			jobTitle: true,
-			fullName: true,
-			// Managers
-			EmployeesReportingTo: {
-				select: {
-					id: true,
-					uuid: true,
-					jobTitle: true,
-					fullName: true,
-					// Group Leaders
-					EmployeesReportingTo: {
-						select: {
-							id: true,
-							uuid: true,
-							jobTitle: true,
-							fullName: true,
-							// Team Leaders
-							EmployeesReportingTo: {
-								select: {
-									id: true,
-									uuid: true,
-									jobTitle: true,
-									fullName: true,
-								},
-							},
-						},
-					},
+			Employee: {
+				where: {
+					uuid: employeeUuid,
 				},
+				select: {uuid: true},
 			},
 		},
 	});
+	const getEmployeeWithReports = async (uuid: string): Promise<any> => {
+		const employee = await prisma.employee.findUnique({
+			where: {
+				uuid,
+			},
+			select: {
+				id: true,
+				uuid: true,
+				jobTitle: true,
+				fullName: true,
+				EmployeesReportingTo: {
+					select: {
+						id: true,
+						uuid: true,
+						jobTitle: true,
+						fullName: true,
+					},
+				},
+			},
+		});
+
+		if (employee && employee.EmployeesReportingTo.length > 0) {
+			const reports = await Promise.all(
+				employee.EmployeesReportingTo.map((report) => getEmployeeWithReports(report.uuid)),
+			);
+
+			return {
+				...employee,
+				EmployeesReportingTo: reports,
+			};
+		} else {
+			return employee;
+		}
+	};
+
+	const selectedChart = await getEmployeeWithReports(employeeInCompany.Employee[0].uuid);
 
 	return {status: 200, data: selectedChart};
 };
