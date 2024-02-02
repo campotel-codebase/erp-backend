@@ -11,6 +11,11 @@ declare module "express-serve-static-core" {
 	interface Request {
 		userAuthCreds: userAuthCredentialsType;
 		employeeAuthCreds: EmployeeAuthCredentialsType;
+		selectedEmployee: {
+			id: number;
+			uuid: string;
+			isActive: number;
+		};
 	}
 }
 
@@ -133,6 +138,35 @@ export const employeeAuth = async (req: Request, res: Response, next: NextFuncti
 	}
 };
 
+// export const isEmployeeBelongToCompany = async (
+// 	req: Request,
+// 	res: Response,
+// 	next: NextFunction,
+// ) => {
+// 	try {
+// 		const employee = await prisma.company.findUnique({
+// 			where: {uuid: req.userAuthCreds.company.uuid},
+// 			select: {
+// 				Employee: {
+// 					where: {
+// 						id: req.body.reportingToId,
+// 					},
+// 					select: {
+// 						id: true,
+// 					},
+// 				},
+// 			},
+// 		});
+// 		if (employee?.Employee.length !== 0) {
+// 			next();
+// 		} else {
+// 			throw new Error("employee assign as IS is does not belong to your company");
+// 		}
+// 	} catch (error: any) {
+// 		res.status(400).json({error: error.message});
+// 	}
+// };
+
 export const isEmployeeBelongToCompany = async (
 	req: Request,
 	res: Response,
@@ -144,20 +178,23 @@ export const isEmployeeBelongToCompany = async (
 			select: {
 				Employee: {
 					where: {
-						id: req.body.reportingToId,
+						uuid: req.params.employeeUuid,
 					},
 					select: {
 						id: true,
+						uuid: true,
+						isActive: true,
 					},
 				},
 			},
 		});
-		if (employee?.Employee.length !== 0) {
+		if (employee && employee?.Employee.length !== 0) {
+			req.selectedEmployee = employee.Employee[0];
 			next();
 		} else {
-			throw new Error("employee assign as IS is does not belong to your company");
+			res.status(404).json("employee not found");
 		}
 	} catch (error: any) {
-		res.status(400).json({error: error.message});
+		res.status(500).json({error: error.message});
 	}
 };
