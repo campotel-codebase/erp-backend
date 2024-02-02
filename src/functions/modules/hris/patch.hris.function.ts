@@ -87,24 +87,11 @@ export const applyBankAccountToEmployee = async (
 };
 
 export const updateEmployeeData = async (
-	company: userAuthCredentialsType["company"],
-	employeeUuid: string,
+	selectedEmployee: selectedEmployeeType,
 	body: Prisma.EmployeeUpdateInput,
 ) => {
-	const findEmployeeInCompany = await prisma.company.findUniqueOrThrow({
-		where: {uuid: company.uuid},
-		select: {
-			Employee: {
-				where: {
-					uuid: employeeUuid,
-				},
-				select: {uuid: true},
-			},
-		},
-	});
-	const employee = findEmployeeInCompany?.Employee[0];
 	const updatedEmployee = await prisma.employee.update({
-		where: {uuid: employee.uuid},
+		where: {uuid: selectedEmployee.uuid},
 		data: body,
 	});
 	return {status: 200, data: updatedEmployee};

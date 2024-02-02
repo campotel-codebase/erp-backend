@@ -173,18 +173,21 @@ hris.patch(
 		}
 	},
 );
-hris.patch("/update/employee/:employeeUuid", async (req, res) => {
-	const company = req.userAuthCreds.company;
-	const {employeeUuid} = req.params;
-	const {body} = req;
+hris.patch(
+	"/update/employee/:employeeUuid",
+	[isEmployeeBelongToCompany],
+	async (req: Request, res: Response) => {
+		const selectedEmployee = req.selectedEmployee;
+		const {body} = req;
 
-	try {
-		const {status, data} = await updateEmployeeData(company, employeeUuid, body);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+		try {
+			const {status, data} = await updateEmployeeData(selectedEmployee, body);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 hris.patch("/update/employment-history/:employmentHistoryUuid", async (req, res) => {
 	const company = req.userAuthCreds.company;
 	const {employmentHistoryUuid} = req.params;
