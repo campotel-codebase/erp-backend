@@ -1,5 +1,6 @@
 import prisma from "../../../../libs/prisma";
 import {userAuthCredentialsType} from "../../../../types/jwt-payload";
+import {selectedEmployeeType} from "../../../../types/modules/hris/selected-employee";
 
 export const getEmployees = async (company: userAuthCredentialsType["company"]) => {
 	const employees = await prisma.company.findMany({
@@ -13,9 +14,9 @@ export const getEmployees = async (company: userAuthCredentialsType["company"]) 
 	return {status: 200, data: employees};
 };
 
-export const getEmployee = async (employeeUuid: string) => {
+export const getEmployee = async (selectedEmployee: selectedEmployeeType) => {
 	const employee = await prisma.employee.findUnique({
-		where: {uuid: employeeUuid},
+		where: {uuid: selectedEmployee.uuid},
 		include: {
 			ReportingTo: {select: {fullName: true}},
 			EmployeesReportingTo: {select: {fullName: true}},
@@ -49,7 +50,7 @@ export const findEmployee = async (
 	return {status: 200, data: employees};
 };
 
-export const getOrgChart = async (employeeUuid: string) => {
+export const getOrgChart = async (selectedEmployee: selectedEmployeeType) => {
 	const getEmployeeWithReports = async (uuid: string): Promise<any> => {
 		const employee = await prisma.employee.findUnique({
 			where: {
@@ -85,7 +86,7 @@ export const getOrgChart = async (employeeUuid: string) => {
 		}
 	};
 
-	const selectedChart = await getEmployeeWithReports(employeeUuid);
+	const selectedChart = await getEmployeeWithReports(selectedEmployee.uuid);
 
 	return {status: 200, data: selectedChart};
 };

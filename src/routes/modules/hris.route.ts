@@ -41,10 +41,10 @@ hris.get(
 	"/get/employee/:employeeUuid",
 	[isEmployeeBelongToCompany],
 	async (req: Request, res: Response) => {
-		const employeeUuid = req.selectedEmployee.uuid;
+		const selectedEmployee = req.selectedEmployee;
 
 		try {
-			const {status, data} = await getEmployee(employeeUuid);
+			const {status, data} = await getEmployee(selectedEmployee);
 			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
@@ -71,9 +71,9 @@ hris.get(
 	"/get/org-chart/:employeeUuid",
 	[isEmployeeBelongToCompany],
 	async (req: Request, res: Response) => {
-		const employeeUuid = req.selectedEmployee.uuid;
+		const selectedEmployee = req.selectedEmployee;
 		try {
-			const {status, data} = await getOrgChart(employeeUuid);
+			const {status, data} = await getOrgChart(selectedEmployee);
 			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
