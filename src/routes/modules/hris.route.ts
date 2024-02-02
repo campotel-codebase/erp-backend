@@ -67,16 +67,19 @@ hris.get(
 		}
 	},
 );
-hris.get("/get/org-chart/:employeeUuid", async (req: Request, res: Response) => {
-	const company = req.userAuthCreds.company;
-	const employeeUuid = req.params.employeeUuid;
-	try {
-		const {status, data} = await getOrgChart(company, employeeUuid);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+hris.get(
+	"/get/org-chart/:employeeUuid",
+	[isEmployeeBelongToCompany],
+	async (req: Request, res: Response) => {
+		const employeeUuid = req.selectedEmployee.uuid;
+		try {
+			const {status, data} = await getOrgChart(employeeUuid);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 /* 
 	Get requests
 */
