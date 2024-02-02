@@ -157,18 +157,22 @@ hris.patch(
 		}
 	},
 );
-hris.patch("/update/assign-bank-account-to-employee/:employeeUuid", async (req, res) => {
-	const company = req.userAuthCreds.company;
-	const {employeeUuid} = req.params;
-	const {body} = req;
+hris.patch(
+	"/update/assign-bank-account-to-employee/:employeeUuid",
+	[isEmployeeBelongToCompany],
+	async (req: Request, res: Response) => {
+		const company = req.userAuthCreds.company;
+		const selectedEmployee = req.selectedEmployee;
+		const {body} = req;
 
-	try {
-		const {status, data} = await applyBankAccountToEmployee(company, employeeUuid, body);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+		try {
+			const {status, data} = await applyBankAccountToEmployee(company, selectedEmployee, body);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 hris.patch("/update/employee/:employeeUuid", async (req, res) => {
 	const company = req.userAuthCreds.company;
 	const {employeeUuid} = req.params;
