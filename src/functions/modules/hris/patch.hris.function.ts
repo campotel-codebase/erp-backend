@@ -5,25 +5,16 @@ import {generateUuid} from "../../../utils/uuid.util";
 import {bankAccountType} from "../../../../types/modules/hris/payroll";
 import {Prisma} from "@prisma/client";
 import {userAuthCredentialsType} from "../../../../types/jwt-payload";
+import {selectedEmployeeType} from "../../../../types/modules/hris/selected-employee";
 
 export const updateEmployeeEmploymentStatus = async (
 	company: userAuthCredentialsType["company"],
-	employeeUuid: string,
+	selectedEmployee: selectedEmployeeType,
 	body: offBoardType,
 ) => {
-	const findEmployeeInCompany = await prisma.company.findUnique({
-		where: {uuid: company.uuid},
-		select: {
-			id: true,
-			Employee: {
-				where: {uuid: employeeUuid, isActive: 1},
-			},
-		},
-	});
-	const employee = findEmployeeInCompany?.Employee[0];
-	if (employee) {
+	if (selectedEmployee.isActive) {
 		const newOffBoardedEmployee = await prisma.employee.update({
-			where: {uuid: employee.uuid},
+			where: {uuid: selectedEmployee.uuid},
 			data: {
 				isPortalOpen: 0,
 				isActive: 0,
@@ -59,7 +50,7 @@ export const updateEmployeeEmploymentStatus = async (
 			return {status: 400, data: "employee hired date is not define"};
 		}
 	} else {
-		return {status: 404, data: "employee not found"};
+		return {status: 404, data: "employee is not currently employed"};
 	}
 };
 

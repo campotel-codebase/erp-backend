@@ -116,6 +116,7 @@ export const makeEmployee = async (
 	company: userAuthCredentialsType["company"],
 	body: {employee: Prisma.EmployeeCreateInput; reportingToId: number},
 ) => {
+	// TODO validate this reportingToId if it belongs to company
 	const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
 	const tempPassword = generatePassword;
 	const newEmployee = await prisma.employee.create({

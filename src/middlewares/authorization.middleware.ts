@@ -6,16 +6,13 @@ import {
 	jwtPayloadType,
 	userAuthCredentialsType,
 } from "../../types/jwt-payload";
+import {selectedEmployeeType} from "../../types/modules/hris/selected-employee";
 
 declare module "express-serve-static-core" {
 	interface Request {
 		userAuthCreds: userAuthCredentialsType;
 		employeeAuthCreds: EmployeeAuthCredentialsType;
-		selectedEmployee: {
-			id: number;
-			uuid: string;
-			isActive: number;
-		};
+		selectedEmployee: selectedEmployeeType;
 	}
 }
 

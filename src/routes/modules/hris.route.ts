@@ -120,7 +120,7 @@ hris.post(
 );
 hris.post(
 	"/make/employee",
-	[...makeEmployeeVS, expressValidatorResult, isEmployeeBelongToCompany],
+	[...makeEmployeeVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const {body} = req;
@@ -141,18 +141,22 @@ hris.post(
 	Patch requests
 */
 
-hris.patch("/update/offboard-employee/:employeeUuid", async (req, res) => {
-	const company = req.userAuthCreds.company;
-	const {employeeUuid} = req.params;
-	const {body} = req;
+hris.patch(
+	"/update/offboard-employee/:employeeUuid",
+	[isEmployeeBelongToCompany],
+	async (req: Request, res: Response) => {
+		const company = req.userAuthCreds.company;
+		const selectedEmployee = req.selectedEmployee;
+		const {body} = req;
 
-	try {
-		const {status, data} = await updateEmployeeEmploymentStatus(company, employeeUuid, body);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+		try {
+			const {status, data} = await updateEmployeeEmploymentStatus(company, selectedEmployee, body);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 hris.patch("/update/assign-bank-account-to-employee/:employeeUuid", async (req, res) => {
 	const company = req.userAuthCreds.company;
 	const {employeeUuid} = req.params;
