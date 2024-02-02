@@ -37,17 +37,20 @@ hris.get("/get/employees", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
-hris.get("/get/employee/:employeeUuid", async (req: Request, res: Response) => {
-	const company = req.userAuthCreds.company;
-	const employeeUuid = req.params.employeeUuid;
+hris.get(
+	"/get/employee/:employeeUuid",
+	[isEmployeeBelongToCompany],
+	async (req: Request, res: Response) => {
+		const employeeUuid = req.selectedEmployee.uuid;
 
-	try {
-		const {status, data} = await getEmployee(company, employeeUuid);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+		try {
+			const {status, data} = await getEmployee(employeeUuid);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 hris.get(
 	"/find/employee",
 	queryRule,

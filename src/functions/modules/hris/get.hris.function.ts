@@ -13,22 +13,12 @@ export const getEmployees = async (company: userAuthCredentialsType["company"]) 
 	return {status: 200, data: employees};
 };
 
-export const getEmployee = async (
-	company: userAuthCredentialsType["company"],
-	employeeUuid: string,
-) => {
-	const employee = await prisma.company.findUnique({
-		where: {uuid: company.uuid},
-		select: {
-			Employee: {
-				where: {
-					uuid: employeeUuid,
-				},
-				include: {
-					ReportingTo: {select: {fullName: true}},
-					EmployeesReportingTo: {select: {fullName: true}},
-				},
-			},
+export const getEmployee = async (employeeUuid: string) => {
+	const employee = await prisma.employee.findUnique({
+		where: {uuid: employeeUuid},
+		include: {
+			ReportingTo: {select: {fullName: true}},
+			EmployeesReportingTo: {select: {fullName: true}},
 		},
 	});
 	return {status: 200, data: employee};

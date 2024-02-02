@@ -192,7 +192,7 @@ export const isEmployeeBelongToCompany = async (
 			req.selectedEmployee = employee.Employee[0];
 			next();
 		} else {
-			res.status(404).json("employee not found");
+			res.status(404).json("employee does not belong to current company");
 		}
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
