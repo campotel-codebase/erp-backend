@@ -13,6 +13,7 @@ declare module "express-serve-static-core" {
 		userAuthCreds: userAuthCredentialsType;
 		employeeAuthCreds: EmployeeAuthCredentialsType;
 		selectedEmployee: selectedEmployeeType;
+		selectedEmployeeForIs: selectedEmployeeType;
 	}
 }
 
@@ -135,35 +136,6 @@ export const employeeAuth = async (req: Request, res: Response, next: NextFuncti
 	}
 };
 
-// export const isEmployeeBelongToCompany = async (
-// 	req: Request,
-// 	res: Response,
-// 	next: NextFunction,
-// ) => {
-// 	try {
-// 		const employee = await prisma.company.findUnique({
-// 			where: {uuid: req.userAuthCreds.company.uuid},
-// 			select: {
-// 				Employee: {
-// 					where: {
-// 						id: req.body.reportingToId,
-// 					},
-// 					select: {
-// 						id: true,
-// 					},
-// 				},
-// 			},
-// 		});
-// 		if (employee?.Employee.length !== 0) {
-// 			next();
-// 		} else {
-// 			throw new Error("employee assign as IS is does not belong to your company");
-// 		}
-// 	} catch (error: any) {
-// 		res.status(400).json({error: error.message});
-// 	}
-// };
-
 export const isEmployeeBelongToCompany = async (
 	req: Request,
 	res: Response,
@@ -190,6 +162,38 @@ export const isEmployeeBelongToCompany = async (
 			next();
 		} else {
 			res.status(404).json("employee does not belong to current company");
+		}
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+};
+
+export const isEmployeeBelongToCompanyForIs = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const employee = await prisma.company.findUnique({
+			where: {uuid: req.userAuthCreds.company.uuid},
+			select: {
+				Employee: {
+					where: {
+						uuid: req.body.reportingToUuid,
+					},
+					select: {
+						id: true,
+						uuid: true,
+						isActive: true,
+					},
+				},
+			},
+		});
+		if (employee && employee?.Employee.length !== 0) {
+			req.selectedEmployeeForIs = employee.Employee[0];
+			next();
+		} else {
+			res.status(404).json("employee assign as IS does not belong to current company");
 		}
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

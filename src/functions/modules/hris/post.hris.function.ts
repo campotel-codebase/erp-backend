@@ -5,6 +5,7 @@ import {generatePassword, hashPassword} from "../../../utils/password.util";
 import prisma from "../../../../libs/prisma";
 import {generateUuid} from "../../../utils/uuid.util";
 import {emailContent} from "../../../utils/email.util";
+import {selectedEmployeeType} from "../../../../types/modules/hris/selected-employee";
 
 export const importEmployees = async (
 	company: userAuthCredentialsType["company"],
@@ -114,9 +115,9 @@ export const makeEmployees = async (
 
 export const makeEmployee = async (
 	company: userAuthCredentialsType["company"],
+	selectedEmployeeForIs: selectedEmployeeType,
 	body: {employee: Prisma.EmployeeCreateInput; reportingToId: number},
 ) => {
-	// TODO validate this reportingToId if it belongs to company
 	const fullName = `${body.employee.lastName} ${body.employee.firstName} ${body.employee.middleName}`;
 	const tempPassword = generatePassword;
 	const newEmployee = await prisma.employee.create({
@@ -127,7 +128,7 @@ export const makeEmployee = async (
 			uuid: await generateUuid(),
 			Company: {connect: {id: company.id}},
 			ReportingTo: {
-				connect: {id: body.reportingToId},
+				connect: {id: selectedEmployeeForIs.id},
 			},
 		},
 	});

@@ -21,7 +21,10 @@ import {uploadCsv} from "../../middlewares/multer.middleware";
 import {makeEmployeeVS, makeEmployeesVS} from "../../validator/modules/hris.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
 import {queryRule} from "../../validator/common.validator";
-import {isEmployeeBelongToCompany} from "../../middlewares/authorization.middleware";
+import {
+	isEmployeeBelongToCompany,
+	isEmployeeBelongToCompanyForIs,
+} from "../../middlewares/authorization.middleware";
 
 const hris = express.Router();
 
@@ -120,13 +123,14 @@ hris.post(
 );
 hris.post(
 	"/make/employee",
-	[...makeEmployeeVS, expressValidatorResult],
+	[...makeEmployeeVS, expressValidatorResult, isEmployeeBelongToCompanyForIs],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
+		const selectedEmployeeForIs = req.selectedEmployeeForIs;
 		const {body} = req;
 
 		try {
-			const {status, data} = await makeEmployee(company, body);
+			const {status, data} = await makeEmployee(company, selectedEmployeeForIs, body);
 			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
