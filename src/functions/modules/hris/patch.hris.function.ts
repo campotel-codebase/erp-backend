@@ -143,3 +143,18 @@ export const updateBankAccountData = async (
 	});
 	return {status: 200, data: updatedBankAccount};
 };
+
+export const reassignEmployeeIS = async (
+	selectedEmployee: selectedEmployeeType,
+	selectedEmployeeForIs: selectedEmployeeType,
+) => {
+	const updatedEmployee = await prisma.employee.update({
+		where: {uuid: selectedEmployee.uuid},
+		data: {
+			ReportingTo: {
+				connect: {id: selectedEmployeeForIs.id},
+			},
+		},
+	});
+	return {status: 200, data: updatedEmployee};
+};
