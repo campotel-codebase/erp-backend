@@ -12,6 +12,7 @@ import {
 } from "../../functions/modules/hris/post.hris.function";
 import {
 	applyBankAccountToEmployee,
+	reassignEmployeeIS,
 	updateBankAccountData,
 	updateEmployeeData,
 	updateEmployeeEmploymentStatus,
@@ -216,6 +217,20 @@ hris.patch("/update/bank-account/:bankAccountUuid", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
+hris.patch(
+	"/update/employee-immediate-superior/:employeeUuid",
+	[isEmployeeBelongToCompany, isEmployeeBelongToCompanyForIs],
+	async (req: Request, res: Response) => {
+		const selectedEmployee = req.selectedEmployee;
+		const selectedEmployeeForIs = req.selectedEmployeeForIs;
+		try {
+			const {status, data} = await reassignEmployeeIS(selectedEmployee, selectedEmployeeForIs);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 /* 
 	Patch requests
 */
