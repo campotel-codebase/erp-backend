@@ -119,12 +119,8 @@ export const makeEmployeeVS = checkSchema({
 			options: (value) => JSON.stringify(value),
 		},
 	},
-	reportingToId: {
-		notEmpty: {
-			bail: true,
-		},
-		isInt: true,
-		toInt: true,
+	reportingToUuid: {
+		...commonStringRule,
 	},
 });
 

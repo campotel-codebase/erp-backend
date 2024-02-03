@@ -5,25 +5,16 @@ import {generateUuid} from "../../../utils/uuid.util";
 import {bankAccountType} from "../../../../types/modules/hris/payroll";
 import {Prisma} from "@prisma/client";
 import {userAuthCredentialsType} from "../../../../types/jwt-payload";
+import {selectedEmployeeType} from "../../../../types/modules/hris/selected-employee";
 
 export const updateEmployeeEmploymentStatus = async (
 	company: userAuthCredentialsType["company"],
-	employeeUuid: string,
+	selectedEmployee: selectedEmployeeType,
 	body: offBoardType,
 ) => {
-	const findEmployeeInCompany = await prisma.company.findUnique({
-		where: {uuid: company.uuid},
-		select: {
-			id: true,
-			Employee: {
-				where: {uuid: employeeUuid, isActive: 1},
-			},
-		},
-	});
-	const employee = findEmployeeInCompany?.Employee[0];
-	if (employee) {
+	if (selectedEmployee.isActive) {
 		const newOffBoardedEmployee = await prisma.employee.update({
-			where: {uuid: employee.uuid},
+			where: {uuid: selectedEmployee.uuid},
 			data: {
 				isPortalOpen: 0,
 				isActive: 0,
@@ -59,39 +50,29 @@ export const updateEmployeeEmploymentStatus = async (
 			return {status: 400, data: "employee hired date is not define"};
 		}
 	} else {
-		return {status: 404, data: "employee not found"};
+		return {status: 404, data: "employee is not currently employed"};
 	}
 };
 
 export const applyBankAccountToEmployee = async (
 	company: userAuthCredentialsType["company"],
-	employeeUuid: string,
+	selectedEmployee: selectedEmployeeType,
 	body: bankAccountType,
 ) => {
-	const findEmployeeInCompany = await prisma.company.findUnique({
-		where: {uuid: company.uuid},
-		select: {
-			Employee: {
-				where: {uuid: employeeUuid, isActive: 1},
-			},
-		},
-	});
-	const employee = findEmployeeInCompany?.Employee[0];
-	if (employee) {
-		const newPayrollForEmployee = await prisma.employee.update({
-			where: {uuid: employee.uuid},
+	if (selectedEmployee.isActive) {
+		await prisma.employee.update({
+			where: {uuid: selectedEmployee.uuid},
 			data: {
 				payType: "atm",
 			},
-			select: {id: true, payType: true},
 		});
-		const assignBank = await prisma.bankAccount.create({
+		await prisma.bankAccount.create({
 			data: {
 				uuid: await generateUuid(),
 				...body,
 				Employee: {
 					connect: {
-						id: newPayrollForEmployee.id,
+						id: selectedEmployee.id,
 					},
 				},
 				Company: {
@@ -99,31 +80,18 @@ export const applyBankAccountToEmployee = async (
 				},
 			},
 		});
-		return {status: 200, data: {newPayrollForEmployee, assignBank}};
+		return {status: 200, data: "success"};
 	} else {
-		return {status: 400, data: "invalid request"};
+		return {status: 404, data: "employee is not currently employed"};
 	}
 };
 
 export const updateEmployeeData = async (
-	company: userAuthCredentialsType["company"],
-	employeeUuid: string,
+	selectedEmployee: selectedEmployeeType,
 	body: Prisma.EmployeeUpdateInput,
 ) => {
-	const findEmployeeInCompany = await prisma.company.findUniqueOrThrow({
-		where: {uuid: company.uuid},
-		select: {
-			Employee: {
-				where: {
-					uuid: employeeUuid,
-				},
-				select: {uuid: true},
-			},
-		},
-	});
-	const employee = findEmployeeInCompany?.Employee[0];
 	const updatedEmployee = await prisma.employee.update({
-		where: {uuid: employee.uuid},
+		where: {uuid: selectedEmployee.uuid},
 		data: body,
 	});
 	return {status: 200, data: updatedEmployee};

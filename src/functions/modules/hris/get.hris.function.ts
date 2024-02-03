@@ -1,5 +1,6 @@
 import prisma from "../../../../libs/prisma";
 import {userAuthCredentialsType} from "../../../../types/jwt-payload";
+import {selectedEmployeeType} from "../../../../types/modules/hris/selected-employee";
 
 export const getEmployees = async (company: userAuthCredentialsType["company"]) => {
 	const employees = await prisma.company.findMany({
@@ -13,22 +14,12 @@ export const getEmployees = async (company: userAuthCredentialsType["company"]) 
 	return {status: 200, data: employees};
 };
 
-export const getEmployee = async (
-	company: userAuthCredentialsType["company"],
-	employeeUuid: string,
-) => {
-	const employee = await prisma.company.findUnique({
-		where: {uuid: company.uuid},
-		select: {
-			Employee: {
-				where: {
-					uuid: employeeUuid,
-				},
-				include: {
-					ReportingTo: {select: {fullName: true}},
-					EmployeesReportingTo: {select: {fullName: true}},
-				},
-			},
+export const getEmployee = async (selectedEmployee: selectedEmployeeType) => {
+	const employee = await prisma.employee.findUnique({
+		where: {uuid: selectedEmployee.uuid},
+		include: {
+			ReportingTo: {select: {fullName: true}},
+			EmployeesReportingTo: {select: {fullName: true}},
 		},
 	});
 	return {status: 200, data: employee};
@@ -59,21 +50,7 @@ export const findEmployee = async (
 	return {status: 200, data: employees};
 };
 
-export const getOrgChart = async (
-	company: userAuthCredentialsType["company"],
-	employeeUuid: string,
-) => {
-	const employeeInCompany = await prisma.company.findUniqueOrThrow({
-		where: {uuid: company.uuid},
-		select: {
-			Employee: {
-				where: {
-					uuid: employeeUuid,
-				},
-				select: {uuid: true},
-			},
-		},
-	});
+export const getOrgChart = async (selectedEmployee: selectedEmployeeType) => {
 	const getEmployeeWithReports = async (uuid: string): Promise<any> => {
 		const employee = await prisma.employee.findUnique({
 			where: {
@@ -109,7 +86,7 @@ export const getOrgChart = async (
 		}
 	};
 
-	const selectedChart = await getEmployeeWithReports(employeeInCompany.Employee[0].uuid);
+	const selectedChart = await getEmployeeWithReports(selectedEmployee.uuid);
 
 	return {status: 200, data: selectedChart};
 };

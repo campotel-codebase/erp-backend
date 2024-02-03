@@ -6,11 +6,14 @@ import {
 	jwtPayloadType,
 	userAuthCredentialsType,
 } from "../../types/jwt-payload";
+import {selectedEmployeeType} from "../../types/modules/hris/selected-employee";
 
 declare module "express-serve-static-core" {
 	interface Request {
 		userAuthCreds: userAuthCredentialsType;
 		employeeAuthCreds: EmployeeAuthCredentialsType;
+		selectedEmployee: selectedEmployeeType;
+		selectedEmployeeForIs: selectedEmployeeType;
 	}
 }
 
@@ -144,20 +147,55 @@ export const isEmployeeBelongToCompany = async (
 			select: {
 				Employee: {
 					where: {
-						id: req.body.reportingToId,
+						uuid: req.params.employeeUuid,
 					},
 					select: {
 						id: true,
+						uuid: true,
+						isActive: true,
 					},
 				},
 			},
 		});
-		if (employee?.Employee.length !== 0) {
+		if (employee && employee?.Employee.length !== 0) {
+			req.selectedEmployee = employee.Employee[0];
 			next();
 		} else {
-			throw new Error("employee assign as IS is does not belong to your company");
+			res.status(404).json("employee does not belong to current company");
 		}
 	} catch (error: any) {
-		res.status(400).json({error: error.message});
+		res.status(500).json({error: error.message});
+	}
+};
+
+export const isEmployeeBelongToCompanyForIs = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const employee = await prisma.company.findUnique({
+			where: {uuid: req.userAuthCreds.company.uuid},
+			select: {
+				Employee: {
+					where: {
+						uuid: req.body.reportingToUuid,
+					},
+					select: {
+						id: true,
+						uuid: true,
+						isActive: true,
+					},
+				},
+			},
+		});
+		if (employee && employee?.Employee.length !== 0) {
+			req.selectedEmployeeForIs = employee.Employee[0];
+			next();
+		} else {
+			res.status(404).json("employee assign as IS does not belong to current company");
+		}
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
 	}
 };

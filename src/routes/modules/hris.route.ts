@@ -21,7 +21,10 @@ import {uploadCsv} from "../../middlewares/multer.middleware";
 import {makeEmployeeVS, makeEmployeesVS} from "../../validator/modules/hris.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
 import {queryRule} from "../../validator/common.validator";
-import {isEmployeeBelongToCompany} from "../../middlewares/authorization.middleware";
+import {
+	isEmployeeBelongToCompany,
+	isEmployeeBelongToCompanyForIs,
+} from "../../middlewares/authorization.middleware";
 
 const hris = express.Router();
 
@@ -37,17 +40,20 @@ hris.get("/get/employees", async (req, res) => {
 		res.status(500).json({error: error.message});
 	}
 });
-hris.get("/get/employee/:employeeUuid", async (req: Request, res: Response) => {
-	const company = req.userAuthCreds.company;
-	const employeeUuid = req.params.employeeUuid;
+hris.get(
+	"/get/employee/:employeeUuid",
+	[isEmployeeBelongToCompany],
+	async (req: Request, res: Response) => {
+		const selectedEmployee = req.selectedEmployee;
 
-	try {
-		const {status, data} = await getEmployee(company, employeeUuid);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+		try {
+			const {status, data} = await getEmployee(selectedEmployee);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 hris.get(
 	"/find/employee",
 	queryRule,
@@ -64,16 +70,19 @@ hris.get(
 		}
 	},
 );
-hris.get("/get/org-chart/:employeeUuid", async (req: Request, res: Response) => {
-	const company = req.userAuthCreds.company;
-	const employeeUuid = req.params.employeeUuid;
-	try {
-		const {status, data} = await getOrgChart(company, employeeUuid);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+hris.get(
+	"/get/org-chart/:employeeUuid",
+	[isEmployeeBelongToCompany],
+	async (req: Request, res: Response) => {
+		const selectedEmployee = req.selectedEmployee;
+		try {
+			const {status, data} = await getOrgChart(selectedEmployee);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 /* 
 	Get requests
 */
@@ -114,13 +123,14 @@ hris.post(
 );
 hris.post(
 	"/make/employee",
-	[...makeEmployeeVS, expressValidatorResult, isEmployeeBelongToCompany],
+	[...makeEmployeeVS, expressValidatorResult, isEmployeeBelongToCompanyForIs],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
+		const selectedEmployeeForIs = req.selectedEmployeeForIs;
 		const {body} = req;
 
 		try {
-			const {status, data} = await makeEmployee(company, body);
+			const {status, data} = await makeEmployee(company, selectedEmployeeForIs, body);
 			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
@@ -135,42 +145,53 @@ hris.post(
 	Patch requests
 */
 
-hris.patch("/update/offboard-employee/:employeeUuid", async (req, res) => {
-	const company = req.userAuthCreds.company;
-	const {employeeUuid} = req.params;
-	const {body} = req;
+hris.patch(
+	"/update/offboard-employee/:employeeUuid",
+	[isEmployeeBelongToCompany],
+	async (req: Request, res: Response) => {
+		const company = req.userAuthCreds.company;
+		const selectedEmployee = req.selectedEmployee;
+		const {body} = req;
 
-	try {
-		const {status, data} = await updateEmployeeEmploymentStatus(company, employeeUuid, body);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
-hris.patch("/update/assign-bank-account-to-employee/:employeeUuid", async (req, res) => {
-	const company = req.userAuthCreds.company;
-	const {employeeUuid} = req.params;
-	const {body} = req;
+		try {
+			const {status, data} = await updateEmployeeEmploymentStatus(company, selectedEmployee, body);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
+hris.patch(
+	"/update/assign-bank-account-to-employee/:employeeUuid",
+	[isEmployeeBelongToCompany],
+	async (req: Request, res: Response) => {
+		const company = req.userAuthCreds.company;
+		const selectedEmployee = req.selectedEmployee;
+		const {body} = req;
 
-	try {
-		const {status, data} = await applyBankAccountToEmployee(company, employeeUuid, body);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
-hris.patch("/update/employee/:employeeUuid", async (req, res) => {
-	const company = req.userAuthCreds.company;
-	const {employeeUuid} = req.params;
-	const {body} = req;
+		try {
+			const {status, data} = await applyBankAccountToEmployee(company, selectedEmployee, body);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
+hris.patch(
+	"/update/employee/:employeeUuid",
+	[isEmployeeBelongToCompany],
+	async (req: Request, res: Response) => {
+		const selectedEmployee = req.selectedEmployee;
+		const {body} = req;
 
-	try {
-		const {status, data} = await updateEmployeeData(company, employeeUuid, body);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
+		try {
+			const {status, data} = await updateEmployeeData(selectedEmployee, body);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 hris.patch("/update/employment-history/:employmentHistoryUuid", async (req, res) => {
 	const company = req.userAuthCreds.company;
 	const {employmentHistoryUuid} = req.params;
