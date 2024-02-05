@@ -32,10 +32,12 @@ const hris = express.Router();
 /* 
 	Get requests
 */
-hris.get("/get/employees", async (req, res) => {
+hris.get("/get/employees", async (req: Request, res: Response) => {
 	const company = req.userAuthCreds.company;
+	const page = req.query.page;
+
 	try {
-		const {status, data} = await getEmployees(company);
+		const {status, data} = await getEmployees(company, typeof page === "string" ? parseInt(page) : 1);
 		res.status(status).json(data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

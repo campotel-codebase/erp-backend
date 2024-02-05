@@ -2,13 +2,28 @@ import prisma from "../../../../libs/prisma";
 import {userAuthCredentialsType} from "../../../../types/jwt-payload";
 import {selectedEmployeeType} from "../../../../types/modules/hris/selected-employee";
 
-export const getEmployees = async (company: userAuthCredentialsType["company"]) => {
+export const getEmployees = async (company: userAuthCredentialsType["company"], page: number) => {
+	const pageSize = 15;
+	const skip = (page - 1) * pageSize;
 	const employees = await prisma.company.findMany({
 		where: {
 			uuid: company.uuid,
 		},
 		select: {
-			Employee: true,
+			Employee: {
+				take: pageSize,
+				skip,
+				select: {
+					uuid: true,
+					employeeCompanyId: true,
+					fullName: true,
+					department: true,
+					jobTitle: true,
+					employmentType: true,
+					isActive: true,
+					isPortalOpen: true,
+				},
+			},
 		},
 	});
 	return {status: 200, data: employees};
