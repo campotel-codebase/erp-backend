@@ -12,7 +12,7 @@ export const getEmployees = async (company: userAuthCredentialsType["company"], 
 		select: {
 			Employee: {
 				take: pageSize,
-				skip: skip,
+				skip,
 				select: {
 					uuid: true,
 					employeeCompanyId: true,
