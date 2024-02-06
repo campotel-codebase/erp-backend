@@ -1,13 +1,14 @@
-import express from "express";
+import express, {Request, Response} from "express";
 import {makeLeaveRequest} from "../../functions/portal/post.portal.function";
 import {getLeaveRequest} from "../../functions/portal/get.portal.function";
 import {updateLeaveRequestStatus} from "../../functions/portal/patch.portal.function";
+import {getEmployee} from "../../functions/shared.function";
 const portal = express.Router();
 
 /* 
 	Post requests
 */
-portal.post("/make/leave-request", async (req, res) => {
+portal.post("/make/leave-request", async (req: Request, res: Response) => {
 	const {body} = req;
 	try {
 		const employee = req.employeeAuthCreds.employee;
@@ -24,7 +25,16 @@ portal.post("/make/leave-request", async (req, res) => {
 /* 
 	Get requests
 */
-portal.get("/view/leave-request/:leaveRequestUuid", async (req, res) => {
+portal.get("/get/employee-profile", async (req: Request, res: Response) => {
+	const employeeUuid = req.employeeAuthCreds.employee.uuid;
+	try {
+		const {status, data} = await getEmployee(employeeUuid);
+		res.status(status).json(data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+portal.get("/view/leave-request/:leaveRequestUuid", async (req: Request, res: Response) => {
 	const {leaveRequestUuid} = req.params;
 	try {
 		const result = await getLeaveRequest(leaveRequestUuid);
@@ -40,7 +50,7 @@ portal.get("/view/leave-request/:leaveRequestUuid", async (req, res) => {
 /* 
 	Patch requests
 */
-portal.patch("/respond/leave-request/:leaveRequestUuid", async (req, res) => {
+portal.patch("/respond/leave-request/:leaveRequestUuid", async (req: Request, res: Response) => {
 	const {leaveRequestUuid} = req.params;
 	const employee = req.employeeAuthCreds.employee;
 	const {body} = req;

@@ -29,17 +29,6 @@ export const getEmployees = async (company: userAuthCredentialsType["company"], 
 	return {status: 200, data: employees};
 };
 
-export const getEmployee = async (selectedEmployee: selectedEmployeeType) => {
-	const employee = await prisma.employee.findUnique({
-		where: {uuid: selectedEmployee.uuid},
-		include: {
-			ReportingTo: {select: {fullName: true}},
-			EmployeesReportingTo: {select: {fullName: true}},
-		},
-	});
-	return {status: 200, data: employee};
-};
-
 export const findEmployee = async (
 	company: userAuthCredentialsType["company"],
 	keyword: any, //TODO define keyword type
