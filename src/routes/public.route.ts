@@ -16,12 +16,11 @@ const publicRoute = express.Router();
 */
 publicRoute.post(
 	"/user/sign-up",
-	userSignUpVS,
-	expressValidatorResult,
+	[...userSignUpVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		try {
-			const result = await userSignUp(req.body);
-			res.status(result.status).json(result.data);
+			const {status, data} = await userSignUp(req.body);
+			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
 		}
@@ -29,12 +28,11 @@ publicRoute.post(
 );
 publicRoute.post(
 	"/user/sign-in",
-	userSignInVS,
-	expressValidatorResult,
+	[...userSignInVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		try {
-			const result = await userSignIn(req.body);
-			res.status(result.status).json(result.data);
+			const {status, data} = await userSignIn(req.body);
+			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
 		}
@@ -42,12 +40,11 @@ publicRoute.post(
 );
 publicRoute.post(
 	"/user/forgot-password",
-	userForgotPasswordVS,
-	expressValidatorResult,
+	[...userForgotPasswordVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		try {
-			const result = await userPwdResetLink(req.body.email);
-			res.status(result.status).json(result.data);
+			const {status, data} = await userPwdResetLink(req.body.email);
+			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
 		}
@@ -55,14 +52,13 @@ publicRoute.post(
 );
 publicRoute.post(
 	"/user/reset-password/:passwordResetUuid",
-	resetPasswordVS,
-	expressValidatorResult,
+	[...resetPasswordVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const {passwordResetUuid} = req.params;
 		const {body} = req;
 		try {
-			const result = await userResetPwd(body, passwordResetUuid);
-			res.status(result.status).json(result.data);
+			const {status, data} = await userResetPwd(body, passwordResetUuid);
+			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
 		}
@@ -72,12 +68,11 @@ publicRoute.post(
 // Portal
 publicRoute.post(
 	"/employee/sign-in",
-	employeeSignInVS,
-	expressValidatorResult,
+	[...employeeSignInVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		try {
-			const result = await employeeSignIn(req.body);
-			res.status(result.status).json(result.data);
+			const {status, data} = await employeeSignIn(req.body);
+			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
 		}
@@ -85,12 +80,11 @@ publicRoute.post(
 );
 publicRoute.post(
 	"/employee/forgot-password",
-	EmployeeForgotPasswordVS,
-	expressValidatorResult,
+	[...EmployeeForgotPasswordVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		try {
-			const result = await employeePwdResetLink(req.body.email);
-			res.status(result.status).json(result.data);
+			const {status, data} = await employeePwdResetLink(req.body.email);
+			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
 		}
@@ -98,14 +92,13 @@ publicRoute.post(
 );
 publicRoute.post(
 	"/employee/reset-password/:passwordResetUuid",
-	resetPasswordVS,
-	expressValidatorResult,
+	[...resetPasswordVS, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const {passwordResetUuid} = req.params;
 		const {body} = req;
 		try {
-			const result = await employeeResetPwd(body, passwordResetUuid);
-			res.status(result.status).json(result.data);
+			const {status, data} = await employeeResetPwd(body, passwordResetUuid);
+			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
 		}
