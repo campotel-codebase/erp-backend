@@ -18,7 +18,7 @@ import {
 	updateEmployeeEmploymentStatus,
 	updateEmploymentHistoryData,
 } from "../../functions/modules/hris/patch.hris.function";
-import {uploadCsv} from "../../middlewares/multer.middleware";
+import {uploadCsv, uploadImage} from "../../middlewares/multer.middleware";
 import {makeEmployeeVS, makeEmployeesVS} from "../../validator/modules/hris.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
 import {queryRule} from "../../validator/common.validator";
@@ -26,6 +26,7 @@ import {
 	isEmployeeBelongToCompany,
 	isEmployeeBelongToCompanyForIs,
 } from "../../middlewares/authorization.middleware";
+import {updateEmployeeAvatar} from "../../functions/modules/hris/put.hris.function";
 
 const hris = express.Router();
 
@@ -237,4 +238,28 @@ hris.patch(
 	Patch requests
 */
 
+/* 
+	Put requests
+*/
+hris.put(
+	"/update/employee-avatar/:employeeUuid",
+	[isEmployeeBelongToCompany, uploadImage.single("avatar")],
+	async (req: Request, res: Response) => {
+		const selectedEmployee = req.selectedEmployee;
+		const url = req.protocol + "://" + req.get("host");
+		const fileName = req.file?.filename;
+		const filePath = "/public/avatar/";
+		const imgSrc = url + filePath + fileName;
+
+		try {
+			const {status, data} = await updateEmployeeAvatar(imgSrc, selectedEmployee);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
+/* 
+	Put requests
+*/
 export default hris;
