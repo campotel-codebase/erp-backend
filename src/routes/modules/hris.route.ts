@@ -60,8 +60,7 @@ hris.get(
 );
 hris.get(
 	"/find/employee",
-	queryRule,
-	expressValidatorResult,
+	[queryRule, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const keyword = req.query.keyword;
@@ -95,7 +94,7 @@ hris.get(
 	Post requests
 */
 
-hris.post("/import/employees", uploadCsv.single("csv"), async (req, res) => {
+hris.post("/import/employees", [uploadCsv.single("csv")], async (req: Request, res: Response) => {
 	const company = req.userAuthCreds.company;
 	const csvBuffer = req.file?.buffer.toString("utf8");
 
@@ -196,19 +195,22 @@ hris.patch(
 		}
 	},
 );
-hris.patch("/update/employment-history/:employmentHistoryUuid", async (req, res) => {
-	const company = req.userAuthCreds.company;
-	const {employmentHistoryUuid} = req.params;
-	const {body} = req;
+hris.patch(
+	"/update/employment-history/:employmentHistoryUuid",
+	async (req: Request, res: Response) => {
+		const company = req.userAuthCreds.company;
+		const {employmentHistoryUuid} = req.params;
+		const {body} = req;
 
-	try {
-		const {status, data} = await updateEmploymentHistoryData(company, employmentHistoryUuid, body);
-		res.status(status).json(data);
-	} catch (error: any) {
-		res.status(500).json({error: error.message});
-	}
-});
-hris.patch("/update/bank-account/:bankAccountUuid", async (req, res) => {
+		try {
+			const {status, data} = await updateEmploymentHistoryData(company, employmentHistoryUuid, body);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
+hris.patch("/update/bank-account/:bankAccountUuid", async (req: Request, res: Response) => {
 	const company = req.userAuthCreds.company;
 	const {bankAccountUuid} = req.params;
 	const {body} = req;
