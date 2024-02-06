@@ -1,7 +1,6 @@
 import express, {Request, Response} from "express";
 import {
 	findEmployee,
-	getEmployee,
 	getEmployees,
 	getOrgChart,
 } from "../../functions/modules/hris/get.hris.function";
@@ -27,6 +26,7 @@ import {
 	isEmployeeBelongToCompanyForIs,
 } from "../../middlewares/authorization.middleware";
 import {updateEmployeeAvatar} from "../../functions/modules/hris/put.hris.function";
+import {getEmployee} from "../../functions/shared.function";
 
 const hris = express.Router();
 
@@ -48,10 +48,10 @@ hris.get(
 	"/get/employee/:employeeUuid",
 	[isEmployeeBelongToCompany],
 	async (req: Request, res: Response) => {
-		const selectedEmployee = req.selectedEmployee;
+		const employeeUuid = req.selectedEmployee.uuid;
 
 		try {
-			const {status, data} = await getEmployee(selectedEmployee);
+			const {status, data} = await getEmployee(employeeUuid);
 			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
