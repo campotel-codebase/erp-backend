@@ -9,8 +9,8 @@ const user = express.Router();
 user.get("/get/user-profile", async (req, res) => {
 	const userUuid = req.userAuthCreds.user.uuid;
 	try {
-		const result = await getUserProfile(userUuid);
-		res.status(result.status).json(result.data);
+		const {status, data} = await getUserProfile(userUuid);
+		res.status(status).json(data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
 	}
@@ -25,8 +25,8 @@ user.get("/get/user-profile", async (req, res) => {
 user.patch("/update/user-profile", async (req, res) => {
 	const userUuid = req.userAuthCreds.user.uuid;
 	try {
-		const result = await updateUserProfile(req.body, userUuid);
-		res.status(result.status).json(result.data);
+		const {status, data} = await updateUserProfile(req.body, userUuid);
+		res.status(status).json(data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
 	}
@@ -47,8 +47,8 @@ user.put("/update/user-avatar", uploadImage.single("avatar"), async (req, res) =
 	const imgSrc = url + filePath + fileName;
 
 	try {
-		const result = await updateUserAvatar(imgSrc, user);
-		res.status(result.status).json(result.data);
+		const {status, data} = await updateUserAvatar(imgSrc, user);
+		res.status(status).json(data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});
 	}
