@@ -29,31 +29,6 @@ export const getEmployees = async (company: userAuthCredentialsType["company"], 
 	return {status: 200, data: employees};
 };
 
-export const findEmployee = async (
-	company: userAuthCredentialsType["company"],
-	keyword: any, //TODO define keyword type
-) => {
-	const employees = await prisma.company.findMany({
-		where: {
-			uuid: company.uuid,
-		},
-		select: {
-			Employee: {
-				where: {
-					fullName: {
-						contains: keyword,
-					},
-				},
-				take: 5,
-				orderBy: {
-					createdAt: "desc",
-				},
-			},
-		},
-	});
-	return {status: 200, data: employees};
-};
-
 export const getOrgChart = async (selectedEmployee: selectedEmployeeType) => {
 	const getEmployeeWithReports = async (uuid: string): Promise<any> => {
 		const employee = await prisma.employee.findUnique({

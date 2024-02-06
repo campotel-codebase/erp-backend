@@ -2,7 +2,9 @@ import express, {Request, Response} from "express";
 import {makeLeaveRequest} from "../../functions/portal/post.portal.function";
 import {getLeaveRequest} from "../../functions/portal/get.portal.function";
 import {updateLeaveRequestStatus} from "../../functions/portal/patch.portal.function";
-import {getEmployee} from "../../functions/shared.function";
+import {findEmployee, getEmployee} from "../../functions/shared.function";
+import {queryRule} from "../../validator/common.validator";
+import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
 const portal = express.Router();
 
 /* 
@@ -34,6 +36,21 @@ portal.get("/get/employee-profile", async (req: Request, res: Response) => {
 		res.status(500).json({error: error.message});
 	}
 });
+portal.get(
+	"/find/employee",
+	[queryRule, expressValidatorResult],
+	async (req: Request, res: Response) => {
+		const companyUuid = req.employeeAuthCreds.company.uuid;
+		const keyword = req.query.keyword;
+
+		try {
+			const {status, data} = await findEmployee(companyUuid, keyword);
+			res.status(status).json(data);
+		} catch (error: any) {
+			res.status(500).json({error: error.message});
+		}
+	},
+);
 portal.get("/view/leave-request/:leaveRequestUuid", async (req: Request, res: Response) => {
 	const {leaveRequestUuid} = req.params;
 	try {

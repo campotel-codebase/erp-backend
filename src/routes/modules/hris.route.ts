@@ -1,9 +1,5 @@
 import express, {Request, Response} from "express";
-import {
-	findEmployee,
-	getEmployees,
-	getOrgChart,
-} from "../../functions/modules/hris/get.hris.function";
+import {getEmployees, getOrgChart} from "../../functions/modules/hris/get.hris.function";
 import {
 	importEmployees,
 	makeEmployee,
@@ -26,7 +22,7 @@ import {
 	isEmployeeBelongToCompanyForIs,
 } from "../../middlewares/authorization.middleware";
 import {updateEmployeeAvatar} from "../../functions/modules/hris/put.hris.function";
-import {getEmployee} from "../../functions/shared.function";
+import {findEmployee, getEmployee} from "../../functions/shared.function";
 
 const hris = express.Router();
 
@@ -62,11 +58,11 @@ hris.get(
 	"/find/employee",
 	[queryRule, expressValidatorResult],
 	async (req: Request, res: Response) => {
-		const company = req.userAuthCreds.company;
+		const companyUuid = req.userAuthCreds.company.uuid;
 		const keyword = req.query.keyword;
 
 		try {
-			const {status, data} = await findEmployee(company, keyword);
+			const {status, data} = await findEmployee(companyUuid, keyword);
 			res.status(status).json(data);
 		} catch (error: any) {
 			res.status(500).json({error: error.message});
