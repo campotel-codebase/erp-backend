@@ -10,7 +10,7 @@ const config = express.Router();
 /* 
 	Patch requests
 */
-config.patch("/departments", async (req: Request, res: Response) => {
+config.patch("/set/departments", async (req: Request, res: Response) => {
 	const companyUuid = req.userAuthCreds.company.uuid;
 	const toString = JSON.stringify(req.body.departments);
 	const prepData = {
@@ -23,7 +23,7 @@ config.patch("/departments", async (req: Request, res: Response) => {
 		res.status(500).json({error: error.message});
 	}
 });
-config.patch("/job-titles", async (req: Request, res: Response) => {
+config.patch("/set/job-titles", async (req: Request, res: Response) => {
 	const companyUuid = req.userAuthCreds.company.uuid;
 	const toString = JSON.stringify(req.body.jobTitles);
 	const prepData = {
@@ -36,7 +36,7 @@ config.patch("/job-titles", async (req: Request, res: Response) => {
 		res.status(500).json({error: error.message});
 	}
 });
-config.patch("/talent-segments", async (req: Request, res: Response) => {
+config.patch("/set/talent-segments", async (req: Request, res: Response) => {
 	const companyUuid = req.userAuthCreds.company.uuid;
 	const toString = JSON.stringify(req.body.talentSegments);
 	const prepData = {
@@ -49,7 +49,7 @@ config.patch("/talent-segments", async (req: Request, res: Response) => {
 		res.status(500).json({error: error.message});
 	}
 });
-config.patch("/benefits", async (req: Request, res: Response) => {
+config.patch("/set/benefits", async (req: Request, res: Response) => {
 	const companyUuid = req.userAuthCreds.company.uuid;
 	const toString = JSON.stringify(req.body.benefits);
 	const prepData = {
