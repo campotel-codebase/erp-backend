@@ -1,5 +1,7 @@
 node_modules/
 
+prisma/migrations/**/*
+
 build/
 
 public/*
@@ -7,5 +9,3 @@ public/*
 !public/avatar/.gitkeep
 
 *.env
-
-prisma/migration/*
