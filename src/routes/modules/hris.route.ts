@@ -14,15 +14,16 @@ import {
 	updateEmploymentHistoryData,
 } from "../../functions/modules/hris/patch.hris.function";
 import {uploadCsv, uploadImage} from "../../middlewares/multer.middleware";
-import {makeEmployeeVS, makeEmployeesVS} from "../../validator/modules/hris.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
-import {queryRule} from "../../validator/common.validator";
+import {queryRule} from "../../validator/shared.validator";
 import {
 	isEmployeeBelongToCompany,
 	isEmployeeBelongToCompanyForIs,
 } from "../../middlewares/authorization.middleware";
 import {updateEmployeeAvatar} from "../../functions/modules/hris/put.hris.function";
 import {findEmployee, getEmployee} from "../../functions/shared.function";
+import makeEmployeesValidator from "../../validator/modules/hris/make-employees.validator";
+import makeEmployeeValidator from "../../validator/modules/hris/make-employee.validator";
 
 const hris = express.Router();
 
@@ -107,7 +108,7 @@ hris.post("/import/employees", [uploadCsv.single("csv")], async (req: Request, r
 });
 hris.post(
 	"/make/employees",
-	[...makeEmployeesVS, expressValidatorResult],
+	[...makeEmployeesValidator, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const body = req.body.employees;
@@ -122,7 +123,7 @@ hris.post(
 );
 hris.post(
 	"/make/employee",
-	[...makeEmployeeVS, expressValidatorResult, isEmployeeBelongToCompanyForIs],
+	[...makeEmployeeValidator, expressValidatorResult, isEmployeeBelongToCompanyForIs],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const selectedEmployeeForIs = req.selectedEmployeeForIs;
