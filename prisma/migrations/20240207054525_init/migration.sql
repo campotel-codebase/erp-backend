@@ -24,6 +24,7 @@ CREATE TABLE [dbo].[Company] (
     [talentSegments] VARCHAR(255),
     [employmentTypes] VARCHAR(255),
     [benefits] VARCHAR(255),
+    [absenceTypes] VARCHAR(255),
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [Company_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT [Company_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Company_uuid_key] UNIQUE NONCLUSTERED ([uuid])
@@ -66,22 +67,21 @@ CREATE TABLE [dbo].[Employee] (
     [fullName] VARCHAR(100),
     [middleName] VARCHAR(30),
     [avatar] NVARCHAR(1000),
-    [bloodType] VARCHAR(20),
+    [bloodType] VARCHAR(20) NOT NULL,
     [hiredDate] DATETIME2 NOT NULL,
-    [lastHiredDate] DATETIME2,
     [isRehired] TINYINT NOT NULL CONSTRAINT [Employee_isRehired_df] DEFAULT 0,
     [isActive] TINYINT NOT NULL CONSTRAINT [Employee_isActive_df] DEFAULT 1,
     [payType] VARCHAR(10),
-    [employmentType] VARCHAR(255),
-    [employeeCompanyId] NVARCHAR(1000),
+    [employmentType] VARCHAR(255) NOT NULL,
+    [employeeCompanyId] NVARCHAR(1000) NOT NULL,
     [tenure] NVARCHAR(1000),
     [salary] DECIMAL(10,2) NOT NULL CONSTRAINT [Employee_salary_df] DEFAULT 0,
-    [jobTitle] VARCHAR(255),
-    [department] VARCHAR(255),
-    [talentSegment] VARCHAR(255),
-    [benefits] VARCHAR(255),
+    [jobTitle] VARCHAR(255) NOT NULL,
+    [department] VARCHAR(255) NOT NULL,
+    [talentSegment] VARCHAR(255) NOT NULL,
+    [benefits] VARCHAR(255) NOT NULL,
     [driverLicense] VARCHAR(100),
-    [taxId] VARCHAR(100),
+    [taxId] VARCHAR(100) NOT NULL,
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [Employee_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT [Employee_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [Employee_uuid_key] UNIQUE NONCLUSTERED ([uuid]),
@@ -92,7 +92,8 @@ CREATE TABLE [dbo].[Employee] (
 -- CreateTable
 CREATE TABLE [dbo].[BankAccount] (
     [id] INT NOT NULL IDENTITY(1,1),
-    [employeeId] INT,
+    [employeeId] INT NOT NULL,
+    [companyId] INT NOT NULL,
     [uuid] NVARCHAR(1000) NOT NULL,
     [bankName] VARCHAR(255) NOT NULL,
     [accountNumber] VARCHAR(255) NOT NULL,
@@ -107,28 +108,34 @@ CREATE TABLE [dbo].[BankAccount] (
 -- CreateTable
 CREATE TABLE [dbo].[EmploymentHistory] (
     [id] INT NOT NULL IDENTITY(1,1),
+    [uuid] NVARCHAR(1000) NOT NULL,
     [employeeId] INT NOT NULL,
+    [companyId] INT NOT NULL,
     [onBoarding] DATETIME2 NOT NULL,
     [offBoarding] DATETIME2 NOT NULL,
     [reason] VARCHAR(255) NOT NULL,
     [remarks] VARCHAR(255),
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [EmploymentHistory_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT [EmploymentHistory_pkey] PRIMARY KEY CLUSTERED ([id])
+    CONSTRAINT [EmploymentHistory_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [EmploymentHistory_uuid_key] UNIQUE NONCLUSTERED ([uuid])
 );
 
 -- CreateTable
 CREATE TABLE [dbo].[LeaveRequest] (
     [id] INT NOT NULL IDENTITY(1,1),
     [employeeId] INT NOT NULL,
+    [status] VARCHAR(20) NOT NULL CONSTRAINT [LeaveRequest_status_df] DEFAULT 'pending',
     [uuid] NVARCHAR(1000) NOT NULL,
     [from] DATETIME2 NOT NULL,
     [to] DATETIME2 NOT NULL,
     [numberOfWorkingDays] INT NOT NULL,
-    [resume] DATETIME2 NOT NULL,
+    [resumeOn] DATETIME2 NOT NULL,
     [reasons] NVARCHAR(1000),
     [absenceType] VARCHAR(20) NOT NULL,
     [isPaid] INT NOT NULL,
     [isHrNoted] TINYINT NOT NULL CONSTRAINT [LeaveRequest_isHrNoted_df] DEFAULT 0,
+    [approvedBy] TEXT NOT NULL,
+    [isApprovalDefault] TINYINT NOT NULL CONSTRAINT [LeaveRequest_isApprovalDefault_df] DEFAULT 1,
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [LeaveRequest_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT [LeaveRequest_pkey] PRIMARY KEY CLUSTERED ([id]),
     CONSTRAINT [LeaveRequest_uuid_key] UNIQUE NONCLUSTERED ([uuid])
@@ -150,7 +157,13 @@ ALTER TABLE [dbo].[Employee] ADD CONSTRAINT [Employee_reportingToId_fkey] FOREIG
 ALTER TABLE [dbo].[BankAccount] ADD CONSTRAINT [BankAccount_employeeId_fkey] FOREIGN KEY ([employeeId]) REFERENCES [dbo].[Employee]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE [dbo].[BankAccount] ADD CONSTRAINT [BankAccount_companyId_fkey] FOREIGN KEY ([companyId]) REFERENCES [dbo].[Company]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
 ALTER TABLE [dbo].[EmploymentHistory] ADD CONSTRAINT [EmploymentHistory_employeeId_fkey] FOREIGN KEY ([employeeId]) REFERENCES [dbo].[Employee]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE [dbo].[EmploymentHistory] ADD CONSTRAINT [EmploymentHistory_companyId_fkey] FOREIGN KEY ([companyId]) REFERENCES [dbo].[Company]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE [dbo].[LeaveRequest] ADD CONSTRAINT [LeaveRequest_employeeId_fkey] FOREIGN KEY ([employeeId]) REFERENCES [dbo].[Employee]([id]) ON DELETE CASCADE ON UPDATE CASCADE;
