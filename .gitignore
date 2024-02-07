@@ -7,3 +7,5 @@ public/*
 !public/avatar/.gitkeep
 
 *.env
+
+prisma/migration/*
