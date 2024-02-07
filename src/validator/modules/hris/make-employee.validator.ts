@@ -10,7 +10,7 @@ import {
 	employeeCheckEmailValidator,
 	employeeCheckPhoneNumberValidator,
 } from "../../custom.validator";
-import {formatISO} from "date-fns";
+import {dateSanitizer, objectSanitizer} from "../../custom/sanitizer";
 
 const makeEmployeeValidator = checkSchema({
 	"employee.lastName": {
@@ -75,7 +75,7 @@ const makeEmployeeValidator = checkSchema({
 	"employee.birthday": {
 		...dateRule,
 		customSanitizer: {
-			options: (value) => formatISO(value),
+			options: (value) => dateSanitizer(value),
 		},
 	},
 	"employee.bloodType": {
@@ -119,7 +119,7 @@ const makeEmployeeValidator = checkSchema({
 	"employee.benefits": {
 		notEmpty: true,
 		customSanitizer: {
-			options: (value) => JSON.stringify(value),
+			options: (value) => objectSanitizer(value),
 		},
 	},
 	reportingToUuid: {

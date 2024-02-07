@@ -1,6 +1,7 @@
 import {checkSchema, query} from "express-validator";
 import {checkResetPasswordUuidValidator} from "./custom.validator";
 import {formatISO} from "date-fns";
+import { dateSanitizer } from "./custom/sanitizer";
 
 export const commonStringRule = {
 	notEmpty: {
@@ -73,9 +74,6 @@ export const dateRule = {
 		errorMessage: "Please use ISO 8601 format",
 	},
 	toDate: true,
-	customSanitizer: {
-		options: (value: Date) => formatISO(value),
-	},
 };
 
 export const queryRule = query("keyword")
