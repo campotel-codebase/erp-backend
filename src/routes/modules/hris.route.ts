@@ -15,7 +15,7 @@ import {
 } from "../../functions/modules/hris/patch.hris.function";
 import {uploadCsv, uploadImage} from "../../middlewares/multer.middleware";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
-import {queryRule} from "../../validator/common.validator";
+import {queryRule} from "../../validator/shared.validator";
 import {
 	isEmployeeBelongToCompany,
 	isEmployeeBelongToCompanyForIs,

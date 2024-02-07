@@ -5,7 +5,7 @@ import {
 	emailRule,
 	phoneNumberRule,
 	dateRule,
-} from "../../common.validator";
+} from "../../shared.validator";
 import {dateSanitizer, objectSanitizer} from "../../custom/sanitizer";
 import {
 	employeeCheckEmailValidator,

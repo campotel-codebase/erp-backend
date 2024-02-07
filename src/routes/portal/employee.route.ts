@@ -3,7 +3,7 @@ import {makeLeaveRequest} from "../../functions/portal/post.portal.function";
 import {getLeaveRequest} from "../../functions/portal/get.portal.function";
 import {updateLeaveRequestStatus} from "../../functions/portal/patch.portal.function";
 import {findEmployee, getEmployee} from "../../functions/shared.function";
-import {queryRule} from "../../validator/common.validator";
+import {queryRule} from "../../validator/shared.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
 const portal = express.Router();
 

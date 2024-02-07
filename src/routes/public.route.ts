@@ -7,7 +7,7 @@ import {
 } from "../functions/portal/post.portal.function";
 import {expressValidatorResult} from "../middlewares/express-validator.middleware";
 import {userSignInVS, userSignUpVS, userForgotPasswordVS} from "../validator/user.validator";
-import {resetPasswordVS} from "../validator/common.validator";
+import {resetPasswordVS} from "../validator/shared.validator";
 const publicRoute = express.Router();
 
 /* 
