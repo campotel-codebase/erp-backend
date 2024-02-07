@@ -7,7 +7,6 @@ import {
 } from "../functions/portal/post.portal.function";
 import {expressValidatorResult} from "../middlewares/express-validator.middleware";
 import {userSignInVS, userSignUpVS, userForgotPasswordVS} from "../validator/user.validator";
-import {EmployeeForgotPasswordVS, employeeSignInVS} from "../validator/employee.validator";
 import {resetPasswordVS} from "../validator/common.validator";
 const publicRoute = express.Router();
 
@@ -66,30 +65,22 @@ publicRoute.post(
 );
 
 // Portal
-publicRoute.post(
-	"/employee/sign-in",
-	[...employeeSignInVS, expressValidatorResult],
-	async (req: Request, res: Response) => {
-		try {
-			const {status, data} = await employeeSignIn(req.body);
-			res.status(status).json(data);
-		} catch (error: any) {
-			res.status(500).json({error: error.message});
-		}
-	},
-);
-publicRoute.post(
-	"/employee/forgot-password",
-	[...EmployeeForgotPasswordVS, expressValidatorResult],
-	async (req: Request, res: Response) => {
-		try {
-			const {status, data} = await employeePwdResetLink(req.body.email);
-			res.status(status).json(data);
-		} catch (error: any) {
-			res.status(500).json({error: error.message});
-		}
-	},
-);
+publicRoute.post("/employee/sign-in", async (req: Request, res: Response) => {
+	try {
+		const {status, data} = await employeeSignIn(req.body);
+		res.status(status).json(data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+publicRoute.post("/employee/forgot-password", async (req: Request, res: Response) => {
+	try {
+		const {status, data} = await employeePwdResetLink(req.body.email);
+		res.status(status).json(data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
 publicRoute.post(
 	"/employee/reset-password/:passwordResetUuid",
 	[...resetPasswordVS, expressValidatorResult],
