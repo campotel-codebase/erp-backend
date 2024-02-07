@@ -24,6 +24,7 @@ import {updateEmployeeAvatar} from "../../functions/modules/hris/put.hris.functi
 import {findEmployee, getEmployee} from "../../functions/shared.function";
 import makeEmployeesValidator from "../../validator/modules/hris/make-employees.validator";
 import makeEmployeeValidator from "../../validator/modules/hris/make-employee.validator";
+import makeBankAccountValidator from "../../validator/modules/hris/make-bank-account.validator";
 
 const hris = express.Router();
 
@@ -163,7 +164,7 @@ hris.patch(
 );
 hris.patch(
 	"/update/assign-bank-account-to-employee/:employeeUuid",
-	[isEmployeeBelongToCompany],
+	[isEmployeeBelongToCompany, ...makeBankAccountValidator, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const selectedEmployee = req.selectedEmployee;
