@@ -31,3 +31,11 @@ export const setBenefits = async (body: {benefits: string}, companyUuid: string)
 	});
 	return {status: 200, data: newBenefits};
 };
+
+export const setAbsenceTypes = async (body: {absenceTypes: string}, companyUuid: string) => {
+	const newAbsenceTypes = await prisma.company.update({
+		where: {uuid: companyUuid},
+		data: body,
+	});
+	return {status: 200, data: newAbsenceTypes};
+};

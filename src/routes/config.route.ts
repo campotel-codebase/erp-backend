@@ -1,5 +1,6 @@
 import express, {Request, Response} from "express";
 import {
+	setAbsenceTypes,
 	setBenefits,
 	setDepartments,
 	setJobTitles,
@@ -57,6 +58,19 @@ config.patch("/set/benefits", async (req: Request, res: Response) => {
 	};
 	try {
 		const {status, data} = await setBenefits(prepData, companyUuid);
+		res.status(status).json(data);
+	} catch (error: any) {
+		res.status(500).json({error: error.message});
+	}
+});
+config.patch("/set/absence-types", async (req: Request, res: Response) => {
+	const companyUuid = req.userAuthCreds.company.uuid;
+	const toString = JSON.stringify(req.body.absenceTypes);
+	const prepData = {
+		absenceTypes: toString,
+	};
+	try {
+		const {status, data} = await setAbsenceTypes(prepData, companyUuid);
 		res.status(status).json(data);
 	} catch (error: any) {
 		res.status(500).json({error: error.message});

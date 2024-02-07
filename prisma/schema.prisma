@@ -25,6 +25,7 @@ model Company {
   talentSegments    String?             @db.VarChar(255)
   employmentTypes   String?             @db.VarChar(255)
   benefits          String?             @db.VarChar(255)
+  absenceTypes      String?             @db.VarChar(255)
   User              User[]
   Employee          Employee[]
   EmploymentHistory EmploymentHistory[]
