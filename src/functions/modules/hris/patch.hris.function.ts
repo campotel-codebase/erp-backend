@@ -1,6 +1,5 @@
 import {formatISO} from "date-fns";
 import prisma from "../../../../libs/prisma";
-import {offBoardType} from "../../../../types/modules/hris/employees";
 import {generateUuid} from "../../../utils/uuid.util";
 import {bankAccountType} from "../../../../types/modules/hris/payroll";
 import {Prisma} from "@prisma/client";
@@ -10,7 +9,7 @@ import {selectedEmployeeType} from "../../../../types/modules/hris/selected-empl
 export const updateEmployeeEmploymentStatus = async (
 	company: userAuthCredentialsType["company"],
 	selectedEmployee: selectedEmployeeType,
-	body: offBoardType,
+	body: Prisma.EmploymentHistoryCreateInput,
 ) => {
 	if (selectedEmployee.isActive) {
 		const newOffBoardedEmployee = await prisma.employee.update({
@@ -32,11 +31,9 @@ export const updateEmployeeEmploymentStatus = async (
 		if (newOffBoardedEmployee.hiredDate) {
 			await prisma.employmentHistory.create({
 				data: {
+					...body,
 					uuid: await generateUuid(),
-					offBoarding: formatISO(body.offBoarding),
 					onBoarding: newOffBoardedEmployee.hiredDate,
-					reason: body.reason,
-					remarks: body.remarks,
 					Employee: {
 						connect: {id: newOffBoardedEmployee.id},
 					},

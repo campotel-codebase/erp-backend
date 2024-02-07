@@ -25,6 +25,7 @@ import {findEmployee, getEmployee} from "../../functions/shared.function";
 import makeEmployeesValidator from "../../validator/modules/hris/make-employees.validator";
 import makeEmployeeValidator from "../../validator/modules/hris/make-employee.validator";
 import makeBankAccountValidator from "../../validator/modules/hris/make-bank-account.validator";
+import makeEmploymentHistoryValidator from "../../validator/modules/hris/make-employment-history.validator";
 
 const hris = express.Router();
 
@@ -148,7 +149,7 @@ hris.post(
 
 hris.patch(
 	"/update/offboard-employee/:employeeUuid",
-	[isEmployeeBelongToCompany],
+	[isEmployeeBelongToCompany, ...makeEmploymentHistoryValidator, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const company = req.userAuthCreds.company;
 		const selectedEmployee = req.selectedEmployee;
