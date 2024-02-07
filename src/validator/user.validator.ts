@@ -1,6 +1,6 @@
 import {checkSchema} from "express-validator";
 import {commonStringRule, passwordRule, emailRule, personNameRule} from "./common.validator";
-import {userCheckEmailValidator} from "./custom.validator";
+import {userCheckEmailValidator} from "./custom/validator";
 
 export const userSignUpVS = checkSchema({
 	companyName: {

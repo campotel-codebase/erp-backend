@@ -1,7 +1,5 @@
 import {checkSchema, query} from "express-validator";
-import {checkResetPasswordUuidValidator} from "./custom.validator";
-import {formatISO} from "date-fns";
-import { dateSanitizer } from "./custom/sanitizer";
+import {checkResetPasswordUuidValidator} from "./custom/validator";
 
 export const commonStringRule = {
 	notEmpty: {

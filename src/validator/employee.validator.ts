@@ -1,5 +1,5 @@
 import {checkSchema} from "express-validator";
-import {employeeCheckEmailValidator} from "./custom.validator";
+import {employeeCheckEmailValidator} from "./custom/validator";
 
 export const employeeSignInVS = checkSchema({
 	email: {

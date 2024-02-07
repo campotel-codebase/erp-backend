@@ -6,11 +6,11 @@ import {
 	phoneNumberRule,
 	dateRule,
 } from "../../common.validator";
+import {dateSanitizer, objectSanitizer} from "../../custom/sanitizer";
 import {
 	employeeCheckEmailValidator,
 	employeeCheckPhoneNumberValidator,
-} from "../../custom.validator";
-import {dateSanitizer, objectSanitizer} from "../../custom/sanitizer";
+} from "../../custom/validator";
 
 const makeEmployeeValidator = checkSchema({
 	"employee.lastName": {
