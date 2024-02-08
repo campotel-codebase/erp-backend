@@ -109,6 +109,9 @@ const makeEmployeeValidator = checkSchema({
 	},
 	"employee.hiredDate": {
 		...dateValidator,
+		customSanitizer: {
+			options: (value) => dateSanitizer(value),
+		},
 	},
 	"employee.employmentType": {
 		...commonStringValidator,
