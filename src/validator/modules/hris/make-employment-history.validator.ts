@@ -1,16 +1,16 @@
 import {checkSchema} from "express-validator";
 import {dateSanitizer} from "../../custom/sanitizer";
-import {commonStringRule, dateRule} from "../../shared.validator";
+import {commonStringValidator, dateValidator} from "../../shared.validator";
 
 const makeEmploymentHistoryValidator = checkSchema({
 	offBoarding: {
-		...dateRule,
+		...dateValidator,
 		customSanitizer: {
 			options: (value) => dateSanitizer(value),
 		},
 	},
-	reason: {...commonStringRule},
-	remarks: {...commonStringRule},
+	reason: {...commonStringValidator},
+	remarks: {...commonStringValidator},
 });
 
 export default makeEmploymentHistoryValidator;

@@ -1,23 +1,17 @@
 import {checkSchema} from "express-validator";
-import {
-	personNameRule,
-	commonStringRule,
-	emailRule,
-	phoneNumberRule,
-	dateRule,
-} from "../../shared.validator";
+import {commonStringValidator} from "../../shared.validator";
 const makeBankAccountValidator = checkSchema({
 	bankName: {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	accountNumber: {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	cardNumber: {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	accountType: {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 });
 

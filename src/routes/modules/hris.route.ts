@@ -15,7 +15,7 @@ import {
 } from "../../functions/modules/hris/patch.hris.function";
 import {uploadCsv, uploadImage} from "../../middlewares/multer.middleware";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
-import {queryRule} from "../../validator/shared.validator";
+import {queryValidator} from "../../validator/shared.validator";
 import {
 	isEmployeeBelongToCompany,
 	isEmployeeBelongToCompanyForIs,
@@ -59,7 +59,7 @@ hris.get(
 );
 hris.get(
 	"/find/employee",
-	[queryRule, expressValidatorResult],
+	[queryValidator, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const companyUuid = req.userAuthCreds.company.uuid;
 		const keyword = req.query.keyword;
