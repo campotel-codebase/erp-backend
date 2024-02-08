@@ -3,7 +3,7 @@ import {makeLeaveRequest} from "../../functions/portal/post.portal.function";
 import {getLeaveRequest} from "../../functions/portal/get.portal.function";
 import {updateLeaveRequestStatus} from "../../functions/portal/patch.portal.function";
 import {findEmployee, getEmployee} from "../../functions/shared.function";
-import {queryRule} from "../../validator/shared.validator";
+import {queryValidator} from "../../validator/shared.validator";
 import {expressValidatorResult} from "../../middlewares/express-validator.middleware";
 const portal = express.Router();
 
@@ -38,7 +38,7 @@ portal.get("/get/employee-profile", async (req: Request, res: Response) => {
 });
 portal.get(
 	"/find/employee",
-	[queryRule, expressValidatorResult],
+	[queryValidator, expressValidatorResult],
 	async (req: Request, res: Response) => {
 		const companyUuid = req.employeeAuthCreds.company.uuid;
 		const keyword = req.query.keyword;

@@ -1,19 +1,24 @@
 import {checkSchema} from "express-validator";
-import {commonStringRule, passwordRule, emailRule, personNameRule} from "./shared.validator";
+import {
+	commonStringValidator,
+	passwordValidator,
+	emailValidator,
+	personNameValidator,
+} from "./shared.validator";
 import {userCheckEmailValidator} from "./custom/validator";
 
 export const userSignUpVS = checkSchema({
 	companyName: {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	lastName: {
-		...personNameRule,
+		...personNameValidator,
 	},
 	firstName: {
-		...personNameRule,
+		...personNameValidator,
 	},
 	email: {
-		...emailRule,
+		...emailValidator,
 		custom: {
 			options: async (value: string) => {
 				const isEmailUsed = await userCheckEmailValidator(value);
@@ -23,7 +28,7 @@ export const userSignUpVS = checkSchema({
 			},
 		},
 	},
-	password: passwordRule,
+	password: passwordValidator,
 });
 
 export const userSignInVS = checkSchema({

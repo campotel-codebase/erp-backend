@@ -1,10 +1,10 @@
 import {checkSchema} from "express-validator";
 import {
-	personNameRule,
-	commonStringRule,
-	emailRule,
-	phoneNumberRule,
-	dateRule,
+	personNameValidator,
+	commonStringValidator,
+	emailValidator,
+	phoneNumberValidator,
+	dateValidator,
 } from "../../shared.validator";
 import {dateSanitizer, objectSanitizer} from "../../custom/sanitizer";
 import {
@@ -14,10 +14,10 @@ import {
 
 const makeEmployeeValidator = checkSchema({
 	"employee.lastName": {
-		...personNameRule,
+		...personNameValidator,
 	},
 	"employee.firstName": {
-		...personNameRule,
+		...personNameValidator,
 	},
 	"employee.middleName": {
 		optional: {
@@ -48,10 +48,10 @@ const makeEmployeeValidator = checkSchema({
 		errorMessage: "field must be a non-empty string",
 	},
 	"employee.suffix": {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	"employee.email": {
-		...emailRule,
+		...emailValidator,
 		custom: {
 			options: async (value: string) => {
 				const isEmailUsed = await employeeCheckEmailValidator(value);
@@ -62,7 +62,7 @@ const makeEmployeeValidator = checkSchema({
 		},
 	},
 	"employee.phoneNumber": {
-		...phoneNumberRule,
+		...phoneNumberValidator,
 		custom: {
 			options: async (value: string) => {
 				const isPhoneNumberUsed = await employeeCheckPhoneNumberValidator(value);
@@ -73,16 +73,16 @@ const makeEmployeeValidator = checkSchema({
 		},
 	},
 	"employee.birthday": {
-		...dateRule,
+		...dateValidator,
 		customSanitizer: {
 			options: (value) => dateSanitizer(value),
 		},
 	},
 	"employee.bloodType": {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	"employee.salary": {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	"employee.driverLicense": {
 		trim: true,
@@ -96,25 +96,28 @@ const makeEmployeeValidator = checkSchema({
 		errorMessage: "field must be a non-empty string",
 	},
 	"employee.taxId": {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	"employee.department": {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	"employee.jobTitle": {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	"employee.talentSegment": {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	"employee.hiredDate": {
-		...dateRule,
+		...dateValidator,
+		customSanitizer: {
+			options: (value) => dateSanitizer(value),
+		},
 	},
 	"employee.employmentType": {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	"employee.employeeCompanyId": {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 	"employee.benefits": {
 		notEmpty: true,
@@ -123,7 +126,7 @@ const makeEmployeeValidator = checkSchema({
 		},
 	},
 	reportingToUuid: {
-		...commonStringRule,
+		...commonStringValidator,
 	},
 });
 

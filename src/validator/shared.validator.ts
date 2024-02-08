@@ -1,7 +1,7 @@
 import {checkSchema, query} from "express-validator";
 import {checkResetPasswordUuidValidator} from "./custom/validator";
 
-export const commonStringRule = {
+export const commonStringValidator = {
 	notEmpty: {
 		bail: true,
 		errorMessage: "this field is required",
@@ -12,7 +12,7 @@ export const commonStringRule = {
 	trim: true,
 };
 
-export const personNameRule = {
+export const personNameValidator = {
 	notEmpty: {
 		bail: true,
 		errorMessage: "this field is required",
@@ -28,15 +28,15 @@ export const personNameRule = {
 	},
 };
 
-export const passwordRule = {
-	...commonStringRule,
+export const passwordValidator = {
+	...commonStringValidator,
 	isLength: {
 		options: {min: 8},
 		errorMessage: "value is required and should be at least 8 characters",
 	},
 };
 
-export const emailRule = {
+export const emailValidator = {
 	trim: true,
 	isEmail: {
 		bail: true,
@@ -49,7 +49,7 @@ export const emailRule = {
 	},
 };
 
-export const phoneNumberRule = {
+export const phoneNumberValidator = {
 	notEmpty: {
 		bail: true,
 		errorMessage: "this field is required",
@@ -66,7 +66,7 @@ export const phoneNumberRule = {
 	},
 };
 
-export const dateRule = {
+export const dateValidator = {
 	isISO8601: {
 		bail: true,
 		errorMessage: "Please use ISO 8601 format",
@@ -74,16 +74,16 @@ export const dateRule = {
 	toDate: true,
 };
 
-export const queryRule = query("keyword")
+export const queryValidator = query("keyword")
 	.notEmpty()
 	.trim()
 	.withMessage("valid keyword value is required");
 
 /* Special ue case */
 export const resetPasswordVS = checkSchema({
-	newPassword: passwordRule,
+	newPassword: passwordValidator,
 	passwordResetUuid: {
-		...commonStringRule,
+		...commonStringValidator,
 		custom: {
 			options: async (value: string) => {
 				const isPasswordResetUuidExists = await checkResetPasswordUuidValidator(value);
